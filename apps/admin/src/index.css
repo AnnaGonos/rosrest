@@ -1,0 +1,26 @@
+.page-main, .page-main * {
+	max-width: none !important;
+}
+@import '../../../site/src/index.css';
+
+
+.admin-block {
+  padding-top: 20px;
+}
+
+.form-label {
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.modal-content-md {
+  max-width: 700px;
+  margin: auto;
+}
+
+
+body {
+  font-family: 'Inter', 'Inter', sans-serif;
+}
+
+
