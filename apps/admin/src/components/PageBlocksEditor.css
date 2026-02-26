@@ -1,0 +1,39 @@
+.no-caret::after {
+  display: none !important;
+}
+
+.card-body {
+    color: #000 !important;
+    padding: 0;
+    border: none;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    /* border-bottom: #ffffff 1px dashed;
+    border-top: #ffffff 1px dashed; */
+    padding-top: 10px;
+    color: #000 !important;
+}
+
+.tx02, .tx03 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tx03 {
+  text-align: center;
+}
+
+.tx02 p, .tx03 p {
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
