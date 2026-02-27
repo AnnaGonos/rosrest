@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписка на новости РАР</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    
+                    <!-- Заголовок -->
+                    <tr>
+                        <td style="background-color: #1D407C; color: #ffffff; padding: 30px 40px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 24px; font-weight: 600;">
+                                Российская ассоциация реставраторов
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <!-- Основной контент -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            
+                            <h2 style="color: #1D407C; font-size: 20px; margin: 0 0 20px 0;">
+                                Спасибо за подписку!
+                            </h2>
+
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+                                Здравствуйте!
+                            </p>
+
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+                                Вы успешно подписались на рассылку новостей Российской ассоциации реставраторов 
+                                на адрес <strong>{{email}}</strong>.
+                            </p>
+
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 15px 0;">
+                                Теперь вы будете получать:
+                            </p>
+
+                            <ul style="color: #333333; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0; padding-left: 20px;">
+                                <li>Еженедельный дайджест новых публикаций</li>
+                                <li>Важные новости из ассоциации</li>
+                                <li>Информацию о событиях и мероприятиях</li>
+                                <li>Обновления законодательства</li>
+                            </ul>
+
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 25px 0;">
+                                Письма будут приходить не чаще одного раза в неделю.
+                            </p>
+
+                            <!-- Кнопка -->
+                            <table cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 10px 0 30px 0;">
+                                        <a href="{{siteUrl}}" 
+                                           style="display: inline-block; padding: 14px 30px; background-color: #1D407C; color: #ffffff; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: 600;">
+                                            Перейти на сайт
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 0;">
+                                С уважением,<br>
+                                Команда РАР
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- Подвал -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 30px 40px; border-top: 1px solid #e0e0e0;">
+                            
+                            <p style="color: #666666; font-size: 13px; line-height: 1.6; margin: 0 0 10px 0; text-align: center;">
+                                <strong>Российская ассоциация реставраторов</strong>
+                            </p>
+
+                            <p style="color: #666666; font-size: 12px; line-height: 1.6; margin: 0 0 10px 0; text-align: center;">
+                                Вы получили это письмо, потому что подписались на новости<br>
+                                на сайте {{siteUrl}} используя адрес {{email}}
+                            </p>
+
+                            <p style="color: #666666; font-size: 12px; line-height: 1.6; margin: 0 0 10px 0; text-align: center;">
+                                <a href="{{unsubscribeUrl}}" style="color: #1D407C; text-decoration: underline;">
+                                    Отписаться от рассылки
+                                </a>
+                            </p>
+
+                            <p style="color: #999999; font-size: 11px; line-height: 1.5; margin: 0; text-align: center;">
+                                Это письмо отправлено автоматически, пожалуйста, не отвечайте на него.<br>
+                                Контакты: {{siteUrl}}
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
