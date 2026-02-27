@@ -1,0 +1,152 @@
+.about-page__header {
+    grid-column: 2 / 8;
+}
+
+.about-page__image-wrapper {
+    display: flex;
+    width: 100%;
+}
+
+.team-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.team-card {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    background: #fff;
+}
+
+.team-card__image {
+    width: 100%;
+    height: 350px;
+    flex: 0 0 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    Object-fit: cover;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.team-card__image a {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.team-card__image img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.team-card__placeholder {
+    font-weight: 700;
+    color: var(--dark-default);
+}
+
+.team-card__info {
+    display: flex;
+    flex-direction: column;
+}
+
+.team-card__name {
+    padding-bottom: 10px
+}
+
+.team-card__position {
+    color: var(--dark-medium);
+    margin-bottom: 6px;
+
+}
+
+.team-card__contacts a {
+    display: block;
+    color: var(--dark-medium);
+    margin-bottom: 4px
+}
+
+.contacts__container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 80px;
+    gap: 20px;
+    font-weight: 300;
+    font-family: var(--rar-font-manrope);
+}
+
+.contacts__socials-container {
+    color: var(--primary-strong);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    height: 50px;
+}
+
+.contacts__socials-container svg {
+    color: var(--primary-strong);
+}
+
+.contacts__socials-container a i::before {
+    color: var(--primary-strong);
+    height: 30px;
+}
+
+@media (max-width: 900px) {
+    .team-card__image {
+        height: 250px;
+    }
+
+    .team-card__image a {
+        height: 250px;
+    }
+
+    .team-card__image img {
+        height: 250px;
+    }
+}
+
+@media (max-width: 700px) {
+    .team-card {
+        grid-template-columns: 200px 1fr;
+        display: grid;
+    }
+
+    .contacts__container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 60px;
+        gap: 40px;
+    }
+
+    .contacts__socials-container {
+        color: var(--dark-default);
+        display: flex;
+        justify-content: start;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 450px) {
+    .team-card {
+        grid-template-columns: 1fr;
+        display: grid;
+        gap: 20px;
+    }
+
+    .team-card__image {
+        height: 350px;
+    }
+
+    .team-card__image a {
+        height: 350px;
+    }
+
+    .team-card__image img {
+        height: 350px;
+    }
+}

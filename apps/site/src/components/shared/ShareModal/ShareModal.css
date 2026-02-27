@@ -1,0 +1,161 @@
+@import '../../LibraryItemModal.css';
+
+
+.share-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--padding-s);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.share-modal {
+    background: var(--primary-bg);
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+    animation: slideUp 0.3s ease-in-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.share-modal__header,
+.share-modal__content {
+    padding: 0 20px 0 40px;
+}
+
+.share-modal__header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.share-modal__content {
+    padding-bottom: 30px;
+}
+
+
+.share-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--primary-strong);
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s;
+    margin-top: 15px;
+}
+
+.share-modal__close:hover {
+    color: var(--primary-default);
+}
+
+.share-modal__download-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary-bg);
+    color: var(--primary-strong);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    font-size: 18px;
+
+}
+
+.share-modal__download-btn.svg {
+    color: var(--primary-strong);
+    width: 40px;
+    height: 40px;
+}
+
+.tg-color {
+    color: #27a7e7;
+}
+
+.vk-color {
+    color: #0077ff;
+}
+
+.share-modal__close-btn {
+    display: inline-flex;
+    align-items: center;
+    background: var(--primary-bg);
+    color: var(--primary-strong);
+    border: none;
+    cursor: pointer;
+    margin-top: 20px;
+    font-weight: 500;
+}
+
+
+.share__download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+    height: 40px;
+    width: 40px;
+    background: var(--primary-default);
+    color: var(--primary-bg);
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.share__download-btn:hover {
+    background: var(--primary-strong);
+}
+
+.share-modal__close-btn p {
+    font-family: var(--rar-font-raleway);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+
+    .share-modal__header,
+    .share-modal__content {
+        padding: 0 10px 0 20px;
+    }
+
+    .share-modal__content {
+        padding-bottom: 30px;
+    }
+}
+
+

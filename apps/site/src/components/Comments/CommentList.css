@@ -1,0 +1,138 @@
+.comment-list {
+  max-width: 700px;
+  margin: 40px 0;
+  font-family: var(--rar-font-manrope);
+}
+
+.comment-list__title {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  font-family: var(--rar-font-manrope);
+}
+
+.comment-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comment-item {
+  background: white;
+  padding: 16px;
+}
+
+.comment-item--depth-1 {
+  margin-left: 24px;
+}
+
+.comment-item--depth-2 {
+  margin-left: 48px;
+}
+
+.comment-item--depth-3 {
+  margin-left: 72px;
+}
+
+.comment-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comment-item__author {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.comment-item__date {
+  font-size: 14px;
+  color: #666;
+}
+
+.comment-item__content {
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+}
+
+.comment-item__reply-btn {
+  background: none;
+  border: none;
+  color: var(--primary-strong, #007bff);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.comment-item__reply-btn:hover {
+  color: var(--primary-dark, #0056b3);
+}
+
+.comment-item__reply-btn i {
+  font-size: 14px;
+}
+
+.comment-item__replies {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.comment-item__reply-form {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.comment-list-loading,
+.comment-list-error,
+.comment-list-empty {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.comment-list-error {
+  color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .comment-list__title {
+    font-size: 20px;
+  }
+
+  .comment-item {
+    padding: 16px;
+  }
+
+  .comment-item__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .comment-item__author {
+    font-size: 15px;
+  }
+
+  .comment-item__date {
+    font-size: 13px;
+  }
+}

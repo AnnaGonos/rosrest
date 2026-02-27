@@ -1,0 +1,194 @@
+.schedule-section {
+    margin-top: 80px;
+}
+
+.schedule-section__title {
+    margin-bottom: 50px;
+}
+
+
+.schedule-section__tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+}
+
+.schedule-section__tab {
+    font-family: var(--rar-font-manrope);
+    padding: 10px 20px;
+    font-size: 15px;
+    border: 1px solid var(--primary-strong);
+    border-radius: 40px;
+    background-color: transparent;
+    color: var(--primary-strong);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.schedule-section__tab:hover {
+    background-color: var(--primary-strong);
+    color: white;
+}
+
+.schedule-section__tab--active {
+    background-color: var(--primary-strong);
+    color: white;
+}
+
+.schedule-section__container {
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+/* День расписания */
+.schedule-day {
+    border-left: 3px solid var(--primary-strong);
+    padding-left: 30px;
+}
+
+.schedule-day__date {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-strong);
+    margin-bottom: 30px;
+}
+
+.schedule-day__blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Блок расписания */
+.schedule-block {
+    display: flex;
+    gap: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--dark-bg-strong);
+}
+
+.schedule-block:last-child {
+    border-bottom: none;
+}
+
+.schedule-block__time {
+    min-width: 120px;
+    font-weight: 600;
+    color: var(--primary-strong);
+    font-family: var(--rar-font-manrope);
+}
+
+.schedule-block__content {
+    flex: 1;
+}
+
+.schedule-block__title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-family: var(--rar-font-manrope);
+}
+
+.schedule-block__location {
+    font-size: 90%;
+    color: var(--primary-strong);
+    border: 1px solid var(--primary-strong);
+    margin-bottom: 12px;
+    width: fit-content;
+    padding: 5px 20px;
+    margin: 20px 0 30px 0;
+    border-radius: 40px;
+    font-family: var(--rar-font-manrope);
+}
+
+.schedule-block__description {
+    color: var(--dark-default);
+    margin-bottom: 20px;
+    font-size: 95%;
+}
+
+.schedule-block__person-section {
+    margin-top: 20px;
+}
+
+.schedule-block__person-title {
+    font-size: 105%;
+    font-weight: 600;
+    color: var(--dark-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    font-family: var(--rar-font-manrope);
+}
+
+.schedule-block__speakers {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.schedule-block__person {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.schedule-block__person-photo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.schedule-block__person-info {
+    flex: 1;
+}
+
+.schedule-block__person-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--dark-default);
+    font-family: var(--rar-font-manrope);
+}
+
+.schedule-block__person-position {
+    font-size: 90%;
+    color: var(--dark-medium);
+    margin-top: 2px;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .schedule-section {
+        margin-top: 60px;
+    }
+
+    .schedule-section__title {
+        margin-bottom: 40px;
+    }
+
+    .schedule-section__container {
+        gap: 40px;
+    }
+
+    .schedule-day {
+        padding-left: 20px;
+    }
+
+    .schedule-block {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .schedule-block__time {
+        min-width: auto;
+    }
+
+    .schedule-block__person-photo {
+        width: 80px;
+        height: 80px;
+    }
+}

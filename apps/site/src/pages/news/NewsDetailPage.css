@@ -1,0 +1,209 @@
+.page__header-news {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.news-detail-page {
+    min-height: 100vh;
+}
+
+.news-detail__meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    font-family: var(--rar-font-manrope);
+    padding: 0;
+}
+
+.news-detail-page .page__container:nth-child(3) {
+    margin-top: 100px;
+    grid-row: 3;
+}
+
+.news-detail-page .page-title {
+    font-size: 1.9rem;
+    min-height: 30%;
+}
+
+.news-detail__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+    font-family: var(--rar-font-manrope);
+}
+
+.news-detail__tag {
+    padding: 4px 10px;
+    border-radius: 40px;
+    height: fit-content;
+    border: 1px solid var(--primary-strong);
+    color: var(--primary-strong);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.news-detail__tag:hover {
+    background-color: var(--primary-strong);
+    color: white;
+}
+
+.news-detail__all-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+    font-family: var(--rar-font-manrope);
+}
+
+.news-detail__all-tags .news-detail__tag {
+    padding: 8px 20px;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.news-detail__content-tags {
+    display: flex;
+    justify-content: center;
+    text-transform: uppercase;
+    margin-top: 30px;
+    font-family: var(--rar-font-manrope);
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    color: var(--primary-strong);
+}
+
+.news-detail__content-tags-label {
+    margin-right: 3px;
+}
+
+.news-detail__content-tag-link {
+    color: var(--primary-strong);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+    margin-left: 2px;
+}
+
+.news-detail__content-tag-link:hover {
+    border-bottom: 1px solid var(--primary-strong);
+}
+
+.news-detail__comments-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 40px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    color: #fff;
+    background-color: var(--primary-strong);
+    border: 1px solid var(--primary-strong);
+}
+
+.news-detail__comments-counter:hover {
+    background-color: #fff;
+    border-color: var(--primary-strong);
+    color: var(--primary-strong);
+}
+
+.news-detail__comments-counter i {
+    font-size: 20px;
+}
+
+.news-detail__preview-image {
+    width: 100%;
+    max-width: 1200px;
+    max-height: 600px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.news-detail__preview-image img {
+    width: 100%;
+    max-height: 600px;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.section-recommendations {
+    margin-top: 120px;
+}
+
+.section-recommendations__title {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.section-recommendations .news-card__image-wrapper {
+    height: 220px;
+}
+
+.section-recommendations .news-card__title {
+    font-size: 15px;
+}
+
+.section-recommendations .arrow-button__arrow {
+    width: 40px;
+    min-height: 32px;
+}
+
+.section-recommendations .arrow-button__arrow .icon--sm {
+    font-size: 14px;
+}
+
+@media (max-width: 950px) {
+    .page__header-news {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .news-detail__meta {
+        height: fit-content;
+    }
+
+    .news-detail__preview-image {
+        max-height: 450px;
+    }
+
+    .news-detail__preview-image img {
+        max-height: 450px;
+    }
+}
+
+@media (max-width: 768px) {
+    
+
+    .news-detail__meta {
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .section-recommendations {
+        margin-top: 80px;
+    }
+
+    .section-recommendations__title {
+        margin-bottom: 30px;
+    }
+
+    .news-detail-page .page-title {
+        font-size: 1.4rem;
+    }
+
+    .news-detail__content-tags {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+}

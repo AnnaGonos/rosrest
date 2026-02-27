@@ -1,0 +1,70 @@
+.scroll-to-top-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    color: var(--primary-strong);
+    border: 1px solid var(--primary-strong);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+    z-index: 289;
+    font-size: 13px;
+    padding: 0;
+    line-height: 1;
+}
+
+.scroll-to-top-button:hover {
+    background-color: white;
+    transform: translateY(-2px);
+}
+
+.scroll-to-top-button:active {
+    transform: translateY(0);
+}
+
+.scroll-to-top-button.visible {
+    opacity: 1;
+    visibility: visible;
+    background-color: white;
+}
+
+.scroll-to-top-button i {
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+
+/* Адаптивный дизайн для мобильных устройств */
+@media (max-width: 768px) {
+    .scroll-to-top-button {
+        width: 45px;
+        height: 45px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    .scroll-to-top-button svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .scroll-to-top-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 35px;
+        height: 35px;
+        font-size: 11px;
+    }
+}

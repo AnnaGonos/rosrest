@@ -1,0 +1,101 @@
+.banner {
+  display: flex;
+  gap: 10px;
+  align-items: start;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  .banner {
+    display: flex;
+    gap: 2px;
+    align-items: start;
+    padding: 10px 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-left: 2px solid;
+    transition: all 0.3s ease;
+  }
+
+  .message-container {
+    gap: 5px;
+    flex: 1;
+    padding: 5px 0;
+  }
+
+  .iconWrapper {
+    margin-right: 0;
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+  padding: 5px 0;
+}
+
+.message-container__title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Синяя тема (по умолчанию) */
+.default {
+  background-color: #f6faff;
+  border-left-color: var(--primary-default);
+}
+
+.default .iconWrapper {
+  color: var(--primary-default);
+}
+
+/* Зеленая тема (успех) */
+.success {
+  background-color: #e8f5e9;
+  border-left-color: #4caf50;
+  color: #1b5e20;
+}
+
+.success .iconWrapper {
+  color: #4caf50;
+}
+
+/* Желтая тема (предупреждение) */
+.warning {
+  background-color: #fff3e0;
+  border-left-color: #ff9800;
+}
+
+.warning .iconWrapper {
+  color: #ff9800;
+}
+
+/* Красная тема (ошибка) */
+.error {
+  background-color: #ffebee;
+  border-left-color: #f44336;
+}
+
+.error .iconWrapper {
+  color: #f44336;
+}
+
+/*
+.banner:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+} */

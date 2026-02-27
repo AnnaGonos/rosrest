@@ -1,0 +1,16 @@
+.page__back-button {
+    grid-column: 1 / span 8;
+    grid-row: 2;
+}
+
+@media (max-width: 768px) {
+    .pagination {
+        gap: 8px;
+    }
+
+    .pagination__item {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}

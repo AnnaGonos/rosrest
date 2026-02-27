@@ -1,0 +1,115 @@
+.education-page__description {
+    max-width: 760px;
+    margin-top: 12px;
+    color: #4a5568;
+}
+
+.education-page__loading,
+.education-page__error,
+.education-page__empty {
+    padding: 40px 0;
+    text-align: center;
+    color: #4a5568;
+}
+
+.education-image-banner {
+    max-height: 400px;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    align-content: start;
+    justify-content: flex-start;
+}
+
+.education-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.education-card {
+    display: grid;
+    grid-template-columns: 250px auto;
+    gap: 20px;
+    border-top: var(--primary-strong) 1px solid;
+    padding-top: 15px;
+}
+
+.education-card:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+
+.education-card__image-wrapper {
+    /* background: #f8fafc; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.education-card__image {
+    max-height: 200px;
+    /* max-height: 120px; */
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.education-card__body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.education-card__title {
+    font-size: 18px;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.education-card__link {
+    color: #1d407c;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.education-card__link:hover {
+    text-decoration: underline;
+}
+
+.education-card__specialties {
+    margin-top: 4px;
+    color: #2d3748;
+}
+
+.education-card__specialties-label {
+    display: block;
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+.education-card__specialties ul {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 4px;
+}
+
+@media (max-width: 700px) {
+    .education-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .education-card__image {
+        height: 200px;
+        width: 70%;
+    }
+
+    .education-card__body {
+        padding: 12px 0 0 0;
+    }
+}

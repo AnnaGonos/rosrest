@@ -1,0 +1,113 @@
+.news-subscribe-form {
+  background: linear-gradient(135deg, var(--primary-strong) 0%, #0056b3 100%);
+  color: white;
+  padding: 32px;
+  border-radius: 12px;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.news-subscribe-form__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  font-family: var(--rar-font-manrope);
+}
+
+.news-subscribe-form__description {
+  font-size: 14px;
+  margin: 0 0 24px 0;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.news-subscribe-form__input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.news-subscribe-form__input {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: var(--rar-font-manrope);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.news-subscribe-form__input:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.news-subscribe-form__input:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.news-subscribe-form__button {
+  padding: 12px 28px;
+  background-color: white;
+  color: var(--primary-strong);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--rar-font-manrope);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.news-subscribe-form__button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.news-subscribe-form__button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.news-subscribe-form__button:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+.news-subscribe-form__error {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffe0e0;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.news-subscribe-form__success {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ccffcc;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .news-subscribe-form {
+    padding: 24px;
+  }
+
+  .news-subscribe-form__title {
+    font-size: 20px;
+  }
+
+  .news-subscribe-form__input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .news-subscribe-form__button {
+    width: 100%;
+  }
+}

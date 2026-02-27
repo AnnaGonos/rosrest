@@ -1,0 +1,20 @@
+.press-center__sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.press-center__sections .section-title--sm {
+    text-transform: uppercase;
+}
+
+
+@media (max-width: 1199px) {
+    .press-center__sections {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        justify-content: space-between;
+    }
+}

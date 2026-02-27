@@ -1,0 +1,142 @@
+.arrow-link,
+.primary-link,
+.outline-link,
+.outline-arrow-link,
+.arrow-button__arrow {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--rar-font-manrope);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease, transform 60ms ease;
+}
+
+button.outline-link {
+    background: transparent;
+}
+
+.arrow-link,
+.primary-link,
+.outline-link {
+    align-items: center;
+    justify-content: center;
+}
+
+.arrow-link,
+.arrow-link:visited {
+    color: var(--primary-strong);
+    height: 100%;
+}
+
+.arrow-link i:hover {
+    color: var(--primary-bg-strong);
+}
+
+.arrow-link:focus,
+.arrow-link:active {
+    outline: 2px solid var(--dark-default-light);
+    color: var(--dark-default-light);
+}
+
+.arrow-link i:focus,
+.arrow-link i:active {
+    color: var(--dark-default-light);
+}
+
+.primary-link,
+.outline-link,
+.arrow-button__arrow {
+    border-radius: 40px;
+    min-height: 40px;
+    border: 1px solid var(--primary-strong);
+}
+
+.primary-link,
+.outline-link {
+    padding: 5px 25px;
+}
+
+.outline-link,
+.outline-arrow-link .outline-link,
+.outline-link:visited {
+    color: var(--primary-strong);
+}
+
+.primary-link,
+.primary-link:visited {
+    background: var(--primary-strong);
+    color: var(--primary-bg);
+}
+
+.primary-link:hover,
+.outline-link:hover,
+.arrow-button__arrow:hover,
+.outline-arrow-link:hover .outline-link,
+.outline-arrow-link:hover .arrow-button__arrow {
+    color: var(--primary-strong);
+    background-color: var(--primary-bg-strong);
+}
+
+.arrow-button__arrow i {
+    color: var(--primary-bg)
+}
+
+.arrow-button__arrow:hover i {
+    color: var(--primary-strong)
+}
+
+.primary-link:focus,
+.primary-link:active,
+.outline-link:focus,
+.outline-link:active,
+.arrow-button__arrow:focus,
+.arrow-button__arrow:active,
+.outline-arrow-link:focus .outline-link,
+.outline-arrow-link:active .outline-link,
+.outline-arrow-link:focus .arrow-button__arrow,
+.outline-arrow-link:active .arrow-button__arrow {
+    outline: 1px solid var(--primary-strong);
+    color: var(--primary-strong);
+    background-color: var(--dark-bg-strong);
+}
+
+.arrow-button__arrow,
+.arrow-button__arrow:visited {
+    align-content: center;
+    justify-content: center;
+    width: 50px;
+    background-color: var(--primary-strong);
+}
+
+.outline-arrow-link:hover .arrow-button__arrow i {
+    color: var(--primary-strong);
+}
+
+.back-button {
+    gap: 10px;
+    background: var(--primary-bg);
+}
+
+.presentation-button__label {
+    margin-left: 10px;
+    text-transform: none;
+}
+
+.back-to-section {
+    padding: 0 20px;
+    border-radius: 40px;
+}
+
+
+@media (max-width: 600px) {
+    .arrow-link,
+    .primary-link,
+    .outline-link {
+        padding: 5px 20px;
+    }
+}

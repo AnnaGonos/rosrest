@@ -1,0 +1,307 @@
+.library-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--padding-s);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.library-modal {
+    background: var(--primary-bg);
+    /* max-width: 600px; */
+    width: 100%;
+    max-width: 1200px;
+    box-sizing: border-box;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.3s ease-in-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.library-modal__header {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    right: 30px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 10;
+}
+
+.library-modal__menu {
+    position: relative;
+}
+
+.library-modal__menu-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--primary-strong);
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s;
+}
+
+.library-modal__menu-btn:hover {
+    color: var(--primary-default);
+}
+
+.library-modal__dropdown {
+    position: absolute;
+    top: 40px;
+    left: 0;
+    background: var(--primary-bg);
+    border: 1px solid var(--dark-default-light);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.library-modal__dropdown-item {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--primary-strong);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+}
+
+.library-modal__dropdown-item:hover {
+    background: color-mix(in srgb, var(--primary-default), transparent 95%);
+}
+
+.library-modal__dropdown-item i {
+    font-size: 16px;
+    color: var(--primary-default);
+}
+
+.library-modal__submenu-arrow {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--primary-strong);
+}
+
+.library-modal__submenu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background: var(--primary-bg);
+    border: 1px solid var(--dark-default-light);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    overflow: hidden;
+    z-index: 101;
+}
+
+.library-modal__submenu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--primary-strong);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+}
+
+.library-modal__submenu-item:hover {
+    background: color-mix(in srgb, var(--primary-default), transparent 95%);
+}
+
+.library-modal__submenu-item i {
+    font-size: 16px;
+    color: var(--primary-default);
+}
+
+.library-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--primary-strong);
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s;
+}
+
+.library-modal__close:hover {
+    color: var(--primary-default);
+}
+
+.library-modal__content {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 40px;
+    padding: 40px;
+    box-sizing: border-box;
+    /* ensure content can scroll inside modal if needed */
+    overflow: auto;
+}
+
+.library-modal__image {
+    width: 100%;
+    height: 100%;
+    max-height: 600px;
+    object-fit: contain;
+}
+
+.library-modal__info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.library-modal__title {
+    font-family: var(--rar-font-manrope);
+    font-size: 24px;
+    color: var(--primary-strong);
+    margin-top: 20px;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.library-modal__category {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--primary-default);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.library-modal__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.library-modal__download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+    height: 40px;
+    width: 40px;
+    background: var(--primary-bg);
+    color: var(--primary-strong);
+    border: 1px solid var(--primary-strong);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.library-modal__download-btn:hover {
+    background: var(--primary-bg-strong);
+}
+
+.library-modal__close-btn {
+    padding: 12px 20px;
+    background: var(--primary-bg-strong);
+    color: var(--primary-strong);
+    border: 2px solid var(--primary-strong);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.library-modal__close-btn:hover {
+    background: var(--primary-strong);
+    color: var(--primary-bg);
+    border-color: var(--primary-strong);
+}
+
+
+@media (max-width: 1000px) {
+    .library-modal__content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        padding: 40px;
+    }
+
+    .library-modal__image {
+        max-height: 500px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .library-modal__content {
+        display: flex;
+        flex-direction: column;
+        padding: 30px 20px;
+        gap: 20px;
+    }
+
+    .library-modal__title {
+        font-size: 20px;
+        text-align: center;
+    }
+
+
+    .library-modal__actions {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+
+    .library-modal__image {
+        max-height: 300px;
+        object-fit: contain;
+    }
+}

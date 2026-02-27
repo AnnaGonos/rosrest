@@ -1,0 +1,92 @@
+.rar-no-members {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px 20px;
+    font-size: 18px;
+}
+
+.rar-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.rar-member-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.rar-member-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.rar-member-card__image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.rar-member-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rar-member-card__content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rar-member-card__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.4;
+}
+
+.rar-member-card__sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rar-member-card__section-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #495057;
+}
+
+@media (max-width: 768px) {
+    .rar-members-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+    }
+
+    .rar-member-card__image {
+        height: 200px;
+    }
+}
+
+@media (max-width: 450px) {
+    .page__container--members .link-card-list.columns-4 {
+        grid-template-columns: 1fr !important;
+    }
+}
