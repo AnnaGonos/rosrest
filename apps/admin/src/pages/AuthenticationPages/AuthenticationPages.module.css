@@ -1,0 +1,38 @@
+.title {
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+    font-family: Outfit, var(--mantine-font-family);
+    font-weight: 500;
+    color: #1D407C;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 4fr 3fr;
+    height: 100%;
+    width: 100%;
+}
+
+.form {
+    padding: 100px 20% 50px 20%;
+    border-right: 1px solid #6c6c6c;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: white;
+}
+
+.backgroundImage {
+    height: 100vh;
+}
+
+.authenticationLogo {
+    max-width: 150px;
+    margin-bottom: 50px;
+}
+
+.authenticationButton {
+    background-color: #1D407C;
+    max-width: 600px;
+    margin-top: 50px;
+}
+
