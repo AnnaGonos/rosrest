@@ -151,7 +151,7 @@ export default function Header() {
     return (
         <header className="header">
             <div className="header-container">
-                <Link to="/" className="nav-link"><img src="../public/logo_header.png" alt="RosRest Logo" className='header__logo' /></Link>
+                <Link to="/" className="nav-link"><img src="/logo_header.png" alt="RosRest Logo" className='header__logo' /></Link>
                 <nav className="header-nav">
                     {menuItems && menuItems.length ? (
                         menuItems.map((item: any) => renderMenuItem(item))

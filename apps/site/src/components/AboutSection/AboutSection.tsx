@@ -49,7 +49,7 @@ export default function AboutSection() {
                 <OutlineArrowButtonLink className="about-section__details" href="#">Узнать больше</OutlineArrowButtonLink>
             </div>
             <div className="about-section__stats">
-                <img src="../public/about-cover-image.png" alt="About Us" className={
+                <img src="/about-cover-image.png" alt="About Us" className={
                     'about-section__image about-section__image-animated' +
                     (visible ? ' about-section__image-visible' : '')
                 } />

@@ -105,7 +105,7 @@ export default function DocumentCategoryPage() {
     fullName: 'Мария Ткаченко',
     position: 'Юрисконсульт',
     email: 'info.rosrest@mail.ru',
-    photoUrl: '../public/1-86-e1744920434831-350x350.jpg',
+    photoUrl: '/1-86-e1744920434831-350x350.jpg',
     profileUrl: null,
   }
 
