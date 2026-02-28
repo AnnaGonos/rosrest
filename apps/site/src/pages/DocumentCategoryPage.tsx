@@ -26,7 +26,7 @@ export default function DocumentCategoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [documents, setDocuments] = useState<any[]>([])
   const [docsLoading, setDocsLoading] = useState(true)
-  const [subcategoryDocs, setSubcategoryDocs] = useState<{ [key: number]: any[] }>({})
+  const [subcategoryDocs, setSubcategoryDocs] = useState<{ [key: string]: any[] }>({})
 
   useEffect(() => {
     let mounted = true
@@ -196,7 +196,7 @@ export default function DocumentCategoryPage() {
           <ContentSection columns={1}>
             {hasDirectDocuments && (
               <div style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>
-                <DocumentList items={subcategoryDocs[null] || []} loading={docsLoading} error={error} emptyMessage="Документы не найдены." />
+                <DocumentList items={subcategoryDocs["null"] || []} loading={docsLoading} error={error} emptyMessage="Документы не найдены." />
               </div>
             )}
             <CategoryAccordion

@@ -5,6 +5,7 @@ import './CategoryAccordion.css'
 type Document = {
   id: number
   name: string
+  title?: string // добавлено для совместимости с DocItem
   fileName?: string
   fileSize?: number
   uploadedAt?: string
@@ -31,7 +32,7 @@ export default function CategoryAccordion({ subcategories, getDocuments, loading
 
   return (
     <div className="category-accordion">
-      {subcategories.map((subcat, index) => {
+      {subcategories.map((subcat) => {
         const isExpanded = expandedId === subcat.id
         const docs = getDocuments(subcat.id)
         const loading = loadingMap[subcat.id] || false
@@ -52,7 +53,7 @@ export default function CategoryAccordion({ subcategories, getDocuments, loading
             {isExpanded && (
               <div className="accordion-content">
                 <DocumentList
-                  items={docs}
+                  items={docs.map((doc) => ({ ...doc, title: doc.title || doc.name, id: String(doc.id) }))}
                   loading={loading}
                   error={error}
                   emptyMessage={`Документы в "${subcat.name}" не найдены.`}
