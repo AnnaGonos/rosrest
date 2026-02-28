@@ -35,7 +35,7 @@ export default function ImageViewer({ src, images, alt = '', className = '', sta
     const [currentIndex, setCurrentIndex] = useState(startIndex)
 
     useEffect(() => {
-        setCurrentIndex((prev) => {
+        setCurrentIndex(() => {
             const next = Math.max(0, Math.min(startIndex || 0, (images && images.length - 1) || 0))
             return next
         })

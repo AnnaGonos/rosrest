@@ -28,7 +28,7 @@ export default function Gallery({ images, mode = 'preview', columns = 3, startIn
     if (mode === 'grid') {
         return (
             <div className={`gallery-grid columns-${columns} ${className}`.trim()}>
-                {images.map((item, i) => (
+                {images.map((_, i) => (
                     <div key={i} className="gallery-grid__item" style={heightVal ? { height: heightVal } : {}}>
                         <ImageViewer images={images} startIndex={i} alt={`image-${i}`} className="gallery-thumb" />
                     </div>

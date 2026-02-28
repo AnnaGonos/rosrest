@@ -102,7 +102,7 @@ export const BackToSectionButton = ({ to = '/about', label = 'Перейти в 
     )
 }
 
-export const PrimaryButtonLinkWithIcon = ({ to = '/about', label = 'Перейти в раздел', title = '' }: Props) => {
+export const PrimaryButtonLinkWithIcon = ({ to = '/about', label = 'Перейти в раздел' }: Props) => {
     return (
         <Link to={to} className="outline-arrow-link" aria-label={label}>
             <span className="arrow-button__arrow"><i className="bi bi-arrow-up-right"></i></span>

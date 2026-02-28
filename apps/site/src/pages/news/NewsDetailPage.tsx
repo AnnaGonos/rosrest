@@ -46,7 +46,7 @@ export default function NewsDetailPage() {
     const { slug } = useParams<{ slug: string }>()
     const [item, setItem] = useState<NewsItem | null>(null)
     const [recommendations, setRecommendations] = useState<NewsCardItem[]>([])
-    const [allTags, setAllTags] = useState<NewsTag[]>([])
+    const [_, setAllTags] = useState<NewsTag[]>([])
     const [recsLoading, setRecsLoading] = useState(false)
     const [commentsCount, setCommentsCount] = useState(0)
     const [loading, setLoading] = useState(true)

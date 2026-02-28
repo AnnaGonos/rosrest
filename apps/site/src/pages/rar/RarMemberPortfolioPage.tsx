@@ -51,12 +51,6 @@ export default function RarMemberPortfolioPage() {
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        return `${API_BASE.replace(/\/$/, '')}/${url.replace(/^\//, '')}`
-    }
 
     const scrollToComments = () => {
         if (commentsRef.current) {
