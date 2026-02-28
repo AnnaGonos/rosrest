@@ -17,6 +17,7 @@ import { InitAdminDto } from './dto/init-admin.dto';
 import { LoginAdminDto } from './dto/login-admin.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminAccount } from './entities/admin-account.entity';
+import { MailService } from '../common/mail.service';
 
 @Injectable()
 export class AdminService {
@@ -28,6 +29,7 @@ export class AdminService {
 	constructor(
 		@InjectRepository(AdminAccount)
 		private readonly adminRepo: Repository<AdminAccount>,
+		private readonly mailService: MailService,
 	) {}
 
 	private signAdmin(admin: AdminAccount): string {
@@ -61,8 +63,15 @@ export class AdminService {
 			passwordHash,
 		});
 		await this.adminRepo.save(admin);
-	
-		
+
+		// Отправка приветственного письма
+		await this.mailService.sendMail(
+			admin.email,
+			'Добро пожаловать в админ-панель RosRest!',
+			'Добро пожаловать в админ-панель RosRest!',
+			this.mailService.getWelcomeHtml(admin.email)
+		);
+
 		return { created: true, email: admin.email };
 	}
 
@@ -80,6 +89,15 @@ export class AdminService {
 
 		this.logger.log(`Успешный вход: ${admin.email}`);
 		const token = this.signAdmin(admin);
+
+		// Отправка письма о входе
+		await this.mailService.sendMail(
+			admin.email,
+			'Вход администратора',
+			'Выполнен вход в админку RosRest',
+			this.mailService.getLoginHtml(admin.email)
+		);
+
 		return { email: admin.email, token, expiresIn: '7d' };
 	}
 
@@ -97,6 +115,14 @@ export class AdminService {
 		admin.resetToken = token;
 		admin.resetTokenExpires = expires;
 		await this.adminRepo.save(admin);
+
+		// Формируем ссылку для сброса пароля
+		const resetUrl = `http://localhost:3001/reset-password/${token}`;
+		const subject = 'Сброс пароля RosRest';
+		const text = `Для сброса пароля перейдите по ссылке: ${resetUrl}`;
+		const html = `<p>Для сброса пароля перейдите по <a href="${resetUrl}">этой ссылке</a>.</p>`;
+		await this.mailService.sendMail(admin.email, subject, text, html);
+
 		return process.env.NODE_ENV === 'development'
 			? { sent: true, token }
 			: { sent: true };
@@ -143,6 +169,14 @@ export class AdminService {
 		}
 		admin.passwordHash = await this.hashPassword(dto.newPassword);
 		await this.adminRepo.save(admin);
+
+		// Отправка письма о смене пароля
+		await this.mailService.sendMail(
+			admin.email,
+			'Смена пароля администратора',
+			'Пароль был изменён',
+			this.mailService.getPasswordChangeHtml(admin.email)
+		);
 
 		const token = this.signAdmin(admin);
 		return { token, passwordChanged: true };

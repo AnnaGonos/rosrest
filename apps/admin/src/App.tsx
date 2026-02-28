@@ -1,6 +1,8 @@
 ﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { isAuthenticated, removeAuth } from './utils/auth'
 import LoginPage from './pages/AuthenticationPages/LoginPage'
+import ResetPasswordRequestPage from './pages/AuthenticationPages/ResetPasswordRequestPage'
+import ResetPasswordPage from './pages/AuthenticationPages/ResetPasswordPage'
 import WelcomePage from './pages/AuthenticationPages/WelcomePage'
 import OverviewPage from './pages/Dashboard/OverviewPage'
 import DocumentsPage from './pages/Dashboard/DocumentsPage'
@@ -46,6 +48,8 @@ function App() {
         <Routes>
           <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
           {/* Защищённые маршруты */}
           <Route path="/" element={<ProtectedRoute element={<OverviewPage />} />} />

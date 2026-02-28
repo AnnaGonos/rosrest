@@ -285,6 +285,19 @@ export default function LoginPage() {
                           {loading ? 'Вход...' : 'Войти в панель'}
                         </Button>
 
+                        <Button
+                          variant="outline-secondary"
+                          className="w-100 mb-2"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/reset-password');
+                          }}
+                        >
+                          <i className="bi bi-key me-2"></i>
+                          Забыли пароль?
+                        </Button>
+
                         <hr />
 
                         <p className="text-center text-muted small">
@@ -300,6 +313,70 @@ export default function LoginPage() {
                             Создайте его во вкладке "Первый запуск"
                           </a>
                         </p>
+                                          <Tab.Pane eventKey="forgot">
+                                            <Form
+                                              onSubmit={async (e) => {
+                                                e.preventDefault();
+                                                if (!loginEmail || !/^\S+@\S+$/.test(loginEmail)) {
+                                                  setLoginEmailError('Введите корректный email');
+                                                  return;
+                                                }
+                                                setLoading(true);
+                                                setLoginError('');
+                                                try {
+                                                  const response = await fetch(API_ENDPOINTS.ADMIN_FORGOT_PASSWORD, {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ email: loginEmail }),
+                                                  });
+                                                  if (!response.ok) {
+                                                    setLoginError('Ошибка при отправке запроса на сброс пароля');
+                                                    return;
+                                                  }
+                                                  setLoginError('Письмо для сброса пароля отправлено на указанный email');
+                                                } catch (err) {
+                                                  setLoginError('Ошибка при отправке запроса');
+                                                } finally {
+                                                  setLoading(false);
+                                                }
+                                              }}
+                                            >
+                                              <Form.Group className="mb-3">
+                                                <Form.Label>Email для сброса пароля</Form.Label>
+                                                <Form.Control
+                                                  type="email"
+                                                  placeholder="admin@rosrest.com"
+                                                  value={loginEmail}
+                                                  onChange={(e) => setLoginEmail(e.target.value)}
+                                                  isInvalid={!!loginEmailError}
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                  {loginEmailError}
+                                                </Form.Control.Feedback>
+                                              </Form.Group>
+                                              {loginError && (
+                                                <Alert variant="info" className="mb-3">
+                                                  {loginError}
+                                                </Alert>
+                                              )}
+                                              <Button
+                                                variant="primary"
+                                                type="submit"
+                                                className="w-100 mb-3"
+                                                size="lg"
+                                                disabled={loading}
+                                              >
+                                                {loading ? 'Отправка...' : 'Сбросить пароль'}
+                                              </Button>
+                                              <Button
+                                                variant="link"
+                                                className="w-100"
+                                                onClick={() => setActiveTab('login')}
+                                              >
+                                                Назад к входу
+                                              </Button>
+                                            </Form>
+                                          </Tab.Pane>
                       </Form>
                     </Tab.Pane>
 

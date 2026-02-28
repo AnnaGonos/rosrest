@@ -30,6 +30,8 @@ export const buildApiUrl = (endpoint: string): string => {
 export const API_ENDPOINTS = {
   ADMIN_LOGIN: buildApiUrl('admin/login'),
   ADMIN_INIT: buildApiUrl('admin/init'),
+  ADMIN_RESET_PASSWORD: buildApiUrl('admin/reset-password'),
+  ADMIN_FORGOT_PASSWORD: buildApiUrl('admin/forgot-password'),
 
   DOCUMENTS_LIST: buildApiUrl('documents'),
   DOCUMENTS_CREATE: buildApiUrl('documents'),

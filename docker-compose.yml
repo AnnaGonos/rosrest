@@ -50,6 +50,49 @@ services:
     networks:
       - rosrest_network
 
+  api:
+    build:
+      context: ./apps/api
+    container_name: rosrest_api
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      DB_HOST: postgres_dev
+      DB_PORT: 5432
+      DB_USER: ${DB_DEV_USER:-postgres}
+      DB_PASSWORD: ${DB_DEV_PASSWORD:-postgres}
+      DB_NAME: ${DB_DEV_NAME:-rosrest_dev}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      API_PORT: 3002
+    depends_on:
+      - postgres_dev
+      - redis
+    networks:
+      - rosrest_network
+
+  postgres_backup:
+    image: prodrigestivill/postgres-backup-local:latest
+    container_name: rosrest_postgres_backup
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres_dev
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${DB_DEV_NAME:-rosrest_dev}
+      POSTGRES_USER: ${DB_DEV_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_DEV_PASSWORD:-postgres}
+      SCHEDULE: "0 3 * * *"
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+    volumes:
+      - ./db_backups:/backups
+    depends_on:
+      - postgres_dev
+    networks:
+      - rosrest_network
+
 volumes:
   postgres_dev_data:
     driver: local
