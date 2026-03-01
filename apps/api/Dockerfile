@@ -7,10 +7,10 @@ COPY .env .env
 
 RUN npm install
 
-COPY ./src ./src
-COPY ./ormconfig.* ./
-COPY ./test ./test
-COPY ./uploads ./uploads
+COPY apps/api/src ./src
+COPY apps/api/ormconfig.* ./
+COPY apps/api/test ./test
+COPY apps/api/uploads ./uploads
 
 RUN npm run build
 
