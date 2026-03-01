@@ -17,7 +17,7 @@ const isTest = env === 'test';
 
 const developmentConfig: DataSourceOptions = {
   type: 'postgres',
-  host: process.env.DB_DEV_HOST || 'localhost',
+  host: process.env.DB_DEV_HOST || 'rosrest_postgres_dev',
   port: parseInt(process.env.DB_DEV_PORT || '5432', 10),
   username: process.env.DB_DEV_USER || 'postgres',
   password: process.env.DB_DEV_PASSWORD || 'postgres',
@@ -31,7 +31,7 @@ const developmentConfig: DataSourceOptions = {
 
 const productionConfig: DataSourceOptions = {
   type: 'postgres',
-  host: process.env.DB_PROD_HOST || 'localhost',
+  host: process.env.DB_PROD_HOST || 'prod-db-host',
   port: parseInt(process.env.DB_PROD_PORT || '5432', 10),
   username: process.env.DB_PROD_USER || 'postgres',
   password: process.env.DB_PROD_PASSWORD || 'postgres',
