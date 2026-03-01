@@ -2,12 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY apps/api/package*.json ./
+COPY package*.json ./
 COPY .env .env
 
 RUN npm install
 
-COPY . .
+COPY ./src ./src
+COPY ./ormconfig.* ./
+COPY ./test ./test
+COPY ./uploads ./uploads
 
 RUN npm run build
 
