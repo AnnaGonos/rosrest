@@ -48,8 +48,6 @@ services:
       - "6379:6379"
     networks:
       - rosrest_network
-    sysctls:
-      vm.overcommit_memory: "1"
 
   api:
     build:
