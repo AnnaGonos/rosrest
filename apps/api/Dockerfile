@@ -9,7 +9,6 @@ RUN npm install
 
 COPY apps/api/src ./src
 COPY apps/api/ormconfig.* ./
-COPY apps/api/test ./test
 COPY apps/api/uploads ./uploads
 
 RUN npm run build
