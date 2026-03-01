@@ -9,8 +9,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    port: 3001,
-    // В продакшене proxy не нужен, запросы идут на VITE_API_URL
+  base: '/',
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
   },
 })
