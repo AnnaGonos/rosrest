@@ -52,7 +52,8 @@ services:
 
   api:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
     container_name: rosrest_api
     restart: unless-stopped
     ports:
