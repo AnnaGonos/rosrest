@@ -146,7 +146,7 @@ export default function RarMembersPage() {
     const fetchCommentsCounts = async (list: RarMember[]) => {
         try {
             const token = localStorage.getItem('admin_token')
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}
+            const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
             const entries = await Promise.all(list.map(async (m) => {
                 try {
                     const res = await fetch(`${API_BASE_URL}/comments/rar-member/${m.id}`, { headers })

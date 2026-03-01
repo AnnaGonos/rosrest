@@ -27,10 +27,9 @@ interface ContentBlockProps {
 }
 
 
-export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, onMoveDown, onAddBlock }: ContentBlockProps & {
+export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, onMoveDown }: ContentBlockProps & {
     onMoveUp?: () => void;
     onMoveDown?: () => void;
-    onAddBlock?: () => void;
     dragHandleProps?: any;
 }) {
     const [editOpen, setEditOpen] = useState(false);

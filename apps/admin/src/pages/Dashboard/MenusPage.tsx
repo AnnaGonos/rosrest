@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Modal, Button, Form, Container, Row, Col, ListGroup } from 'react-bootstrap'
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
@@ -23,7 +23,7 @@ export default function MenusPage() {
     const lastSnapshotRef = useRef<MenuNode[] | null>(null)
 
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { delay: 1000 } }),
+        useSensor(PointerSensor, { activationConstraint: { delay: 1000, tolerance: 1 } }),
         useSensor(TouchSensor, { activationConstraint: { delay: 1000, tolerance: 1 } })
     )
 

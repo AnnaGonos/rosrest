@@ -8,7 +8,6 @@ import {
   Spinner,
   Alert,
   Modal,
-  Badge,
   Form,
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'

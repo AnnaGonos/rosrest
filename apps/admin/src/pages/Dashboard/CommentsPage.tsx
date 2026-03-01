@@ -92,7 +92,7 @@ export default function CommentsPage() {
                 const data = await res.json()
                 title = data?.page?.title || data?.title || title
                 slug = data?.page?.slug || data?.slug || id
-                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop()
+                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop() || ''
                 url = `${SITE_BASE}/news/${slug}`
               }
             } else if (type === 'monitoring-zakon') {
@@ -127,7 +127,7 @@ export default function CommentsPage() {
               if (data) {
                 title = data?.page?.title || data?.title || title
                 slug = data?.page?.slug || data?.slug || id
-                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop()
+                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop() || ''
                 url = `${SITE_BASE}/monitoring-zakon/${slug}`
               }
             } else if (type === 'rar-member') {
@@ -136,7 +136,7 @@ export default function CommentsPage() {
                 const data = await res.json()
                 title = data?.page?.title || data?.title || title
                 slug = data?.page?.slug || data?.slug || id
-                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop()
+                if (typeof slug === 'string' && slug.includes('/')) slug = slug.split('/').pop() || ''
 
                 url = `${SITE_BASE}/portfolio/${slug}`
               }

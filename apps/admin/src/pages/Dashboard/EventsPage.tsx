@@ -137,7 +137,7 @@ export default function EventsPage() {
 
   const createDescriptionEditor = useEditor({
     extensions: [
-      StarterKit.configure({ link: true }),
+      StarterKit.configure({ link: {} }),
       LinkExtension.configure({
         openOnClick: false,
       }),
@@ -154,7 +154,7 @@ export default function EventsPage() {
 
   const editDescriptionEditor = useEditor({
     extensions: [
-      StarterKit.configure({ link: true }),
+      StarterKit.configure({ link: {} }),
       LinkExtension.configure({
         openOnClick: false,
       }),
@@ -754,7 +754,7 @@ export default function EventsPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {pastEvents.map((event, dayIndex) => (
+                            {pastEvents.map((event) => (
                               <tr key={event.id}>
                                 <td>
                                   {event.previewImageUrl ? (

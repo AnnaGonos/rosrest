@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Row, Col, Button, Alert, Spinner, ButtonGroup, Badge } from 'react-bootstrap'
+import { Container, Row, Col, Button, Alert, Spinner, ButtonGroup } from 'react-bootstrap'
 import { IconArrowLeft, IconRefresh, IconDownload } from '@tabler/icons-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'

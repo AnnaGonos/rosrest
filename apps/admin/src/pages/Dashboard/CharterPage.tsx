@@ -73,9 +73,9 @@ export default function CharterPage() {
       })
       if (!res.ok) throw new Error('Ошибка загрузки документов')
       const data = await res.json()
-      const sorted = (data || []).sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime()
-        const dateB = new Date(b.createdAt || 0).getTime()
+      const sorted = (data || []).sort((a: any, b: any) => {
+        const dateA = new Date((a as any).createdAt || 0).getTime()
+        const dateB = new Date((b as any).createdAt || 0).getTime()
         return dateB - dateA
       })
       setDocuments(sorted)

@@ -213,7 +213,7 @@ export default function MonitoringZakonPage() {
     const fetchCommentsCounts = async (list: MonitoringItem[]) => {
         try {
             const token = localStorage.getItem('admin_token')
-            const headers = token ? { Authorization: `Bearer ${token}` } : {}
+            const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {}
             const entries = await Promise.all(list.map(async (n) => {
                 try {
                     const res = await fetch(`${API_BASE_URL}/comments/monitoring-zakon/${n.id}`, { headers })
