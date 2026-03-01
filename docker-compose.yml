@@ -61,7 +61,7 @@ services:
       DB_PROD_HOST: ${DB_PROD_HOST:-postgres_dev}
       DB_PROD_PORT: ${DB_PROD_PORT:-5432}
       DB_PROD_USER: ${DB_PROD_USER:-postgres}
-      DB_PROD_PASSWORD: ${DB_PROD_PASSWORD:-postgres}
+      DB_PROD_PASSWORD: ${DB_PROD_PASSWORD}
       DB_PROD_NAME: ${DB_PROD_NAME:-rosrest_dev}
       DB_PROD_SSL: ${DB_PROD_SSL:-false}
       REDIS_URL: redis://rosrest_redis:6379
@@ -77,11 +77,11 @@ services:
     container_name: rosrest_postgres_backup
     restart: unless-stopped
     environment:
-      POSTGRES_HOST: postgres_dev
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ${DB_DEV_NAME:-rosrest_dev}
-      POSTGRES_USER: ${DB_DEV_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_DEV_PASSWORD:-postgres}
+      POSTGRES_HOST: ${DB_PROD_HOST:-postgres_dev}
+      POSTGRES_PORT: ${DB_PROD_PORT:-5432}
+      POSTGRES_DB: ${DB_PROD_NAME:-rosrest_dev}
+      POSTGRES_USER: ${DB_PROD_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PROD_PASSWORD}
       SCHEDULE: "0 3 * * *"
       BACKUP_KEEP_DAYS: 7
       BACKUP_KEEP_WEEKS: 4
