@@ -58,12 +58,12 @@ services:
     ports:
       - "3002:3002"
     environment:
-      DB_HOST: ${DB_PROD_HOST:-postgres_dev}
-      DB_PORT: ${DB_PROD_PORT:-5432}
-      DB_USER: ${DB_PROD_USER:-postgres}
-      DB_PASSWORD: ${DB_PROD_PASSWORD:-postgres}
-      DB_NAME: ${DB_PROD_NAME:-rosrest_dev}
-      DB_SSL: ${DB_PROD_SSL:-false}
+      DB_PROD_HOST: ${DB_PROD_HOST:-postgres_dev}
+      DB_PROD_PORT: ${DB_PROD_PORT:-5432}
+      DB_PROD_USER: ${DB_PROD_USER:-postgres}
+      DB_PROD_PASSWORD: ${DB_PROD_PASSWORD:-postgres}
+      DB_PROD_NAME: ${DB_PROD_NAME:-rosrest_dev}
+      DB_PROD_SSL: ${DB_PROD_SSL:-false}
       REDIS_URL: redis://rosrest_redis:6379
       API_PORT: 3002
     depends_on:
