@@ -46,10 +46,18 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_DEV_HOST || 'localhost',
-      port: parseInt(process.env.DB_DEV_PORT || '5432', 10),
-      username: process.env.DB_DEV_USER || 'postgres',
-      password: process.env.DB_DEV_PASSWORD || 'postgres',
+      host: process.env.NODE_ENV === 'production'
+        ? process.env.DB_PROD_HOST || 'prod-db-host'
+        : process.env.DB_DEV_HOST || 'localhost',
+      port: process.env.NODE_ENV === 'production'
+        ? parseInt(process.env.DB_PROD_PORT || '5432', 10)
+        : parseInt(process.env.DB_DEV_PORT || '5432', 10),
+      username: process.env.NODE_ENV === 'production'
+        ? process.env.DB_PROD_USER || 'postgres'
+        : process.env.DB_DEV_USER || 'postgres',
+      password: process.env.NODE_ENV === 'production'
+        ? process.env.DB_PROD_PASSWORD || 'postgres'
+        : process.env.DB_DEV_PASSWORD || 'postgres',
       database: process.env.DB_DEV_NAME || 'rosrest_dev',
       autoLoadEntities: true,
       synchronize: true,
