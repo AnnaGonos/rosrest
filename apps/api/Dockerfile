@@ -7,6 +7,7 @@ COPY .env .env
 
 RUN npm install
 
+COPY apps/api/tsconfig.json ./tsconfig.json
 COPY apps/api/src ./src
 COPY apps/api/ormconfig.* ./
 COPY apps/api/uploads ./uploads
