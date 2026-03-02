@@ -79,6 +79,7 @@
     display: flex;
     gap: 10px;
     z-index: 10;
+    flex-wrap: wrap;
 }
 
 .slider-dot {
@@ -139,6 +140,12 @@
     }
 }
 
+@media (max-width: 991px) {
+    .slider-dots {
+        display: none;
+    }
+}
+
 @media (max-width: 768px) {
     .slider-section {
         margin-bottom: 0px;
@@ -166,5 +173,9 @@
         width: 100px;
         height: 25px;
         margin-left: 75%;
+    }
+
+    .slider-dots {
+        display: none;
     }
 }
