@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --port 3000 --host",
     "build": "tsc && vite build",
+    "postbuild": "sudo cp -r dist/* /var/www/test.rosrest.com/dist/ && sudo chown -R www-data:www-data /var/www/test.rosrest.com/dist",
     "preview": "vite preview"
   },
   "dependencies": {
