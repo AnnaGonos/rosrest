@@ -64,13 +64,13 @@ export class AdminService {
 		});
 		await this.adminRepo.save(admin);
 
-		// Отправка приветственного письма
-		await this.mailService.sendMail(
-			admin.email,
-			'Добро пожаловать в админ-панель RosRest!',
-			'Добро пожаловать в админ-панель RosRest!',
-			this.mailService.getWelcomeHtml(admin.email)
-		);
+		// Отправка приветственного письма временно отключена
+		// await this.mailService.sendMail(
+		// 	admin.email,
+		// 	'Добро пожаловать в админ-панель RosRest!',
+		// 	'Добро пожаловать в админ-панель RosRest!',
+		// 	this.mailService.getWelcomeHtml(admin.email)
+		// );
 
 		return { created: true, email: admin.email };
 	}
@@ -90,13 +90,13 @@ export class AdminService {
 		this.logger.log(`Успешный вход: ${admin.email}`);
 		const token = this.signAdmin(admin);
 
-		// Отправка письма о входе
-		await this.mailService.sendMail(
-			admin.email,
-			'Вход администратора',
-			'Выполнен вход в админку RosRest',
-			this.mailService.getLoginHtml(admin.email)
-		);
+		// Отправка письма о входе временно отключена
+		// await this.mailService.sendMail(
+		// 	admin.email,
+		// 	'Вход администратора',
+		// 	'Выполнен вход в админку RosRest',
+		// 	this.mailService.getLoginHtml(admin.email)
+		// );
 
 		return { email: admin.email, token, expiresIn: '7d' };
 	}
