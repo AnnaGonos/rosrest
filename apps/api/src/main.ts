@@ -15,6 +15,8 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 
+	app.setGlobalPrefix('api');
+
 	app.use(helmet({
 		contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
 		crossOriginEmbedderPolicy: false,
