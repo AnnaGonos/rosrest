@@ -1,4 +1,5 @@
 import React from 'react'
+import { getFileUrl } from '../utils/getFileUrl';
 
 export interface Block {
     id: string
@@ -27,13 +28,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
     const [selectedTabIndex, setSelectedTabIndex] = React.useState<{ [blockId: string]: number }>({});
     const [openTS02Tabs, setOpenTS02Tabs] = React.useState<{ [tabId: string]: boolean }>({});
 
-    const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
-    const resolveUploadUrl = (url: string) => {
-        if (url && url.startsWith('/uploads')) {
-            return `${filesBaseUrl}${url}`;
-        }
-        return url;
-    }
+
 
     return (
         <>
@@ -271,7 +266,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         caption?: string;
                         variant?: string;
                     } || {};
-                    const imageSrc = src && src.startsWith('/uploads') ? `${filesBaseUrl}${src}` : src;
+                    const imageSrc = src && src.startsWith('/uploads') ? getFileUrl(src) : src;
                     const imageWithCaption = v === 'IM02' || v === 'IM03';
                     const getAlignValue = (align: string) => {
                         if (align === 'left' || align === 'top') return 'flex-start';
@@ -358,7 +353,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 // TL01: Изображение-ссылка
                 if (block.type === 'TL01') {
                     const { src = '', alt = '', width, height, alignH = 'center', url = '', pdfUrl = '', linkType = 'url', openInNewTab = true } = block.content || {};
-                    const imageSrc = resolveUploadUrl(src);
+                    const imageSrc = getFileUrl(src);
 
                     const getAlignValue = (align: string) => {
                         if (align === 'left') return 'flex-start';
@@ -366,7 +361,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return 'center';
                     };
 
-                    const finalUrl = linkType === 'pdf' ? resolveUploadUrl(pdfUrl) : url;
+                    const finalUrl = linkType === 'pdf' ? getFileUrl(pdfUrl) : url;
 
                     return (
                         <div key={block.id} className="tile-link-block tile-link-block--tl01 mb-40" style={{ display: 'flex', justifyContent: getAlignValue(alignH) }}>
@@ -444,8 +439,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     <div className="text-muted">Нет изображений</div>
                                 )}
                                 {items.map((item: any, idx: number) => {
-                                    const imageSrc = resolveUploadUrl(item.src);
-                                    const itemUrl = item.linkType === 'pdf' ? resolveUploadUrl(item.pdfUrl) : item.url;
+                                    const imageSrc = getFileUrl(item.src);
+                                    const itemUrl = item.linkType === 'pdf' ? getFileUrl(item.pdfUrl) : item.url;
 
                                     const ImageContent = (
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Alert,
   Button,
@@ -72,12 +73,7 @@ export default function EducationPage() {
     return map
   }, [items])
 
-  const resolveImageUrl = (url?: string | null) => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    const base = (import.meta as any).env.VITE_API_URL || 'http://localhost:3002'
-    return url.startsWith('/') ? `${base}${url}` : url
-  }
+
 
   const loadEducation = async () => {
     setLoading(true)
@@ -266,7 +262,7 @@ export default function EducationPage() {
     return (
       <Row className="g-3">
         {list.map((it) => {
-          const imgSrc = resolveImageUrl(it.imageUrl) || 'https://placehold.co/320x180?text=Logo'
+          const imgSrc = getFileUrl(it.imageUrl ?? '') || 'https://placehold.co/320x180?text=Logo'
           return (
             <Col key={it.id} xs={12} sm={6} md={6}>
               <Card className="h-100 position-relative" style={{ border: '1px solid #dee2e0', borderRadius: '8px', padding: '0.5rem' }}>

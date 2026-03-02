@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Alert,
   Badge,
@@ -49,16 +50,7 @@ export default function ContractsPage() {
   const [editFormError, setEditFormError] = useState('')
   const [editUploading, setEditUploading] = useState(false)
 
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-  const resolveDocumentUrl = (url: string): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('//')) return `${window.location.protocol}${url}`
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
 
   useEffect(() => {
     loadDocuments()
@@ -313,7 +305,7 @@ export default function ContractsPage() {
                           {doc.pdfUrl && (
                             <Button
                               as="a"
-                              href={resolveDocumentUrl(doc.pdfUrl)}
+                              href={getFileUrl(doc.pdfUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               size="sm"

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import { Container, Row, Col, Card, Button, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap'
 import { IconPlus, IconAlertCircle, IconEdit, IconTrash, IconDeviceFloppy, IconX, IconInfoSquareRounded } from '@tabler/icons-react'
 import DatePicker from 'react-datepicker'
@@ -70,14 +71,7 @@ export default function ProjectsPage() {
 
     const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        const base = filesBaseUrl.replace(/\/$/, '')
-        const path = url.replace(/^\//, '')
-        return `${base}/${path}`
-    }
+
 
     const transliterate = (text: string): string => {
         const map: { [key: string]: string } = {
@@ -425,7 +419,7 @@ export default function ProjectsPage() {
                                     {project.previewImage && (
                                         <Card.Img
                                             variant="top"
-                                            src={resolveImageUrl(project.previewImage)}
+                                            src={getFileUrl(project.previewImage)}
                                             alt={project.page.title}
                                             style={{ height: '250px', objectFit: 'cover', marginBottom: '20px' }}
                                         />
@@ -521,7 +515,7 @@ export default function ProjectsPage() {
                                         onChange={setProjectPreviewImage}
                                         required={!editingProjectId}
                                         description={editingProjectId ? 'Оставьте пустым, чтобы сохранить текущее изображение' : ''}
-                                        currentImageUrl={editingProjectId && projects.find(p => p.id === editingProjectId)?.previewImage ? resolveImageUrl(projects.find(p => p.id === editingProjectId)!.previewImage) : undefined}
+                                        currentImageUrl={editingProjectId && projects.find(p => p.id === editingProjectId)?.previewImage ? getFileUrl(projects.find(p => p.id === editingProjectId)!.previewImage) : undefined}
                                     />
                                 </Form.Group>
 

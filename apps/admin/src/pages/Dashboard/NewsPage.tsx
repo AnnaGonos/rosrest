@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import { Container, Row, Col, Card, Button, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -88,14 +89,7 @@ export default function NewsPage() {
 
     const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        const base = filesBaseUrl.replace(/\/$/, '')
-        const path = url.replace(/^\//, '')
-        return `${base}/${path}`
-    }
+
 
     const transliterate = (text: string): string => {
         const map: { [key: string]: string } = {
@@ -727,7 +721,7 @@ export default function NewsPage() {
                                         {newsItem.previewImage && (
                                             <Card.Img
                                                 variant="top"
-                                                src={resolveImageUrl(newsItem.previewImage)}
+                                                src={getFileUrl(newsItem.previewImage)}
                                                 alt={newsItem.page.title}
                                                 style={{ height: '250px', objectFit: 'cover', marginBottom: '20px' }}
                                             />

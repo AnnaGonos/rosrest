@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import type { CSSProperties } from 'react'
 import {
   Alert,
@@ -65,16 +66,7 @@ export default function HomeSliderPage() {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false)
   const [deletingSlide, setDeletingSlide] = useState<HomeSlide | null>(null)
 
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-  const resolveImageUrl = (url: string): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('//')) return `${window.location.protocol}${url}`
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
 
   useEffect(() => {
     loadSlides()
@@ -283,7 +275,7 @@ export default function HomeSliderPage() {
                     style={{ height: 600 }}
                   >
                     <FallbackImage
-                      src={resolveImageUrl(slide.imageUrl)}
+                      src={getFileUrl(slide.imageUrl)}
                       alt="Слайд"
                       placeholder="https://placehold.co/1200x400?text=Слайд"
                       className="d-block w-100"
@@ -330,7 +322,7 @@ export default function HomeSliderPage() {
                     <div className="d-flex flex-column gap-3 p-3">
                       <div className="d-flex justify-content-center">
                         <FallbackImage
-                          src={resolveImageUrl(slide.imageUrl)}
+                          src={getFileUrl(slide.imageUrl)}
                           alt="Слайд"
                           placeholder="https://placehold.co/320x180?text=Слайд"
                           style={{ maxHeight: 180, objectFit: 'contain', width: '100%' }}

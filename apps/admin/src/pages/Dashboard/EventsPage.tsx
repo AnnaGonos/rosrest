@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Container,
   Row,
@@ -169,14 +170,7 @@ export default function EventsPage() {
     },
   })
 
-  const resolveImageUrl = (url?: string): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('data:image')) return url
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
+
 
 
   const parseCoordinates = (coords: string): { lat: number; lon: number } | null => {
@@ -422,7 +416,7 @@ export default function EventsPage() {
           imageUploadValue: {
             mode: mod.photoUrl ? 'url' : 'file',
             file: null,
-            url: mod.photoUrl ? resolveImageUrl(mod.photoUrl) : ''
+            url: mod.photoUrl ? getFileUrl(mod.photoUrl) : ''
           } as ImageUploadValue
         })) || [],
         speakers: block.speakers?.map(sp => ({
@@ -431,7 +425,7 @@ export default function EventsPage() {
           imageUploadValue: {
             mode: sp.photoUrl ? 'url' : 'file',
             file: null,
-            url: sp.photoUrl ? resolveImageUrl(sp.photoUrl) : ''
+            url: sp.photoUrl ? getFileUrl(sp.photoUrl) : ''
           } as ImageUploadValue
         })) || []
       }))
@@ -442,7 +436,7 @@ export default function EventsPage() {
     setEditPreviewImageSource({
       mode: event.previewImageUrl ? 'url' : 'file',
       file: null,
-      url: event.previewImageUrl ? resolveImageUrl(event.previewImageUrl) : '',
+      url: event.previewImageUrl ? getFileUrl(event.previewImageUrl) : '',
     })
     setEditFormError('')
     editDescriptionEditor?.commands.setContent(event.description || '')
@@ -485,7 +479,7 @@ export default function EventsPage() {
                 formData.append(`moderatorPhoto_${dayIndex}_${blockIndex}_${moderatorIndex}`, mod.imageUploadValue.file);
                 photoUrl = '';
               } else if (mod.imageUploadValue.mode === 'url') {
-                const originalResolved = mod.originalPhotoUrl ? resolveImageUrl(mod.originalPhotoUrl) : '';
+                const originalResolved = mod.originalPhotoUrl ? getFileUrl(mod.originalPhotoUrl) : '';
                 if (mod.imageUploadValue.url === originalResolved && mod.originalPhotoUrl) {
                   photoUrl = mod.originalPhotoUrl;
                 } else {
@@ -506,7 +500,7 @@ export default function EventsPage() {
                 formData.append(`speakerPhoto_${dayIndex}_${blockIndex}_${speakerIndex}`, sp.imageUploadValue.file);
                 photoUrl = '';
               } else if (sp.imageUploadValue.mode === 'url') {
-                const originalResolved = sp.originalPhotoUrl ? resolveImageUrl(sp.originalPhotoUrl) : '';
+                const originalResolved = sp.originalPhotoUrl ? getFileUrl(sp.originalPhotoUrl) : '';
                 if (sp.imageUploadValue.url === originalResolved && sp.originalPhotoUrl) {
                   photoUrl = sp.originalPhotoUrl;
                 } else {
@@ -529,7 +523,7 @@ export default function EventsPage() {
 
         formData.append('previewImage', editPreviewImageSource.file)
       } else if (editPreviewImageSource.mode === 'url' && editPreviewImageSource.url.trim()) {
-        const originalResolved = editOriginalPreviewImageUrl ? resolveImageUrl(editOriginalPreviewImageUrl) : '';
+        const originalResolved = editOriginalPreviewImageUrl ? getFileUrl(editOriginalPreviewImageUrl) : '';
         if (editPreviewImageSource.url === originalResolved && editOriginalPreviewImageUrl) {
           formData.append('previewImageUrl', editOriginalPreviewImageUrl)
         } else {
@@ -677,7 +671,7 @@ export default function EventsPage() {
                               <td>
                                 {event.previewImageUrl ? (
                                   <img
-                                    src={resolveImageUrl(event.previewImageUrl)}
+                                    src={getFileUrl(event.previewImageUrl)}
                                     alt={event.title}
                                     className="img-thumbnail"
                                     style={{ width: 60, height: 60, objectFit: 'cover' }}
@@ -759,7 +753,7 @@ export default function EventsPage() {
                                 <td>
                                   {event.previewImageUrl ? (
                                     <img
-                                      src={resolveImageUrl(event.previewImageUrl)}
+                                      src={getFileUrl(event.previewImageUrl)}
                                       alt={event.title}
                                       className="img-thumbnail"
                                       style={{ width: 60, height: 60, objectFit: 'cover' }}

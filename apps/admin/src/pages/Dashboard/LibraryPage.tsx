@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Alert,
   Badge,
@@ -124,16 +125,8 @@ export default function LibraryPage() {
   } | null>(null)
   const [confirmCloseArticleModal, setConfirmCloseArticleModal] = useState(false)
 
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-  const resolveImageUrl = (url: string | undefined): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('//')) return `${window.location.protocol}${url}`
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
+
 
   const transliterate = (text: string): string => {
     const map: { [key: string]: string } = {
@@ -810,7 +803,7 @@ export default function LibraryPage() {
                   ) : (
                     <Row className="g-3">
                       {group.items.map((item) => {
-                        const imgSrc = resolveImageUrl(item.previewImage)
+                        const imgSrc = getFileUrl(item.previewImage ?? '')
                         return (
                           <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
                             <Card className="h-100" style={{ border: '1px solid #dee2e0', borderRadius: '8px' }}>

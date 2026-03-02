@@ -1,4 +1,5 @@
 import { FileInput, FileInputProps } from '@mantine/core';
+import { getFileUrl } from '../utils/getFileUrl';
 import { IconUpload } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 
@@ -37,9 +38,7 @@ export function ImagePreviewInput({
 
 
   let imageUrl = preview || currentImageUrl || '';
-  if (imageUrl.startsWith('/uploads')) {
-    imageUrl = `http://localhost:3002${imageUrl}`;
-  }
+  imageUrl = getFileUrl(imageUrl);
 
   return (
     <div>

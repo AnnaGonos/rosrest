@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Container,
   Row,
@@ -40,16 +41,7 @@ export default function AwardsPage() {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false)
   const [deletingItem, setDeletingItem] = useState<Award | null>(null)
 
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-  const resolveImageUrl = (url: string): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('//')) return `${window.location.protocol}${url}`
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
 
   useEffect(() => {
     loadAwards()
@@ -233,7 +225,7 @@ export default function AwardsPage() {
                       <Card.Body className="d-flex flex-column gap-2">
                         <div className="d-flex justify-content-center mb-2">
                           <img
-                            src={resolveImageUrl(it.imageUrl)}
+                            src={getFileUrl(it.imageUrl)}
                             alt="Награда"
                             style={{ maxHeight: 350, objectFit: 'contain', width: '100%' }}
                             onError={(e) => {

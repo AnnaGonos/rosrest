@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import {
   Container,
   Button,
@@ -50,14 +51,7 @@ export default function SubcategoriesPage() {
   const token = localStorage.getItem('admin_token')
   const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
-  const resolveDocumentUrl = (url: string): string => {
-    if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    if (url.startsWith('//')) return `${window.location.protocol}${url}`
-    const base = filesBaseUrl.replace(/\/$/, '')
-    const path = url.replace(/^\//, '')
-    return `${base}/${path}`
-  }
+
 
   const [modalOpened, setModalOpened] = useState(false)
   const [subcategoryName, setSubcategoryName] = useState('')
@@ -597,7 +591,7 @@ export default function SubcategoriesPage() {
                       <td>
                         {doc.pdfUrl ? (
                           <a
-                            href={resolveDocumentUrl(doc.pdfUrl)}
+                            href={getFileUrl(doc.pdfUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ color: '#0d6efd', textDecoration: 'none' }}
@@ -735,7 +729,7 @@ export default function SubcategoriesPage() {
                                     <td>
                                       {doc.pdfUrl ? (
                                         <a
-                                          href={resolveDocumentUrl(doc.pdfUrl)}
+                                          href={getFileUrl(doc.pdfUrl)}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           style={{ color: '#0d6efd', textDecoration: 'none' }}

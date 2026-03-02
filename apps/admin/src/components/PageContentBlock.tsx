@@ -1,4 +1,5 @@
 import { Button } from 'react-bootstrap';
+import { getFileUrl } from '../utils/getFileUrl';
 import { useState } from 'react';
 import EditModal from './EditModal';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -1144,7 +1145,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
 
         // IM01, IM02, IM03 — стандартные изображения
         let { src = '', alt = '', width, height, alignH = 'center', alignV = 'center', caption = '', /*variant = 'IM01'*/ } = block.content || {};
-        const imageSrc = src && src.startsWith('/uploads') ? `http://localhost:3002${src}` : src;
+        const imageSrc = getFileUrl(src);
         const imageWithCaption = variant === 'IM02' || variant === 'IM03';
         alignH = ['left', 'center', 'right'].includes(alignH) ? alignH : 'center';
         alignV = ['top', 'center', 'bottom'].includes(alignV) ? alignV : 'center';
@@ -1226,7 +1227,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
         const [editOpen, setEditOpen] = useState(false);
         const { src = '', alt = '', width, height, alignH = 'center', url = '', pdfUrl = '', linkType = 'url', openInNewTab = true } = block.content ||{};
         console.log('TL01 Block Content:', { src, alt, url, pdfUrl, linkType, openInNewTab, fullContent: block.content });
-        const imageSrc = src && src.startsWith('/uploads') ? `http://localhost:3002${src}` : src;
+        const imageSrc = getFileUrl(src);
         
         const getAlignValue = (align: string) => {
             if (align === 'left') return 'flex-start';

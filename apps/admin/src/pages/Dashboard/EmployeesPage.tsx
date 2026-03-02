@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { getFileUrl } from '../../utils/getFileUrl';
 import {
   Container,
   Row,
@@ -280,12 +281,7 @@ export default function EmployeesPage() {
     }
   };
 
-  const resolveImageUrl = (raw?: string | null) => {
-    if (!raw) return undefined;
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
-    const base = (import.meta as any).env.VITE_API_URL || 'http://localhost:3002';
-    return raw.startsWith('/') ? `${base}${raw}` : raw;
-  };
+
 
   if (loading)
     return (
@@ -374,9 +370,9 @@ export default function EmployeesPage() {
               >
                 <Card.Body>
                   <div className="mb-3">
-                    {resolveImageUrl(it.photoUrl) ? (
+                    {getFileUrl(it.photoUrl ?? '') ? (
                       <img
-                        src={resolveImageUrl(it.photoUrl)!}
+                        src={getFileUrl(it.photoUrl ?? '')!}
                         alt={it.fullName}
                         style={{ width: '100%', height: '350px', objectFit: 'cover' }}
                       />

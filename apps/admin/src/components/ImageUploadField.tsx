@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { getFileUrl } from '../utils/getFileUrl';
 import { Button } from 'react-bootstrap';
 import { buildApiUrl } from '../config/api';
 
@@ -26,6 +27,7 @@ interface ImageUploadFieldProps {
 
 export default function ImageUploadField({ value, onChange, hideAdvancedFields }: ImageUploadFieldProps) {
   const src = value?.src || '';
+
   const alt = value?.alt || '';
   const width = value?.width;
   const height = value?.height;
@@ -118,10 +120,6 @@ export default function ImageUploadField({ value, onChange, hideAdvancedFields }
     }
   };
 
-  let previewUrl = src;
-  if (previewUrl && previewUrl.startsWith('/uploads')) {
-    previewUrl = `http://localhost:3002${previewUrl}`;
-  }
 
   const justifyMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
   const alignMap = { top: 'flex-start', center: 'center', bottom: 'flex-end' };
@@ -133,22 +131,25 @@ export default function ImageUploadField({ value, onChange, hideAdvancedFields }
         className="preview-site-style mb-3"
         style={{ display: 'flex', justifyContent: justifyMap[alignH], alignItems: alignMap[alignV], minHeight: 120 }}
       >
-        {src ? (
-          <img
-            ref={imgRef}
-            src={previewUrl}
-            alt={alt}
-            onLoad={handleImgLoad}
-            style={{
-              maxWidth: '100%',
-              maxHeight: 180,
-              objectFit: 'contain',
-              objectPosition,
-              ...(width ? { width: `${width}px!important` } : {}),
-              ...(height ? { height: `${height}px!important` } : {}),
-            }}
-          />
-        ) : (
+        {src ? (() => {
+          const previewUrl = getFileUrl(src);
+          return (
+            <img
+              ref={imgRef}
+              src={previewUrl}
+              alt={alt}
+              onLoad={handleImgLoad}
+              style={{
+                maxWidth: '100%',
+                maxHeight: 180,
+                objectFit: 'contain',
+                objectPosition,
+                ...(width ? { width: `${width}px!important` } : {}),
+                ...(height ? { height: `${height}px!important` } : {}),
+              }}
+            />
+          );
+        })() : (
           <div style={{ width: '100%', height: 120, background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
             <i className="bi bi-image" style={{ fontSize: 32, color: '#bbb' }}></i>
           </div>
