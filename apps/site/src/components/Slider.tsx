@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './Slider.css'
+import { getFileUrl } from '../utils/getFileUrl';
 import TypewriterText from './TypewriterText'
 
 interface Slide {
@@ -118,9 +119,7 @@ export default function Slider() {
     }
 
     const slide = slides[currentSlide]
-    const slideImageUrl = slide?.imageUrl
-        ? `${import.meta.env.VITE_API_URL || 'http://localhost:3002'}${slide.imageUrl}`
-        : null
+    const slideImageUrl = getFileUrl(slide?.imageUrl);
 
     return (
         <section className="slider-section">
