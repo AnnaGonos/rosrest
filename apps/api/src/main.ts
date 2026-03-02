@@ -18,7 +18,7 @@ async function bootstrap() {
 	app.use(helmet({
 		contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
 		crossOriginEmbedderPolicy: false,
-		crossOriginResourcePolicy: { policy: 'cross-origin' }, 
+		crossOriginResourcePolicy: { policy: 'cross-origin' },
 	}));
 
 	const allowedOrigins = process.env.NODE_ENV === 'production'
@@ -68,6 +68,8 @@ async function bootstrap() {
 	await app.listen(port);
 	console.log(`[API] Listening on http://localhost:${port}`);
 	console.log(`[Swagger] http://localhost:${port}/api/docs`);
+	console.log('CORS_ORIGIN:', process.env.CORS_ORIGIN);
+	console.log('allowedOrigins:', allowedOrigins);
 }
 
 bootstrap();
