@@ -10,7 +10,7 @@ interface Slide {
 }
 
 export default function Slider() {
-    const [_fade, setFade] = useState(false);
+    const [fade, setFade] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [slides, setSlides] = useState<Slide[]>([])
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -135,6 +135,9 @@ export default function Slider() {
         )
     }
 
+    const slide = slides[currentSlide]
+    const slideImageUrl = getFileUrl(slide?.imageUrl);
+
     return (
         <section className="slider-section">
             <div className="slider-text-block">
@@ -149,26 +152,19 @@ export default function Slider() {
                 <svg className='slider-text-block__vector' viewBox="0 0 147 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M146 8.62077C116.012 6.54638 86.282 2.67849 56.2393 1.8177C38.9703 1.32291 -12.673 -0.125491 4.42085 2.66808C32.5176 7.2598 61.5561 7.11226 89.8453 10.2001C100.806 11.3965 111.679 13.0001 122.584 14.695C126.781 15.3472 130.058 16.4494 123.343 16.0313C93.3711 14.1653 63.5547 10.0186 33.5822 8.01337C30.3838 7.79938 20.9074 7.69508 23.9883 8.68151C35.2812 12.2973 47.3965 13.7218 58.9494 15.7276C72.8614 18.143 86.9985 19.6514 100.794 22.8344C105.75 23.9777 112.387 24.3345 117.001 26.6611C125.166 30.7784 99.1222 28.2461 90.1706 28.0582C75.2728 27.7454 60.3921 26.7817 45.507 26.1144" stroke="#1D407C" strokeWidth="2" strokeLinecap="round" />
                 </svg>
+
             </div>
+
             <div
-                className="slider-image-block"
+                className={`slider-image-block slider-image-fade${fade ? ' fade-out' : ''}`}
+                style={{
+                    backgroundImage: slideImageUrl ? `url('${slideImageUrl}')` : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
-                <div
-                    className="slider-track"
-                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
-                    {slides.map((slide, _idx) => (
-                        <div
-                            key={slide.id}
-                            className="slider-slide"
-                            style={{
-                                backgroundImage: `url('${getFileUrl(slide.imageUrl)}')`,
-                            }}
-                        />
-                    ))}
-                </div>
                 <div className="slider-dots">
                     {slides.map((_, index) => (
                         <button

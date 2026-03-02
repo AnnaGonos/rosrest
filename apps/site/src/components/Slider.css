@@ -1,21 +1,3 @@
-.slider-image-block {
-    position: relative;
-    width: 100%;
-    height: 600px;
-    overflow: hidden;
-}
-.slider-track {
-    display: flex;
-    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
-    will-change: transform;
-    height: 100%;
-}
-.slider-slide {
-    min-width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-}
 .slider-image-fade {
     opacity: 1;
     transition: opacity 0.5s;
