@@ -221,7 +221,7 @@ export default function LoginPage() {
           <Col md={6} lg={5}>
             <Card className="shadow-lg">
               <Card.Body className="p-5">
-                <h2 className="text-center mb-4">Админка Rosrest</h2>
+                <h2 className="text-center mb-4">Панель управления</h2>
 
                 <Tab.Container activeKey={activeTab} onSelect={(k) => {
                   setActiveTab(k || 'login')
