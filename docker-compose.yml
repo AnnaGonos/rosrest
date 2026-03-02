@@ -86,6 +86,7 @@ services:
       - ./apps/api/nginx.document.conf:/etc/nginx/conf.d/default.conf
       - uploads_data:/app/uploads
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/admin.rosrest.com/dist:/var/www/admin.rosrest.com/dist:ro
     networks:
       - rosrest_network
     
