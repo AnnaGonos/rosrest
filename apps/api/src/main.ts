@@ -10,7 +10,7 @@ import { AppModule } from './app.module';
 
 const cookieParser = require('cookie-parser');
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
