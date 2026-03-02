@@ -49,7 +49,7 @@ export default function SubcategoriesPage() {
   const [error, setError] = useState('')
 
   const token = localStorage.getItem('admin_token')
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
+
 
 
 

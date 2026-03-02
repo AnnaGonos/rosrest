@@ -69,7 +69,7 @@ export default function ProjectsPage() {
     const [confirmDeleteModal, setConfirmDeleteModal] = useState(false)
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
 
-    const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
+
 
 
 

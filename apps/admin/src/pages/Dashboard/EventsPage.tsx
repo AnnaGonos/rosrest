@@ -89,7 +89,6 @@ export default function EventsPage() {
   const [activeTab, setActiveTab] = useState<string>('upcoming')
 
   const token = localStorage.getItem('admin_token')
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
   const [createModalOpened, setCreateModalOpened] = useState(false)
   const [isCreating, setIsCreating] = useState(false)

@@ -51,7 +51,7 @@ export default function PartnersPage() {
   const [deletingPartner, setDeletingPartner] = useState<Partner | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
+
 
 
 

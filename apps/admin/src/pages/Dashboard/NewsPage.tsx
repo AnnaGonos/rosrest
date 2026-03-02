@@ -87,10 +87,6 @@ export default function NewsPage() {
     const PAGE_SIZE = 21
     const [currentPage, setCurrentPage] = useState(1)
 
-    const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
-
-
-
     const transliterate = (text: string): string => {
         const map: { [key: string]: string } = {
             'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
