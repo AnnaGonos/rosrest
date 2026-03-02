@@ -41,7 +41,7 @@ export class FileUploadService {
 			throw new BadRequestException('Invalid image format. Allowed: jpg, png, gif, webp');
 		}
 
-		const maxSize = 15 * 1024 * 1024; // 15MB
+		const maxSize = 150 * 1024 * 1024; // 15MB
 		if (file.size > maxSize) {
 			throw new BadRequestException('Image size must not exceed 15MB');
 		}
