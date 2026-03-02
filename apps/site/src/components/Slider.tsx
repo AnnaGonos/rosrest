@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './Slider.css'
 import { getFileUrl } from '../utils/getFileUrl';
 import TypewriterText from './TypewriterText'
@@ -10,6 +10,8 @@ interface Slide {
 }
 
 export default function Slider() {
+    const [fade, setFade] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [slides, setSlides] = useState<Slide[]>([])
     const [currentSlide, setCurrentSlide] = useState(0)
     const [loading, setLoading] = useState(true)
@@ -82,18 +84,33 @@ export default function Slider() {
     }
 
     const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % slides.length)
-        setLastInteraction(Date.now())
+        setFade(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            setCurrentSlide((prev) => (prev + 1) % slides.length);
+            setFade(false);
+        }, 500);
+        setLastInteraction(Date.now());
     }
 
     const prevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-        setLastInteraction(Date.now())
+        setFade(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+            setFade(false);
+        }, 500);
+        setLastInteraction(Date.now());
     }
 
     const goToSlide = (index: number) => {
-        setCurrentSlide(index)
-        setLastInteraction(Date.now())
+        setFade(true);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => {
+            setCurrentSlide(index);
+            setFade(false);
+        }, 500);
+        setLastInteraction(Date.now());
     }
 
     if (loading) {
@@ -139,7 +156,7 @@ export default function Slider() {
             </div>
 
             <div
-                className="slider-image-block"
+                className={`slider-image-block slider-image-fade${fade ? ' fade-out' : ''}`}
                 style={{
                     backgroundImage: slideImageUrl ? `url('${slideImageUrl}')` : undefined,
                     backgroundSize: 'cover',

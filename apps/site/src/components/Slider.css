@@ -1,3 +1,11 @@
+.slider-image-fade {
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+.slider-image-fade.fade-out {
+    opacity: 0;
+}
+
 .slider-section {
     display: flex;
     padding: var(--padding-s);
@@ -79,7 +87,6 @@
     display: flex;
     gap: 10px;
     z-index: 10;
-    flex-wrap: wrap;
 }
 
 .slider-dot {
@@ -103,6 +110,10 @@
 }
 
 @media (max-width: 1199px) {
+    .slider-dots {
+        flex-wrap: wrap;
+    }
+
     .slider-section {
         flex-direction: column;
         gap: 40px;
