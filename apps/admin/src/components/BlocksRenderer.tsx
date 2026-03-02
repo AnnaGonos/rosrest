@@ -27,12 +27,13 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
     const [selectedTabIndex, setSelectedTabIndex] = React.useState<{ [blockId: string]: number }>({});
     const [openTS02Tabs, setOpenTS02Tabs] = React.useState<{ [tabId: string]: boolean }>({});
 
+    const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
     const resolveUploadUrl = (url: string) => {
         if (url && url.startsWith('/uploads')) {
-            return `http://localhost:3002${url}`;
+            return `${filesBaseUrl}${url}`;
         }
         return url;
-    };
+    }
 
     return (
         <>
@@ -270,7 +271,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         caption?: string;
                         variant?: string;
                     } || {};
-                    const imageSrc = src && src.startsWith('/uploads') ? `http://localhost:3002${src}` : src;
+                    const imageSrc = src && src.startsWith('/uploads') ? `${filesBaseUrl}${src}` : src;
                     const imageWithCaption = v === 'IM02' || v === 'IM03';
                     const getAlignValue = (align: string) => {
                         if (align === 'left' || align === 'top') return 'flex-start';
