@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './Slider.css'
 import { getFileUrl } from '../utils/getFileUrl';
 import TypewriterText from './TypewriterText'
@@ -10,7 +10,7 @@ interface Slide {
 }
 
 export default function Slider() {
-    const [fade, setFade] = useState(false);
+    const [_fade, setFade] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [slides, setSlides] = useState<Slide[]>([])
     const [currentSlide, setCurrentSlide] = useState(0)
