@@ -729,7 +729,7 @@ small {
   font-weight: 500;
   margin-top: 0;
   margin-bottom: 8px;
-  font-family: var(--rar-font-manrope);
+  font-family: var(--rar-font-forum) !important;
   color: var(--primary-strong);
 }
 
