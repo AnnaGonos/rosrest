@@ -236,7 +236,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                 </div>
                                 <div className='image-block__image'>
                                     {src ? (
-                                        <img src={src} alt={alt} />
+                                        <img src={getFileUrl(src)} alt={alt} />
                                     ) : (
                                         <div>
                                             <i className="bi bi-image" style={{ fontSize: 48, color: '#bbb' }}></i>
@@ -328,7 +328,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     <div key={idx} className='gallery-item'>
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {img.src ? (
-                                                <img src={img.src} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
+                                                <img src={getFileUrl(img.src)} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
                                             ) : (
                                                 <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
                                             )}

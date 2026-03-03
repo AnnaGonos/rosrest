@@ -90,8 +90,8 @@
 }
 
 .slider-dot {
-    width: 15px;
-    height: 10px;
+    width: 8px;
+    height: 5px;
     border: 2px solid var(--primary-strong);
     background: transparent;
     border-radius: 40px;
@@ -101,7 +101,7 @@
 }
 
 .slider-dot--active {
-    width: 75px;
+    width: 35px;
 }
 
 .slider-dot:hover {

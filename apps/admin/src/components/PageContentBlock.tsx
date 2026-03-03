@@ -570,7 +570,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                             <div key={idx} style={{ width: `calc(${100 / columns}% - 12px)`, minWidth: 120, maxWidth: 320, position: 'relative' }}>
                                 <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {img.src ? (
-                                        <img src={img.src} alt={img.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
+                                        <img src={getFileUrl(img.src)} alt={img.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
                                     ) : (
                                         <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
                                     )}
@@ -631,7 +631,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                                 <div key={idx} className="d-flex align-items-center gap-2 p-2">
                                     <div style={{ width: 80, height: 60, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         {img.src ? (
-                                            <img src={img.src} alt={img.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: 60 }} />
+                                            <img src={getFileUrl(img.src)} alt={img.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: 60 }} />
                                         ) : (
                                             <div style={{ color: '#bbb', fontSize: 24 }}><i className="bi bi-image"></i></div>
                                         )}
@@ -1092,7 +1092,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                         </div>
                         <div style={{ flex: 1, minWidth: 180, maxWidth: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {src ? (
-                                <img src={src} alt={alt} style={{ maxWidth: '100%', maxHeight: 320, objectFit: 'contain', borderRadius: 8 }} />
+                                <img src={getFileUrl(src)} alt={alt} style={{ maxWidth: '100%', maxHeight: 320, objectFit: 'contain', borderRadius: 8 }} />
                             ) : (
                                 <div style={{ width: '100%', height: 180, background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8 }}>
                                     <i className="bi bi-image" style={{ fontSize: 48, color: '#bbb' }}></i>
@@ -1427,7 +1427,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                         <div key={idx} style={{ width: `calc(${100 / columns}% - 12px)`, minWidth: 120, maxWidth: 320, position: 'relative' }}>
                             <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 {item.src ? (
-                                    <img src={item.src} alt={item.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
+                                    <img src={getFileUrl(item.src)} alt={item.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
                                 ) : (
                                     <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
                                 )}

@@ -1,3 +1,4 @@
+import { getFileUrl } from '../utils/getFileUrl'
 import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Button, Form, Tabs, Tab } from 'react-bootstrap'
 
@@ -117,7 +118,7 @@ export default function ImageUploadInput({
                         {previewUrl && value.mode === 'file' && (
                             <div className="mt-3">
                                 <img
-                                    src={previewUrl}
+                                    src={getFileUrl(previewUrl)}
                                     alt="Предпросмотр изображения"
                                     style={{ maxWidth: '100%', maxHeight: 150, borderRadius: 4, objectFit: 'contain' }}
                                 />
@@ -154,7 +155,7 @@ export default function ImageUploadInput({
 
                         {previewUrl && value.mode === 'url' && (
                             <div className="mt-3">
-                                <img src={previewUrl} alt="Предпросмотр изображения"
+                                <img src={getFileUrl(previewUrl)} alt="Предпросмотр изображения"
                                     style={{ maxWidth: '100%', maxHeight: 150, borderRadius: 4, objectFit: 'contain' }}
                                 />
                             </div>
