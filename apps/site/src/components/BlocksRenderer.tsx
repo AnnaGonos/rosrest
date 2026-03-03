@@ -153,15 +153,15 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 // Кнопочные блоки
                 if (block.type.startsWith('BF')) {
                     const { text = '', url = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-                    // тип ссылки pdf, используем pdfUrl, иначе url
-                    const buttonHref = linkType === 'pdf' ? pdfUrl : url;
-                    const getButtonLink = (href: string) => {
-                        if (!href) return '#';
-                        if (linkType === 'internal') {
-                            return href.startsWith('/') ? href : `/${href}`;
-                        }
-                        return href;
-                    };
+                    // тип ссылки pdf, используем getFileUrl(pdfUrl), иначе getFileUrl(url) для файлов, либо url для внутренних
+                    let buttonHref: string | undefined;
+                    if (linkType === 'pdf') {
+                        buttonHref = getFileUrl(pdfUrl) || '';
+                    } else if (linkType === 'internal') {
+                        buttonHref = url ? (url.startsWith('/') ? url : `/${url}`) : '#';
+                    } else {
+                        buttonHref = getFileUrl(url) || url ;
+                    }
                     let alignClass = '';
                     if (align === 'left') alignClass = 'text-start';
                     else if (align === 'right') alignClass = 'text-end';
@@ -169,7 +169,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     return (
                         <div key={block.id} className={`${alignClass} mb-40`}>
                             <a
-                                href={getButtonLink(buttonHref)}
+                                href={buttonHref}
                                 target={openInNewTab ? "_blank" : undefined}
                                 rel={openInNewTab ? "noopener noreferrer" : undefined}
                                 className={`button-link ${variant}`}
