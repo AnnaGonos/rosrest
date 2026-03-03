@@ -153,15 +153,15 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 // Кнопочные блоки
                 if (block.type.startsWith('BF')) {
                     const { text = '', url = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-                    // тип ссылки pdf, используем pdfUrl, иначе url
-                    const buttonHref = linkType === 'pdf' ? pdfUrl : url;
-                    const getButtonLink = (href: string) => {
-                        if (!href) return '#';
-                        if (linkType === 'internal') {
-                            return href.startsWith('/') ? href : `/${href}`;
-                        }
-                        return href;
-                    };
+                    // тип ссылки pdf, используем getFileUrl(pdfUrl), иначе getFileUrl(url) для файлов, либо url для внутренних
+                    let buttonHref: string | undefined;
+                    if (linkType === 'pdf') {
+                        buttonHref = getFileUrl(pdfUrl) || '';
+                    } else if (linkType === 'internal') {
+                        buttonHref = url ? (url.startsWith('/') ? url : `/${url}`) : '#';
+                    } else {
+                        buttonHref = getFileUrl(url) || url ;
+                    }
                     let alignClass = '';
                     if (align === 'left') alignClass = 'text-start';
                     else if (align === 'right') alignClass = 'text-end';
@@ -169,7 +169,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     return (
                         <div key={block.id} className={`${alignClass} mb-40`}>
                             <a
-                                href={getButtonLink(buttonHref)}
+                                href={buttonHref}
                                 target={openInNewTab ? "_blank" : undefined}
                                 rel={openInNewTab ? "noopener noreferrer" : undefined}
                                 className={`button-link ${variant}`}
@@ -228,15 +228,19 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     // IM04: секция с изображением
                     if (variant === 'IM04') {
                         const { title = '', text = '', src = '', alt = '', reverse = false } = block.content || {};
+                        const safeTitle = title ?? undefined;
+                        const safeText = text ?? undefined;
+                        const safeSrc = src ?? undefined;
+                        const safeAlt = alt ?? undefined;
                         return (
                             <div key={block.id} className={`image-block image-block--${variant.toLowerCase()} ${reverse ? ' image-block--reverse' : ''} mb-40`}>
                                 <div className='image-block__description'>
-                                    {title && <h2 className="section-title--sm">{title}</h2>}
-                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: text || '' }} />
+                                    {safeTitle && <h2 className="section-title--sm">{safeTitle}</h2>}
+                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: safeText || '' }} />
                                 </div>
                                 <div className='image-block__image'>
-                                    {src ? (
-                                        <img src={getFileUrl(src)} alt={alt} />
+                                    {safeSrc ? (
+                                        <img src={getFileUrl(safeSrc) || ''} alt={safeAlt} />
                                     ) : (
                                         <div>
                                             <i className="bi bi-image" style={{ fontSize: 48, color: '#bbb' }}></i>
@@ -328,7 +332,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     <div key={idx} className='gallery-item'>
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {img.src ? (
-                                                <img src={getFileUrl(img.src)} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
+                                                <img src={getFileUrl(img.src) || ''} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
                                             ) : (
                                                 <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
                                             )}
