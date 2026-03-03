@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import EmployeeCard from '../../components/EmployeeCard/EmployeeCard'
@@ -40,8 +41,7 @@ export default function ContactsPage() {
 
   const resolveImage = (raw?: string | null) => {
     if (!raw) return undefined
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-    return raw.startsWith('/') ? `${API_BASE}${raw}` : raw
+    return getFileUrl(raw)
   }
 
   const sorted = items.slice().sort((a, b) => {

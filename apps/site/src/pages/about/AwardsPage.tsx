@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import Gallery from '../../components/Gallery/Gallery'
@@ -47,8 +48,8 @@ export default function AwardsPage() {
         })
         .map((it) => {
             const raw = it.imageUrl || ''
-            const src = raw.startsWith('/') ? `${API_BASE}${raw}` : raw
-            return { imageUrl: src, caption: it.caption || undefined }
+            const src = getFileUrl(raw)
+            return { imageUrl: src ?? undefined, caption: it.caption || undefined }
         })
 
     return (

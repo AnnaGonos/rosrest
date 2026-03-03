@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
@@ -59,7 +60,10 @@ export default function CharterPage() {
                 </div>
 
                 <ContentSection columns={1}>
-                    <DocumentList items={items} loading={loading} error={error} />
+                    <DocumentList items={items.map(item => ({
+                        ...item,
+                        pdfUrl: item.pdfUrl ? getFileUrl(item.pdfUrl) : undefined
+                    }))} loading={loading} error={error} />
                 </ContentSection>
             </div>
         </div>

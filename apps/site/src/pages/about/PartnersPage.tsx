@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
@@ -67,11 +68,11 @@ export default function PartnersPage() {
                             variant="featured"
                             items={items.map((p) => {
                                 const raw = p.imageUrl || ''
-                                const image = raw.startsWith('/') ? `${API_BASE}${raw}` : raw || undefined
+                                const image = getFileUrl(raw)
                                 return {
                                     title: p.name,
                                     href: p.link || '#',
-                                    image,
+                                    image: image ?? undefined,
                                     target: p.link ? '_blank' : '_self',
                                 }
                             })}
