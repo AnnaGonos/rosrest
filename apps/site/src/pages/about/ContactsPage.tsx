@@ -41,7 +41,8 @@ export default function ContactsPage() {
 
   const resolveImage = (raw?: string | null) => {
     if (!raw) return undefined
-    return getFileUrl(raw)
+    const url = getFileUrl(raw)
+    return url ?? undefined
   }
 
   const sorted = items.slice().sort((a, b) => {
