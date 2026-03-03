@@ -1,4 +1,5 @@
 import React from 'react'
+import { getFileUrl } from '../utils/getFileUrl';
 
 export interface Block {
     id: string
@@ -27,12 +28,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
     const [selectedTabIndex, setSelectedTabIndex] = React.useState<{ [blockId: string]: number }>({});
     const [openTS02Tabs, setOpenTS02Tabs] = React.useState<{ [tabId: string]: boolean }>({});
 
-    const resolveUploadUrl = (url: string) => {
-        if (url && url.startsWith('/uploads')) {
-            return `http://localhost:3002${url}`;
-        }
-        return url;
-    };
+
 
     return (
         <>
@@ -232,15 +228,19 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     // IM04: секция с изображением
                     if (variant === 'IM04') {
                         const { title = '', text = '', src = '', alt = '', reverse = false } = block.content || {};
+                        const safeTitle = title ?? undefined;
+                        const safeText = text ?? undefined;
+                        const safeSrc = src ?? undefined;
+                        const safeAlt = alt ?? undefined;
                         return (
                             <div key={block.id} className={`image-block image-block--${variant.toLowerCase()} ${reverse ? ' image-block--reverse' : ''} mb-40`}>
                                 <div className='image-block__description'>
-                                    {title && <h2 className="section-title--sm">{title}</h2>}
-                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: text || '' }} />
+                                    {safeTitle && <h2 className="section-title--sm">{safeTitle}</h2>}
+                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: safeText || '' }} />
                                 </div>
                                 <div className='image-block__image'>
-                                    {src ? (
-                                        <img src={src} alt={alt} />
+                                    {safeSrc ? (
+                                        <img src={getFileUrl(safeSrc) || ''} alt={safeAlt} />
                                     ) : (
                                         <div>
                                             <i className="bi bi-image" style={{ fontSize: 48, color: '#bbb' }}></i>
@@ -270,7 +270,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         caption?: string;
                         variant?: string;
                     } || {};
-                    const imageSrc = src && src.startsWith('/uploads') ? `http://localhost:3002${src}` : src;
+                    const imageSrc = src && src.startsWith('/uploads') ? getFileUrl(src) : src;
                     const imageWithCaption = v === 'IM02' || v === 'IM03';
                     const getAlignValue = (align: string) => {
                         if (align === 'left' || align === 'top') return 'flex-start';
@@ -332,7 +332,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     <div key={idx} className='gallery-item'>
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {img.src ? (
-                                                <img src={img.src} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
+                                                <img src={getFileUrl(img.src) || ''} alt={img.alt} style={{ maxWidth: '100%', width: '100%', maxHeight: '100%', objectFit: 'cover', height: '100%' }} />
                                             ) : (
                                                 <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
                                             )}
@@ -357,7 +357,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 // TL01: Изображение-ссылка
                 if (block.type === 'TL01') {
                     const { src = '', alt = '', width, height, alignH = 'center', url = '', pdfUrl = '', linkType = 'url', openInNewTab = true } = block.content || {};
-                    const imageSrc = resolveUploadUrl(src);
+                    const imageSrc = getFileUrl(src);
 
                     const getAlignValue = (align: string) => {
                         if (align === 'left') return 'flex-start';
@@ -365,7 +365,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return 'center';
                     };
 
-                    const finalUrl = linkType === 'pdf' ? resolveUploadUrl(pdfUrl) : url;
+                    const finalUrl = linkType === 'pdf' ? getFileUrl(pdfUrl) : url;
 
                     return (
                         <div key={block.id} className="tile-link-block tile-link-block--tl01 mb-40" style={{ display: 'flex', justifyContent: getAlignValue(alignH) }}>
@@ -443,8 +443,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     <div className="text-muted">Нет изображений</div>
                                 )}
                                 {items.map((item: any, idx: number) => {
-                                    const imageSrc = resolveUploadUrl(item.src);
-                                    const itemUrl = item.linkType === 'pdf' ? resolveUploadUrl(item.pdfUrl) : item.url;
+                                    const imageSrc = getFileUrl(item.src);
+                                    const itemUrl = item.linkType === 'pdf' ? getFileUrl(item.pdfUrl) : item.url;
 
                                     const ImageContent = (
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
