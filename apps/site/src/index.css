@@ -730,6 +730,7 @@ small {
   margin-top: 0;
   margin-bottom: 8px;
   font-family: var(--rar-font-manrope);
+  color: var(--primary-strong);
 }
 
 .article-text h1 {
