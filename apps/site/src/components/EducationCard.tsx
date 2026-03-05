@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+
+import { getFileUrl } from '../utils/getFileUrl';
 
 type EducationInstitution = {
   id: number
@@ -12,10 +13,11 @@ interface Props {
   item: EducationInstitution
 }
 
+
 const resolveImageUrl = (raw?: string | null) => {
-  if (!raw) return 'https://placehold.co/320x180?text=Education'
-  if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-  return `${API_BASE}${raw.startsWith('/') ? raw : `/${raw}`}`
+  if (!raw) return 'https://placehold.co/320x180?text=Education';
+  const url = getFileUrl(raw);
+  return url || raw || 'https://placehold.co/320x180?text=Education';
 }
 
 export default function EducationCard({ item }: Props) {

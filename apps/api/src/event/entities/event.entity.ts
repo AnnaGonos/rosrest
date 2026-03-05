@@ -5,7 +5,7 @@ export class Event {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 120 })
+  @Column({ type: 'text' })
   title!: string;
 
   @Column()

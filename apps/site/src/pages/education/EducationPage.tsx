@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import EducationCard from '../../components/EducationCard'
+import { getFileUrl } from '../../utils/getFileUrl';
 import './EducationPage.css'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
@@ -83,12 +84,12 @@ export default function EducationPage() {
                     <a href="/education/srednee-professionalnoe-obrazovanie"
                         rel="nofollow"
                     >
-                        <img className="education-image-banner" src="/education/srednee-600x450.png" alt="Образование" />
+                        <img className="education-image-banner" src={getFileUrl('/education/srednee-600x450.png') || ''} alt="Образование" />
                     </a>
                     <a href="/education/vysshee-professionalnoe-obrazovanie"
                         rel="nofollow"  
                     >
-                        <img className="education-image-banner" src="/education/vysshee-600x450.png" alt="Образование" />
+                        <img className="education-image-banner" src={getFileUrl('/education/vysshee-600x450.png') || ''} alt="Образование" />
                     </a>
                 </ContentSection>
 
@@ -104,11 +105,11 @@ export default function EducationPage() {
                 <ContentSection columns={2}>
                     <a target="_blank" rel="nofollow"
                         href="https://docs.google.com/forms/d/e/1FAIpQLSeHb-dRYqcTY3grMzRbuomG77FSydRo9ErHxIkuyLrUvA9hsg/viewform">
-                        <img className="education-image-banner" src="/education/anketa-vypusknika-600x450.png" alt="Анкета выпускника" />
+                        <img className="education-image-banner" src={getFileUrl('/education/anketa-vypusknika-600x450.png') || ''} alt="Анкета выпускника" />
                     </a>
                     <a target="_blank" rel="nofollow"
                         href="https://docs.google.com/spreadsheets/d/1F78TcG9PUyOxldUDbMuhlWiGI8hMYQJ9SJzQ92cQLN0/edit?gid=0#gid=0">
-                        <img className="education-image-banner" src="/education/baza-vypusknikov-600x450.png" alt="Таблица выпускников" />
+                        <img className="education-image-banner" src={getFileUrl('/education/baza-vypusknikov-600x450.png') || ''} alt="Таблица выпускников" />
                     </a>
                 </ContentSection>
             </div >

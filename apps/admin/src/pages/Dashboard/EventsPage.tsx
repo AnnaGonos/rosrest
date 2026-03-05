@@ -835,7 +835,6 @@ export default function EventsPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                maxLength={120}
               />
             </Form.Group>
 
@@ -1416,7 +1415,6 @@ export default function EventsPage() {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 required
-                maxLength={120}
               />
             </Form.Group>
             <Row style={{ marginLeft: '-5px' }}>
