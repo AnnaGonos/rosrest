@@ -133,7 +133,7 @@ export default function ServiceDetailPage() {
                         </div>
                     )}
                 </div>
-                
+
                 <ContentSection columns={1}>
                     <BlocksRenderer blocks={service.page.blocks} />
                 </ContentSection>

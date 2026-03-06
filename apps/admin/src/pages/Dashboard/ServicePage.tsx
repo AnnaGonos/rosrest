@@ -333,8 +333,15 @@ export default function ServicesPage() {
                 throw new Error(errorData.message || 'Не удалось сохранить услугу')
             }
 
+            // После создания услуги — найти её в списке и открыть на редактирование
             await loadServices()
-            closeServiceModal()
+            // Найти только что созданную услугу по слагу и заголовку
+            const createdService = services.find(s => s.page.slug === slug && s.page.title === title)
+            if (createdService) {
+                openEditServiceModal(createdService)
+            } else {
+                closeServiceModal()
+            }
         } catch (err) {
             setServiceFormError(err instanceof Error ? err.message : 'Неизвестная ошибка')
         } finally {
