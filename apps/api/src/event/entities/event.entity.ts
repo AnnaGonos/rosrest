@@ -5,7 +5,7 @@ export class Event {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', default: 'Untitled event' })
   title!: string;
 
   @Column()
@@ -18,16 +18,16 @@ export class Event {
   previewImageUrl?: string;
 
   @Column({ type: 'text', nullable: true })
-  description?: string; 
+  description?: string;
 
   @Column({ type: 'text', nullable: true })
   address?: string;
 
   @Column({ type: 'text', nullable: true })
-  detailedAddress?: string; 
+  detailedAddress?: string;
 
   @Column({ type: 'text', nullable: true })
-  mapCoordinates?: string; 
+  mapCoordinates?: string;
 
   @Column({ type: 'text', nullable: true })
   registrationUrl?: string;
@@ -41,7 +41,7 @@ export class Event {
     date: string;
     blocks: Array<{
       timeStart: string;
-      timeEnd?: string; 
+      timeEnd?: string;
       title: string;
       description: string;
       location?: string;
