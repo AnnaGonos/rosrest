@@ -3,7 +3,6 @@ import { Transform } from 'class-transformer';
 
 export class CreateEventDto {
   @IsString()
-  @MaxLength(120)
   title!: string;
 
   @IsString()
