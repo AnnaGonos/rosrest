@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { getFileUrl } from '../../utils/getFileUrl';
 import './Event.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 
@@ -18,8 +19,6 @@ export type EventCardItem = {
     isPublished?: boolean
     vkPosts?: string[]
 }
-
-const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
 const MONTH_NAMES = [
     'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
@@ -98,11 +97,7 @@ export const formatDateRange = (start?: string | null, end?: string | null) => {
     return `${startParsed.day} ${MONTH_NAMES[startParsed.month - 1]} ${startParsed.year} - ${endParsed.day} ${MONTH_NAMES[endParsed.month - 1]} ${endParsed.year}`
 }
 
-const resolveUrl = (raw?: string | null) => {
-    if (!raw) return ''
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-    return raw.startsWith('/') ? `${API_BASE}${raw}` : `${API_BASE}/${raw}`
-}
+
 
 type Props = {
     event: EventCardItem
@@ -110,7 +105,7 @@ type Props = {
 }
 
 export default function EventCard({ event, to }: Props) {
-    const imageUrl = resolveUrl(event.previewImageUrl)
+    const imageUrl = getFileUrl(event.previewImageUrl)
     const hasImage = Boolean(imageUrl)
     const linkTo = to || `/events/${event.id}`
 
@@ -119,7 +114,7 @@ export default function EventCard({ event, to }: Props) {
             <article className="event-card">
                 {hasImage && (
                     <div className="event-card__cover">
-                        <img src={imageUrl} alt={`Превью события ${event.title}`} loading="lazy" />
+                        <img src={imageUrl ?? undefined} alt={`Превью события ${event.title}`} loading="lazy" />
                     </div>
                 )}
                 <div className="event-card__body">

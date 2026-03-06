@@ -844,7 +844,7 @@ export default function EventsPage() {
                   <Form.Label>Дата начала <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="ДД.МММ.ГГГГ или МММ.ГГГГ"
+                    placeholder="ДД.ММ.ГГГГ или ММ.ГГГГ"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     required
@@ -859,7 +859,7 @@ export default function EventsPage() {
                   <Form.Label>Дата окончания</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="ДД.МММ.ГГГГ или МММ.ГГГГ"
+                    placeholder="ДД.ММ.ГГГГ или ММ.ГГГГ"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
                   />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { getFileUrl } from '../../utils/getFileUrl';
 import { motion, AnimatePresence } from 'framer-motion'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import EventCard, { EventCardItem } from '../../components/Event/EventCard'

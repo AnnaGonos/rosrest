@@ -7,14 +7,11 @@ import ImageViewer from '../../components/ImageViewer/ImageViewer'
 import ShareModal from '../../components/ShareModal'
 import FAQSection from '../../components/FAQSection/FAQSection'
 import ScheduleSection from '../../components/ScheduleSection/ScheduleSection'
+import { getFileUrl } from '../../utils/getFileUrl'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
-const resolveUrl = (raw?: string | null) => {
-    if (!raw) return ''
-    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-    return raw.startsWith('/') ? `${API_BASE}${raw}` : `${API_BASE}/${raw}`
-}
+
 
 const buildYandexMapUrl = (coordinates?: string | null) => {
     if (!coordinates) return null
@@ -58,7 +55,7 @@ export default function EventDetailPage() {
         }
     }, [id])
 
-    const coverUrl = resolveUrl(event?.previewImageUrl)
+    const coverUrl = getFileUrl(event?.previewImageUrl )
     const hasCover = Boolean(coverUrl)
 
     return (
@@ -97,7 +94,7 @@ export default function EventDetailPage() {
 
                             {hasCover && (
                                 <div className="event-detail__cover">
-                                    <ImageViewer src={coverUrl} alt={`Превью события ${event.title}`} />
+                                    <ImageViewer src={coverUrl ?? undefined} alt={`Превью события ${event.title}`} />
                                 </div>
                             )}
                         </div>
