@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import { getFileUrl } from '../../utils/getFileUrl';
 import { BlocksRenderer } from '../../components/BlocksRenderer'
 import './ServiceDetailPage.css'
 
@@ -45,12 +46,7 @@ export default function ServiceDetailPage() {
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        return `${API_BASE.replace(/\/$/, '')}/${url.replace(/^\//, '')}`
-    }
+
 
     useEffect(() => {
         fetchService()
@@ -104,7 +100,7 @@ export default function ServiceDetailPage() {
                                         {contact.photo && (
                                             <div className="service-contact-card__photo">
                                                 <img
-                                                    src={resolveImageUrl(contact.photo)}
+                                                    src={getFileUrl(contact.photo) ?? undefined}
                                                     alt={contact.fullName}
                                                 />
                                             </div>

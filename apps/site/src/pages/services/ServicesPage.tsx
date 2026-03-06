@@ -29,7 +29,8 @@ export default function ServicesPage() {
         setLoading(true)
         setError(null)
         try {
-            const response = await fetch('http://localhost:3002/services?isDraft=false')
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002';
+            const response = await fetch(`${API_BASE}/services?isDraft=false`)
             if (!response.ok) throw new Error('Ошибка загрузки услуг')
             const data = await response.json()
             setServices(data)
