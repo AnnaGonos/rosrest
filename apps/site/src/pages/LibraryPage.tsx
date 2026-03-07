@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getFileUrl } from '../utils/getFileUrl'
 import { useParams, useNavigate } from 'react-router-dom'
 import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../components/ContentSection/ContentSection'
@@ -299,7 +300,7 @@ export default function LibraryPage() {
                                             >
                                                 {item.previewImage && (
                                                     <img
-                                                        src={`${API_BASE_URL}${item.previewImage}`}
+                                                        src={getFileUrl(item.previewImage) || ''}
                                                         alt={item.title}
                                                         className="library-card__preview"
                                                     />

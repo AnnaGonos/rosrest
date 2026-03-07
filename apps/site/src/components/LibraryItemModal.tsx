@@ -1,5 +1,5 @@
 import { useState } from 'react'
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+import { getFileUrl } from '../utils/getFileUrl'
 import { PrimaryButtonLink } from './LinkButtons'
 import ShareModal from './shared/ShareModal/ShareModal'
 import './LibraryItemModal.css'
@@ -30,11 +30,7 @@ interface LibraryItemModalProps {
 export default function LibraryItemModal({ item, isOpen, onClose }: LibraryItemModalProps) {
     const [isShareOpen, setIsShareOpen] = useState(false)
 
-    const imageSrc = item?.previewImage
-        ? item.previewImage.startsWith('http')
-            ? item.previewImage
-            : `${API_BASE_URL}${item.previewImage}`
-        : undefined
+    const imageSrc = item?.previewImage ? getFileUrl(item.previewImage) || undefined : undefined
 
     if (!isOpen || !item) return null
 
@@ -78,7 +74,7 @@ export default function LibraryItemModal({ item, isOpen, onClose }: LibraryItemM
 
                         <div className="library-modal__actions body-text">
                             <PrimaryButtonLink
-                                href={item.contentUrl}
+                                href={getFileUrl(item.contentUrl) || undefined}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >

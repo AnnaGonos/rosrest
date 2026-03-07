@@ -1,5 +1,6 @@
 import './DocumentList.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import { getFileUrl } from '../utils/getFileUrl'
 
 type DocItem = {
     id: string
@@ -20,17 +21,8 @@ type Props = {
 }
 
 export default function DocumentList({ items, loading, error, emptyMessage = 'Документы не найдены.', variant = 'list' }: Props) {
-    const resolvePdf = (raw?: string | null) => {
-        if (!raw) return undefined
-        if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-        return raw.startsWith('/') ? `${API_BASE}${raw}` : raw
-    }
-
-    const resolvePreview = (raw?: string | null) => {
-        if (!raw) return undefined
-        if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-        return raw.startsWith('/') ? `${API_BASE}${raw}` : raw
-    }
+    const resolvePdf = (raw?: string | null) => getFileUrl(raw) || undefined
+    const resolvePreview = (raw?: string | null) => getFileUrl(raw) || undefined
 
     if (loading) return <div>Загрузка...</div>
     if (error) return <div className="body-text">Ошибка: {error}</div>

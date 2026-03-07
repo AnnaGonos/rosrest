@@ -7,6 +7,7 @@ import { BlocksRenderer, type Block } from '../components/BlocksRenderer'
 import './LibraryPage.css'
 import ScrollToTopButton from '../components/ScrollToTop/ScrollToTopButton'
 import ShareModal from '../components/ShareModal'
+import { getFileUrl } from '../utils/getFileUrl'
 
 interface PageData {
     id: string
@@ -52,14 +53,7 @@ export default function LibraryArticlePage() {
     const [error, setError] = useState<string | null>(null)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        const base = API_BASE_URL.replace(/\/$/, '')
-        const path = url.replace(/^\//, '')
-        return `${base}/${path}`
-    }
+    const resolveImageUrl = (url: string): string => getFileUrl(url) || ''
 
     useEffect(() => {
         fetchArticlePage()
@@ -133,7 +127,7 @@ export default function LibraryArticlePage() {
                     </div>
                     {previewImage && (
                         <div className="content-section__image-wrapper">
-                            <img src={resolveImageUrl(previewImage)} alt={page.title} />
+                            <img src={getFileUrl(previewImage) || ''} alt={page.title} />
                         </div>
                     )}
                 </div>
