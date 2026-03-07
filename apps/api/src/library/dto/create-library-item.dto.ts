@@ -1,3 +1,11 @@
+	@ApiProperty({
+		example: 'https://rosrest.com/uploads/images/restoration-preview.jpg',
+		required: false,
+		description: 'URL изображения обложки (альтернатива загрузке файла)'
+	})
+	@IsOptional()
+	@IsString()
+	previewImage?: string;
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';

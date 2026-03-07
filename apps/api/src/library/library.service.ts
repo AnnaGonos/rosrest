@@ -91,9 +91,12 @@ export class LibraryService {
 
 		if (files?.previewImage?.[0] && fileUploadService) {
 			itemData.previewImage = await fileUploadService.upload(files.previewImage[0], 'image', 'library/images');
+		} else if ((dto as any).previewImage) {
+			itemData.previewImage = (dto as any).previewImage;
+		} else if ((dto as any).previewImageUrl) {
+			itemData.previewImage = (dto as any).previewImageUrl;
 		}
-
-
+		// ...existing code...
 		if (dto.type === LibraryItemType.BOOK) {
 			if (files?.pdfFile?.[0]) {
 				if (fileUploadService) {

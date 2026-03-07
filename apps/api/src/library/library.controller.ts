@@ -172,7 +172,9 @@ export class LibraryController {
 					type: 'string',
 					description: 'URL контента (ссылка на облако/страницу, если не загружается pdfFile)',
 				},
-				previewImage: { type: 'string', format: 'binary', description: 'Изображение обложки (обязательно для книг)' },
+				previewImage: { type: 'string', format: 'binary', description: 'Изображение обложки (обязательно для книг, либо укажите ссылку)' },
+				// поддержка ссылки
+				previewImageUrl: { type: 'string', description: 'URL изображения обложки (альтернатива загрузке файла)' },
 				pdfFile: { type: 'string', format: 'binary', description: 'PDF файл для загрузки (для книг)' },
 				slug: { type: 'string', description: 'Slug URL (только для статей)' },
 				publishedAt: { type: 'string', format: 'date-time', description: 'Дата публикации (только для статей)' },
@@ -219,6 +221,8 @@ export class LibraryController {
 				contentUrl: { type: 'string', description: 'URL контента (ссылка на облако/страницу)' },
 				pdfFile: { type: 'string', format: 'binary', description: 'PDF файл для загрузки' },
 				previewImage: { type: 'string', format: 'binary', description: 'Изображение обложки для загрузки' },
+				// поддержка ссылки
+				previewImageUrl: { type: 'string', description: 'URL изображения обложки (альтернатива загрузке файла)' },
 				slug: { type: 'string', description: 'Slug URL (только для статей)' },
 				publishedAt: { type: 'string', format: 'date-time', description: 'Дата публикации (только для статей)' },
 				isDraft: { type: 'boolean', description: 'Черновик (только для статей)' },
