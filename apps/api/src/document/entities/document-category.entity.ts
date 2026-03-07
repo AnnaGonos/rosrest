@@ -37,5 +37,15 @@ export class DocumentCategory {
 	@ApiProperty({ example: '2025-12-28T10:00:00.000Z' })
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt!: Date;
+
+	@ApiProperty({
+		example: [
+			{ id: '1', type: 'TX01', content: { html: '<p>Текст</p>' }, order: 0 }
+		],
+		required: false,
+		description: 'Контент-блоки для страницы категории'
+	})
+	@Column({ type: 'jsonb', nullable: true })
+	blocks?: any[];
 }
 

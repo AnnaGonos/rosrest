@@ -249,9 +249,12 @@ export class DocumentService {
 		}
 
 		const category = this.categoryTreeRepo.create({ name: dto.name, parent, slug, icon })
-		const saved = await this.categoryTreeRepo.save(category)
-		await this.invalidateCache()
-		return saved
+		if (dto.blocks) {
+            (category as any).blocks = dto.blocks;
+        }
+        const saved = await this.categoryTreeRepo.save(category)
+        await this.invalidateCache()
+        return saved
 	}
 
 	async getCategoryTree() {
@@ -294,6 +297,10 @@ export class DocumentService {
 		if (dto.name !== undefined && dto.name.trim()) {
 			category.name = dto.name.trim()
 		}
+
+        if (dto.blocks !== undefined) {
+            (category as any).blocks = dto.blocks;
+        }
 
 		if (dto.slug !== undefined) {
 			if (!dto.slug.trim()) {

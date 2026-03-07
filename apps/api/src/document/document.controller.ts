@@ -177,6 +177,7 @@ export class DocumentCategoryController {
 				slug: { type: 'string', example: 'razjasnenija-gosorganov', description: 'URL адрес категории (только латиница, цифры и дефисы)' },
 				parentId: { type: 'number', example: 1, description: 'ID родительской категории (опционально)' },
 				icon: { type: 'string', example: 'bi-folder', description: 'Иконка (только для корневых категорий)' },
+                blocks: { type: 'array', items: { type: 'object' }, description: 'Контент-блоки для страницы категории', example: [{ id: '1', type: 'TX01', content: { html: '<p>Текст</p>' }, order: 0 }] },
 			},
 			required: ['name'],
 		},
@@ -199,6 +200,7 @@ export class DocumentCategoryController {
 				parentId: { type: 'number' },
 				slug: { type: 'string' },
 				icon: { type: 'string' },
+                blocks: { type: 'array', items: { type: 'object' }, description: 'Контент-блоки для страницы категории', example: [{ id: '1', type: 'TX01', content: { html: '<p>Текст</p>' }, order: 0 }] },
 			},
 		},
 	})

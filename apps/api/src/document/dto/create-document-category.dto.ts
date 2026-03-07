@@ -26,5 +26,15 @@ export class CreateDocumentCategoryDto {
 	@IsString()
 	@MaxLength(255)
 	icon?: string;
+
+	@ApiProperty({
+		example: [
+			{ id: '1', type: 'TX01', content: { html: '<p>Текст</p>' }, order: 0 }
+		],
+		required: false,
+		description: 'Контент-блоки для страницы категории'
+	})
+	@IsOptional()
+	blocks?: any[];
 }
 

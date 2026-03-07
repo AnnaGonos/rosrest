@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { PageBlocksEditor } from '../../components/PageBlocksEditor'
 import {
   Container,
   Button,
@@ -60,6 +61,7 @@ export default function DocumentsPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [formError, setFormError] = useState('')
   const [editIcon, setEditIcon] = useState('')
+  const [editBlocks, setEditBlocks] = useState<any[]>([])
   const [deleteModalOpened, setDeleteModalOpened] = useState(false)
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -105,6 +107,7 @@ export default function DocumentsPage() {
     setEditName(c.name)
     setEditSlug(c.slug || '')
     setEditIcon((c as any).icon || '')
+    setEditBlocks(Array.isArray((c as any).blocks) ? (c as any).blocks : [])
     setFormError('')
     setEditModalOpened(true)
   }
@@ -164,7 +167,7 @@ export default function DocumentsPage() {
         return
       }
 
-      const payload = { name: editName.trim(), slug: slugValue, icon: editIcon || undefined }
+      const payload = { name: editName.trim(), slug: slugValue, icon: editIcon || undefined, blocks: editBlocks }
 
       const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_UPDATE(editingCategory.id), {
         method: 'PATCH',
@@ -348,14 +351,20 @@ export default function DocumentsPage() {
                 </Form.Group>
 
                 {editingCategory && (
-                  <Form.Group className="mb-3" controlId="editCategoryIcon">
-                    <Form.Label>Icon (bootstrap класс или URL)</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={editIcon}
-                      onChange={(e) => setEditIcon(e.currentTarget.value)}
-                    />
-                  </Form.Group>
+                  <>
+                    <Form.Group className="mb-3" controlId="editCategoryIcon">
+                      <Form.Label>Icon (bootstrap класс или URL)</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={editIcon}
+                        onChange={(e) => setEditIcon(e.currentTarget.value)}
+                      />
+                    </Form.Group>
+                    <div className="mb-3">
+                      <Form.Label>Контент категории (блоки)</Form.Label>
+                      <PageBlocksEditor blocks={editBlocks} setBlocks={setEditBlocks} />
+                    </div>
+                  </>
                 )}
               </Form>
             </Modal.Body>

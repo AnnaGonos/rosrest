@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BlocksRenderer } from '../components/BlocksRenderer'
 import { useParams } from 'react-router-dom'
 import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../components/ContentSection/ContentSection'
@@ -94,6 +95,8 @@ export default function DocumentCategoryPage() {
   if (loading) return <div>Загрузка...</div>
   if (!category) return <div className="page-main">Категория не найдена</div>
 
+  const hasBlocks = Array.isArray((category as any).blocks) && (category as any).blocks.length > 0
+
   const resolveImage = (raw?: string | null) => {
     if (!raw) return undefined
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
@@ -123,6 +126,12 @@ export default function DocumentCategoryPage() {
           <BackToSectionButton to="/documents" label="К разделу Документы" />
           <h1 className="page-title">{category.name}</h1>
         </div>
+
+        {hasBlocks && (
+          <div style={{ marginBottom: 40 }}>
+            <BlocksRenderer blocks={(category as any).blocks} />
+          </div>
+        )}
 
         {category.slug === 'attestation' && (
           <ContentSection columns={1}>
