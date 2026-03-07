@@ -53,7 +53,6 @@ export default function LibraryArticlePage() {
     const [error, setError] = useState<string | null>(null)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
 
-    const resolveImageUrl = (url: string): string => getFileUrl(url) || ''
 
     useEffect(() => {
         fetchArticlePage()

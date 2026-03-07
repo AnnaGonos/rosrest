@@ -1,6 +1,6 @@
 import './DocumentList.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import { getFileUrl } from '../utils/getFileUrl'
+import { getFileUrl } from '../../utils/getFileUrl'
 
 type DocItem = {
     id: string
@@ -10,7 +10,6 @@ type DocItem = {
     createdAt?: string
 }
 
-const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
 type Props = {
     items: DocItem[]
