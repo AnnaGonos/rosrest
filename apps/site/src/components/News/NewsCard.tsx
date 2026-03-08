@@ -19,8 +19,6 @@ const MONTH_NAMES = [
     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
 ]
 
-const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
-
 const formatDate = (dateStr?: string): string => {
     if (!dateStr) return ''
     const date = new Date(dateStr)
