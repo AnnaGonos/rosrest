@@ -121,12 +121,22 @@ export default function NewsDetailPage() {
             return response.json()
         }
 
+        const fetchById = async (id: string) => {
+            const response = await fetch(`${API_BASE}/news/${id}`)
+            if (!response.ok) return null
+            return response.json()
+        }
+
         const fetchItem = async () => {
             setLoading(true)
             setError(null)
             try {
                 const rawSlug = slug || ''
-                const data = await fetchBySlug(rawSlug)
+                let data = await fetchBySlug(rawSlug)
+                
+                if (!data && /^[a-f0-9\-]{36}$/.test(rawSlug)) {
+                    data = await fetchById(rawSlug)
+                }
                 if (!data) throw new Error('Ошибка загрузки новости')
                 setItem(data)
             } catch (err) {
