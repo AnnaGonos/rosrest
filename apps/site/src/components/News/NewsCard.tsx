@@ -1,3 +1,4 @@
+import { getFileUrl } from '../../utils/getFileUrl';
 import { Link } from 'react-router-dom'
 import './NewsCard.css'
 import { ArrowButton } from '../LinkButtons'
@@ -46,11 +47,11 @@ export default function NewsCard({ news }: NewsCardProps) {
     return (
         <Link to={`/news/${news.page.slug.replace(/^news\//, '')}`} className="news-card">
             <div className="news-card__image-wrapper">
-                <img
-                    src={resolveImageUrl(news.previewImage)}
-                    alt={news.page.title}
-                    className="news-card__image"
-                />
+                    <img
+                        src={getFileUrl(news.previewImage) || ''} 
+                        alt={news.page.title}
+                        className="news-card__image"
+                    />
             </div>
             <div className="news-card__content">
                 <div className="news-card__tags-link">

@@ -1,3 +1,4 @@
+import { getFileUrl } from '../../utils/getFileUrl';
 import { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import ContentSection from '../../components/ContentSection/ContentSection'
@@ -72,14 +73,7 @@ export default function NewsDetailPage() {
         return `${day} ${month} ${year}`
     }
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        const base = API_BASE.replace(/\/$/, '')
-        const path = url.replace(/^\//, '')
-        return `${base}/${path}`
-    }
+
 
     useEffect(() => {
         if (!item) return
@@ -120,7 +114,8 @@ export default function NewsDetailPage() {
 
     useEffect(() => {
         const fetchBySlug = async (value: string) => {
-            const encoded = encodeURIComponent(value)
+            const cleanSlug = value.replace(/^news\//, '')
+            const encoded = encodeURIComponent(cleanSlug)
             const response = await fetch(`${API_BASE}/news/slug/${encoded}`)
             if (!response.ok) return null
             return response.json()
@@ -131,16 +126,7 @@ export default function NewsDetailPage() {
             setError(null)
             try {
                 const rawSlug = slug || ''
-                const candidates = rawSlug.startsWith('news/')
-                    ? [rawSlug, rawSlug.replace(/^news\//, '')]
-                    : [`news/${rawSlug}`, rawSlug]
-
-                let data = null
-                for (const candidate of candidates) {
-                    data = await fetchBySlug(candidate)
-                    if (data) break
-                }
-
+                const data = await fetchBySlug(rawSlug)
                 if (!data) throw new Error('Ошибка загрузки новости')
                 setItem(data)
             } catch (err) {
@@ -187,7 +173,7 @@ export default function NewsDetailPage() {
                     {item.previewImage && (
                         <div className="news-detail__preview-image">
                             <img
-                                src={resolveImageUrl(item.previewImage)}
+                                src={getFileUrl(item.previewImage) || ''}
                                 alt={item.page.title}
                             />
                         </div>

@@ -1,3 +1,4 @@
+import { getFileUrl } from '../utils/getFileUrl';
 import { useRef } from 'react';
 import { useState, useEffect } from 'react'
 import { OutlineArrowButtonLink } from './LinkButtons'
@@ -78,11 +79,8 @@ export default function Partners() {
 
         <div className="partners-grid">
           {partners.map((partner, idx) => {
-            const imageUrl = partner.imageUrl.startsWith('http')
-              ? partner.imageUrl
-              : `${import.meta.env.VITE_API_URL || 'http://localhost:3002'}${partner.imageUrl}`;
+            const imageUrl = getFileUrl(partner.imageUrl) || '';
             const delay = `${0.08 * idx}s`;
-          
             const cardClass = "partner-card" + (inView ? " partner-card--animated" : " partner-card--visible");
             const style = inView ? { '--partner-delay': delay } as React.CSSProperties : {};
             return (
