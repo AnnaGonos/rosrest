@@ -35,15 +35,6 @@ type NewsCardProps = {
 }
 
 export default function NewsCard({ news }: NewsCardProps) {
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        const base = API_BASE.replace(/\/$/, '')
-        const path = url.replace(/^\//, '')
-        return `${base}/${path}`
-    }
-
     return (
         <Link to={`/news/${news.page.slug.replace(/^news\//, '')}`} className="news-card">
             <div className="news-card__image-wrapper">
