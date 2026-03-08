@@ -56,8 +56,9 @@ export class NewsService {
   }
 
   async findBySlug(slug: string): Promise<any> {
+    const normalized = slug.startsWith('news/') ? slug : `news/${slug}`;
     const news = await this.newsRepository.findOne({
-      where: { page: { slug } },
+      where: { page: { slug: normalized } },
       relations: ['page', 'page.blocks', 'page.blocks.children', 'tags'],
     });
     if (!news) throw new NotFoundException('News not found');
