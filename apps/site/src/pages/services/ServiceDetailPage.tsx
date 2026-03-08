@@ -46,8 +46,6 @@ export default function ServiceDetailPage() {
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
-
-
     useEffect(() => {
         fetchService()
     }, [slug])

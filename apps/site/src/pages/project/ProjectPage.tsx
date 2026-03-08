@@ -1,4 +1,5 @@
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import { getFileUrl } from '../../utils/getFileUrl';
 import ContentSection from '../../components/ContentSection/ContentSection'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './Projectpage.css'
@@ -43,13 +44,7 @@ export default function ProjectPage() {
     }
 
 
-    const resolveImageUrl = (url: string): string => {
-        if (!url) return ''
-        if (url.startsWith('http://') || url.startsWith('https://')) return url
-        if (url.startsWith('//')) return `${window.location.protocol}${url}`
-        
-        return `${API_BASE.replace(/\/$/, '')}/${url.replace(/^\//, '')}`
-    }
+
 
     if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
     if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
@@ -76,7 +71,7 @@ export default function ProjectPage() {
                         items={projects.map(project => ({
                             title: project.page.title,
                             href: `/projects/${project.page.slug.replace(/^projects\//, '')}`,
-                            image: resolveImageUrl(project.previewImage),
+                            image: getFileUrl(project.previewImage) || '',
                         }))}
                         variant='image'
                     />

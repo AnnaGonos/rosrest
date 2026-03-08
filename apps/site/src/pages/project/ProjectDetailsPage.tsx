@@ -36,16 +36,18 @@ export default function ProjectDetailsPage() {
         fetchProject()
     }, [slug])
 
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+
     const fetchProject = async () => {
         setLoading(true)
         setError(null)
         try {
-            const response = await fetch(`http://localhost:3002/projects`)
+            const response = await fetch(`${API_BASE}/projects`)
             if (!response.ok) throw new Error('Ошибка загрузки проекта')
             const data: Project[] = await response.json()
             const found = data.find(p => p.page.slug.replace(/^projects\//, '') === slug)
             if (!found) throw new Error('Проект не найден')
-            
+
             setProject(found)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
@@ -75,7 +77,7 @@ export default function ProjectDetailsPage() {
                     <BackToSectionButton to="/projects" label="К разделу Проекты" />
                     <h1 className="page-title">{project.page.title}</h1>
                 </div>
-                
+
                 <ContentSection columns={1}>
                     <BlocksRenderer blocks={project.page.blocks} />
                 </ContentSection>
