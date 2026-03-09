@@ -481,44 +481,46 @@ export default function NewsPage() {
 
     const filteredNews = news.filter((newsItem) => {
         if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase()
-            if (!newsItem.page.title.toLowerCase().includes(query)) {
-                return false
+            const query = searchQuery.toLowerCase();
+            const title = newsItem.page.title?.toLowerCase() || '';
+            const slug = newsItem.page.slug?.toLowerCase() || '';
+            if (!title.includes(query) && !slug.includes(query)) {
+                return false;
             }
         }
 
         if (filterByTag !== null) {
             if (!newsItem.tags.some(tag => tag.id === filterByTag)) {
-                return false
+                return false;
             }
         }
 
         if (filterByDateFrom || filterByDateTo) {
             if (newsItem.page.publishedAt) {
-                const newsDate = new Date(newsItem.page.publishedAt)
+                const newsDate = new Date(newsItem.page.publishedAt);
 
                 if (filterByDateFrom) {
-                    const fromDate = new Date(filterByDateFrom)
-                    fromDate.setHours(0, 0, 0, 0)
+                    const fromDate = new Date(filterByDateFrom);
+                    fromDate.setHours(0, 0, 0, 0);
                     if (newsDate < fromDate) {
-                        return false
+                        return false;
                     }
                 }
 
                 if (filterByDateTo) {
-                    const toDate = new Date(filterByDateTo)
-                    toDate.setHours(23, 59, 59, 999)
+                    const toDate = new Date(filterByDateTo);
+                    toDate.setHours(23, 59, 59, 999);
                     if (newsDate > toDate) {
-                        return false
+                        return false;
                     }
                 }
             } else {
-                return false
+                return false;
             }
         }
 
-        return true
-    })
+        return true;
+    });
 
     const handleClearFilters = () => {
         setSearchQuery('')
@@ -616,10 +618,10 @@ export default function NewsPage() {
                         <Row className="g-3">
                             <Col md={4}>
                                 <Form.Group>
-                                    <Form.Label>Поиск по названию</Form.Label>
+                                    <Form.Label>Поиск по названию или адресу</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Введите название новости..."
+                                        placeholder="Введите название или адрес (slug) новости..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
