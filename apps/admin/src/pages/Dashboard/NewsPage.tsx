@@ -137,7 +137,11 @@ export default function NewsPage() {
             setLoading(true)
             setError(null)
             const token = localStorage.getItem('admin_token')
-            const response = await fetch(API_ENDPOINTS.NEWS.list(), {
+            
+            const url = API_ENDPOINTS.NEWS.list().includes('?')
+                ? API_ENDPOINTS.NEWS.list() + '&pageSize=100000'
+                : API_ENDPOINTS.NEWS.list() + '?pageSize=100000';
+            const response = await fetch(url, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
