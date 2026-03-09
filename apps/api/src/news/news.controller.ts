@@ -136,11 +136,11 @@ export class NewsController {
   @ApiResponse({ status: 201, description: 'Новость создана', type: News })
   @UseInterceptors(FileInterceptor('previewImage'))
   async create(
-    @Body() body: any,
+    @Body() createDto: CreateNewsDto,
     @UploadedFile() previewImage?: any,
   ): Promise<News> {
-    let previewImageUrl = body.previewImage;
-    
+    let previewImageUrl = createDto.previewImage;
+
     if (previewImage) {
       previewImageUrl = await this.fileUploadService.upload(
         {
@@ -152,17 +152,16 @@ export class NewsController {
         'image',
         'news',
       );
-    }
-    else if (body.previewImageUrl) {
-      previewImageUrl = body.previewImageUrl;
+    } else if (createDto.previewImageUrl) {
+      previewImageUrl = createDto.previewImageUrl;
     }
 
     let tagIds: number[] = [];
-    if (body.tagIds) {
-      tagIds = body.tagIds; 
+    if (createDto.tagIds) {
+      tagIds = createDto.tagIds;
     }
 
-    return this.newsService.create({ ...body, previewImage: previewImageUrl, tagIds });
+    return this.newsService.create({ ...createDto, previewImage: previewImageUrl, tagIds });
   }
 
   @Patch(':id')
