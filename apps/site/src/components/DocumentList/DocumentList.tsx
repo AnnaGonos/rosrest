@@ -5,7 +5,7 @@ import { getFileUrl } from '../../utils/getFileUrl'
 type DocItem = {
     id: string
     title: string
-    fileUrl?: string | null // универсальное поле для PDF/DOC/DOCX
+    fileUrl?: string | null
     previewUrl?: string | null
     createdAt?: string
 }
@@ -20,7 +20,7 @@ type Props = {
 }
 
 export default function DocumentList({ items, loading, error, emptyMessage = 'Документы не найдены.', variant = 'list' }: Props) {
-    const resolveFile = (raw?: string | null) => getFileUrl(raw) || undefined
+    const resolveFile = (raw?: string | null) => getFileUrl(raw) || ''
     const resolvePreview = (raw?: string | null) => getFileUrl(raw) || undefined
 
     if (loading) return <div>Загрузка...</div>
@@ -32,14 +32,21 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
             <div className="documents-list">
                 {items.length === 0 && <div className="body-text">{emptyMessage}</div>}
                 <ul>
-                    {items.map((d) => (
-                        <li key={d.id}>
-                            <a href={resolveFile(d.fileUrl)} target="_blank" rel="noopener noreferrer">
-                                {d.title}
-                                <i className="bi bi-arrow-up-right"></i>
-                            </a>
-                        </li>
-                    ))}
+                    {items.map((d) => {
+                        const fileUrl = resolveFile(d.fileUrl);
+                        return (
+                            <li key={d.id}>
+                                {fileUrl ? (
+                                    <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+                                        {d.title}
+                                        <i className="bi bi-arrow-up-right"></i>
+                                    </a>
+                                ) : (
+                                    <span>{d.title}</span>
+                                )}
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
         )
@@ -49,11 +56,12 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
                 {items.length === 0 && <div className="body-text">{emptyMessage}</div>}
                 <div className="documents-grid__items">
                     {items.map((d) => {
-                        const preview = resolvePreview(d.previewUrl)
-                        return (
+                        const preview = resolvePreview(d.previewUrl);
+                        const fileUrl = resolveFile(d.fileUrl);
+                        return fileUrl ? (
                             <a
                                 key={d.id}
-                                href={resolveFile(d.fileUrl)}
+                                href={fileUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="documents-grid__item"
@@ -67,7 +75,17 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
                                     </div>
                                 )}
                             </a>
-                        )
+                        ) : (
+                            <div key={d.id} className="documents-grid__item" title={d.title}>
+                                {preview ? (
+                                    <img src={preview} alt={d.title} className="documents-grid__image" />
+                                ) : (
+                                    <div className="documents-grid__placeholder">
+                                        <span>{d.title}</span>
+                                    </div>
+                                )}
+                            </div>
+                        );
                     })}
                 </div>
             </div>
