@@ -122,33 +122,35 @@ export class FileUploadService {
 		filePaths.forEach((filePath) => this.delete(filePath));
 	}
 
-	listFiles(subfolder?: string) {
-		const targetDir = subfolder ? path.join(this.uploadDir, subfolder) : this.uploadDir;
+	       listFiles(subfolder?: string) {
+		       const collectFiles = (dir: string, urlPrefix: string): any[] => {
+			       if (!fs.existsSync(dir)) return [];
+			       const entries = fs.readdirSync(dir);
+			       let result: any[] = [];
+			       for (const entry of entries) {
+				       const fullPath = path.join(dir, entry);
+				       const stat = fs.statSync(fullPath);
+				       if (stat.isFile()) {
+					       result.push({
+						       filename: entry,
+						       url: `${urlPrefix}/${entry}`,
+						       size: stat.size,
+						       createdAt: stat.birthtime,
+					       });
+				       } else if (stat.isDirectory()) {
+					       result = result.concat(collectFiles(fullPath, `${urlPrefix}/${entry}`));
+				       }
+			       }
+			       return result;
+		       };
 
-		if (!fs.existsSync(targetDir)) {
-			return [];
-		}
-
-		const files = fs.readdirSync(targetDir);
-		const urlPrefix = subfolder ? `/uploads/${subfolder}` : '/uploads';
-
-		return files
-			.filter((filename) => {
-				const filePath = path.join(targetDir, filename);
-				return fs.statSync(filePath).isFile();
-			})
-			.map((filename) => {
-				const filePath = path.join(targetDir, filename);
-				const stats = fs.statSync(filePath);
-
-				return {
-					filename,
-					url: `${urlPrefix}/${filename}`,
-					size: stats.size,
-					createdAt: stats.birthtime,
-				};
-			})
-			.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-	}
+		       if (subfolder) {
+			       const targetDir = path.join(this.uploadDir, subfolder);
+			       const urlPrefix = `/uploads/${subfolder}`;
+			       return collectFiles(targetDir, urlPrefix).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+		       } else {
+			       return collectFiles(this.uploadDir, '/uploads').sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+		       }
+	       }
 }
 
