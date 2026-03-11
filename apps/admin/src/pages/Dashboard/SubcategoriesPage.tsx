@@ -321,9 +321,9 @@ export default function SubcategoriesPage() {
       formData.append('isPublished', String(docIsPublished))
 
       if (docSource.file) {
-        formData.append('pdfFile', docSource.file)
+        formData.append('file', docSource.file)
       } else if (trimmedUrl) {
-        formData.append('pdfUrl', trimmedUrl)
+        formData.append('fileUrl', trimmedUrl)
       }
 
       const res = await fetch(`${API_ENDPOINTS.DOCUMENTS_CREATE}`, {
