@@ -96,6 +96,8 @@ export class FileUploadService {
 
 		   let baseName = path.basename(file.originalname, path.extname(file.originalname));
 		   let ext = path.extname(file.originalname);
+		   // Нормализуем имя файла в NFC (Unicode)
+		   baseName = baseName.normalize('NFC');
 		   let safeName = `${baseName}${ext}`;
 		   let filepath = path.join(targetDir, safeName);
 		   // Если файл с таким именем уже есть, добавляем timestamp
