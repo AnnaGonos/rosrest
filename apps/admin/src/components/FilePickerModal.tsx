@@ -81,12 +81,11 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
                 ) : file.mimetype && file.mimetype === 'application/pdf' ? (
                   <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
                 ) : file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ? (
-                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                    <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
-                      <i className="bi bi-file-earmark-word" style={{ fontSize: 48, color: '#0275d8' }}></i>
-                      <span className="small mt-1">DOC</span>
-                    </div>
-                  </a>
+                  <iframe
+                    src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
+                    style={{ width: '100%', height: 120, border: 'none', background: '#f8f9fa', borderRadius: 4 }}
+                    title={file.originalName}
+                  />
                 ) : (
                   <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
                     <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
