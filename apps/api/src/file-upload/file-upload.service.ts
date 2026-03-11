@@ -94,13 +94,17 @@ export class FileUploadService {
 			}
 		}
 
-		const ext = path.extname(file.originalname);
-		const safeName = `${Date.now()}${ext}`;
-		const filepath = path.join(targetDir, safeName);
-
-		await fs.promises.writeFile(filepath, file.buffer);
-
-		return `${urlPrefix}/${safeName}`;
+		   let baseName = path.basename(file.originalname, path.extname(file.originalname));
+		   let ext = path.extname(file.originalname);
+		   let safeName = `${baseName}${ext}`;
+		   let filepath = path.join(targetDir, safeName);
+		   // Если файл с таким именем уже есть, добавляем timestamp
+		   if (fs.existsSync(filepath)) {
+			   safeName = `${baseName}_${Date.now()}${ext}`;
+			   filepath = path.join(targetDir, safeName);
+		   }
+		   await fs.promises.writeFile(filepath, file.buffer);
+		   return `${urlPrefix}/${safeName}`;
 	}
 
 	delete(filePath: string): void {

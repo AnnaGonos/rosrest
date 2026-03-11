@@ -6,6 +6,7 @@ interface FileItem {
     id: string;
     url: string;
     originalName: string;
+    filename?: string;
     mimetype: string;
     size: number;
     createdAt: string;
@@ -47,7 +48,7 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
     };
 
     const filteredFiles = files.filter(f =>
-        (!search || f.originalName.toLowerCase().includes(search.toLowerCase()))
+        (!search || (f.originalName ?? f.filename ?? '').toLowerCase().includes(search.toLowerCase()))
     );
 
     return (
@@ -71,54 +72,47 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
                     <div className="text-danger">{error}</div>
                 ) : (
                     <div className="d-flex flex-wrap gap-3">
-                        {filteredFiles.map(file => (
-                            <div key={file.id} className="border rounded p-2" style={{ width: 180 }}>
-                                {(() => {
-                                    const ext = (file.originalName ?? '').split('.').pop()?.toLowerCase() || '';
-                                    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
-                                    const isImage = (file.mimetype && file.mimetype.startsWith('image/')) || imageExts.includes(ext);
-                                    if (isImage) {
-                                        return (
-                                            <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                                                <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
-                                            </a>
-                                        );
-                                    }
-                                    if (file.mimetype && file.mimetype === 'application/pdf') {
-                                        return (
-                                            <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                                                <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
-                                            </a>
-                                        );
-                                    }
-                                    if (file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-                                        return (
-                                            <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                                                <iframe
-                                                    src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
-                                                    style={{ width: '100%', height: 120, border: 'none', background: '#f8f9fa', borderRadius: 4 }}
-                                                    title={file.originalName}
-                                                />
-                                            </a>
-                                        );
-                                    }
-                                    return (
-                                        <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                                            <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
-                                                <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
-                                                {file.originalName && (
-                                                    <span className="small mt-1">{file.originalName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
-                                                )}
-                                            </div>
-                                        </a>
-                                    );
-                                })()}
-                                <div className="mt-2 small text-muted">{file.originalName}</div>
-                                <Button variant="outline-primary" size="sm" className="mt-2 w-100" onClick={() => onSelect(file)}>
-                                    Выбрать
-                                </Button>
+                        {filteredFiles.map((file, idx) => {
+                          // Определяем расширение и тип файла
+                          const ext = (file.originalName ?? file.filename ?? '').split('.').pop()?.toLowerCase() || '';
+                          const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                          const isImage = imageExts.includes(ext);
+                          const isPdf = ext === 'pdf';
+                          const isDoc = ['doc', 'docx'].includes(ext);
+                          const displayName = file.originalName ?? file.filename ?? '';
+                          return (
+                            <div key={file.id || file.url || idx} className="border rounded p-2" style={{ width: 180 }}>
+                              <div className="small fw-bold text-center mb-1" style={{ minHeight: 32, wordBreak: 'break-all' }}>{displayName}</div>
+                              {isImage ? (
+                                <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                                  <img src={getFileUrl(file.url)} alt={displayName} style={{ width: 150, height: 100, objectFit: 'contain', display: 'block', margin: '0 auto', background: '#f8f9fa', borderRadius: 4 }} />
+                                </a>
+                              ) : isPdf ? (
+                                <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                                  <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: 150, height: 100, background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }} />
+                                </a>
+                              ) : isDoc ? (
+                                <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                                  <iframe
+                                    src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
+                                    style={{ width: 150, height: 100, border: 'none', background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }}
+                                    title={displayName}
+                                  />
+                                </a>
+                              ) : (
+                                <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 100 }}>
+                                    <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
+                                    <span className="small mt-1">{ext.toUpperCase() || 'FILE'}</span>
+                                  </div>
+                                </a>
+                              )}
+                              <Button variant="outline-primary" size="sm" className="mt-2 w-100" onClick={() => onSelect(file)}>
+                                Выбрать
+                              </Button>
                             </div>
-                        ))}
+                          );
+                        })}
                         {filteredFiles.length === 0 && <div className="text-muted">Нет файлов</div>}
                     </div>
                 )}
