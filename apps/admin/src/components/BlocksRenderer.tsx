@@ -152,11 +152,13 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 }
                 // Кнопочные блоки
                 if (block.type.startsWith('BF')) {
-                    const { text = '', url = '', fileUrl = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-                    // Если есть fileUrl (универсальное поле), используем его
+                    const { text = '', url = '', fileUrl = '', docUrl = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
+                    
                     let buttonHref: string | undefined;
                     if (fileUrl) {
                         buttonHref = getFileUrl(fileUrl) || '';
+                    } else if (docUrl) {
+                        buttonHref = getFileUrl(docUrl) || '';
                     } else if (linkType === 'pdf' && pdfUrl) {
                         buttonHref = getFileUrl(pdfUrl) || '';
                     } else if (linkType === 'internal') {
