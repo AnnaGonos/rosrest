@@ -989,11 +989,11 @@ export default function SubcategoriesPage() {
                 <ImageUploadInput
                   id="docSource"
                   label="Файл документа или ссылка"
-                  helpText="Загрузите PDF-файл или укажите URL на документ."
+                  helpText="Загрузите PDF, DOC или DOCX файл, либо укажите ссылку на документ."
                   value={docSource}
                   onChange={setDocSource}
                   disabled={isAddingDocument}
-                  accept="application/pdf"
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                   required
                 />
                 <Form.Label className="mb-2 mt-4">Статус публикации (Опубликовать / Черновик) <span className="text-danger">*</span></Form.Label>
@@ -1119,11 +1119,11 @@ export default function SubcategoriesPage() {
                 <ImageUploadInput
                   id="editDocSource"
                   label="Обновить файл/ссылку (необязательно)"
-                  helpText="Оставьте пустым, если не нужно менять файл."
+                  helpText="Оставьте пустым, если не нужно менять файл. Поддерживаются PDF, DOC, DOCX."
                   value={editDocSource}
                   onChange={setEditDocSource}
                   disabled={isEditingDoc}
-                  accept="application/pdf"
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 />
 
                 <Form.Label className="mb-1 mt-4">Статус публикации (Опубликовать / Черновик)</Form.Label>
