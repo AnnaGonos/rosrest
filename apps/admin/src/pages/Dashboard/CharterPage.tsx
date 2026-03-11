@@ -12,7 +12,7 @@ import {
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 
 type CharterDocument = {
   id: string

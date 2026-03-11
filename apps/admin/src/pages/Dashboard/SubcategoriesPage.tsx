@@ -16,7 +16,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput';
+
 
 type Category = {
   id: number
@@ -27,14 +28,14 @@ type Category = {
 }
 
 type Document = {
-  id: string
-  title: string
-  pdfUrl?: string
-  type: string
-  category?: any
-  subcategory?: any
-  isPublished: boolean
-  createdAt: string
+  id: string;
+  title: string;
+  pdfUrl?: string;
+  type: string;
+  category?: any;
+  subcategory?: any;
+  isPublished: boolean;
+  createdAt: string;
 }
 
 export default function SubcategoriesPage() {
@@ -1124,34 +1125,29 @@ export default function SubcategoriesPage() {
                   />
                 </Form.Group>
                 <ImageUploadInput
-                  if (editDocSource.file) {
-                    const formData = new FormData()
-                    formData.append('title', editDocTitle.trim())
-                    formData.append('isPublished', editDocIsPublished ? 'true' : 'false')
-                    formData.append('file', editDocSource.file)
-                    res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
-                      method: 'PATCH',
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: formData,
-                    })
-                  } else {
-                    const formData = new FormData()
-                    formData.append('title', editDocTitle.trim())
-                    formData.append('isPublished', editDocIsPublished ? 'true' : 'false')
-                    const trimmedUrl = editDocSource.url.trim()
-                    if (editDocSource.mode === 'url' && trimmedUrl) {
-                      formData.append('fileUrl', trimmedUrl)
-                    }
-                    res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
-                      method: 'PATCH',
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                      body: formData,
-                    })
-                  }
+                  id="editDocSource"
+                  label="Обновить файл/ссылку (необязательно)"
+                  helpText="Оставьте пустым, если не нужно менять файл. Поддерживаются PDF, DOC, DOCX."
+                  value={editDocSource}
+                  onChange={setEditDocSource}
+                  disabled={isEditingDoc}
+                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                />
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEditDocModalOpened(false)
+                  setEditingDocument(null)
+                  setEditDocTitle('')
+                  setEditDocSource({ mode: 'file', file: null, url: '' })
+                  setEditDocIsPublished(true)
+                  setEditDocFormError('')
+                }}
+                disabled={isEditingDoc}
+              >
                 Отмена
               </Button>
               <Button variant="primary" onClick={handleEditDocument} disabled={isEditingDoc}>

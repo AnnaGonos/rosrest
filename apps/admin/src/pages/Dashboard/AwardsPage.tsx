@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 
 type Award = {
   id: string
@@ -269,7 +269,7 @@ export default function AwardsPage() {
               required
               helpText="Выберите файл (JPG, PNG, WEBP) или укажите URL-ссылку."
               value={uploadSource}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setUploadSource(val)
                 setFormError('')
               }}

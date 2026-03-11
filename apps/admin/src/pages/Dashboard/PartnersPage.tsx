@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 
 interface Partner {
   id: string
@@ -388,7 +388,7 @@ export default function PartnersPage() {
               required
               helpText="Загрузите логотип или вставьте ссылку на изображение. Поддерживаются JPG, PNG, WEBP, SVG, GIF."
               value={logoSource}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setLogoSource(val)
                 setFormError('')
               }}

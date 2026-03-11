@@ -12,7 +12,7 @@ import {
   Spinner,
 } from 'react-bootstrap'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
 
@@ -504,7 +504,7 @@ export default function EducationPage() {
                   : 'Загрузите логотип или укажите URL изображения.'
               }
               value={imageSource}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setImageSource(val)
                 setFormError('')
               }}

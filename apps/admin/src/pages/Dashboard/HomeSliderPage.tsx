@@ -14,7 +14,7 @@ import {
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
-import ImageUploadInput, { ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, ImageUploadValue } from '../../components/ImageUploadInput'
 
 interface HomeSlide {
   id: number
@@ -361,7 +361,7 @@ export default function HomeSliderPage() {
               helpText="Выберите файл (JPG, PNG, WEBP, SVG) или укажите ссылку."
               value={imageSource}
               disabled={uploading}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setImageSource(val)
                 setFormError('')
               }}

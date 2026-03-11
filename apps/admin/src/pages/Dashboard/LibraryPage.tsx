@@ -18,7 +18,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import { IconDeviceFloppy, IconX, IconAlertCircle } from '@tabler/icons-react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 import { PageBlocksEditor } from '../../components/PageBlocksEditor'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
@@ -1134,7 +1134,7 @@ export default function LibraryPage() {
                   : 'Загрузите изображение обложки или укажите URL изображения.'
               }
               value={newItemPreviewImage}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setNewItemPreviewImage(val)
                 setItemFormError('')
               }}

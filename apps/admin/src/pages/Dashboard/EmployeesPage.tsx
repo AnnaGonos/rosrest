@@ -13,7 +13,7 @@ import {
 } from 'react-bootstrap';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { API_ENDPOINTS } from '../../config/api';
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput';
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput';
 
 type Employee = {
   id?: string;
@@ -503,7 +503,7 @@ export default function EmployeesPage() {
               label={<span>Фото сотрудника <span className="text-danger">*</span></span>}
               helpText="Выберите файл (JPG, PNG, WEBP) или укажите URL-ссылку."
               value={photoSource}
-              onChange={(val) => {
+              onChange={(val: ImageUploadValue) => {
                 setPhotoSource(val);
                 setFormError('');
               }}

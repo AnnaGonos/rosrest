@@ -1,5 +1,5 @@
 import { Form, Button, Row, Col, Card } from 'react-bootstrap'
-import ImageUploadInput, { ImageUploadValue } from './ImageUploadInput'
+import { ImageUploadInput, ImageUploadValue } from './ImageUploadInput'
 
 export interface ServiceContactData {
     id?: string
@@ -147,7 +147,7 @@ export function ServiceContactsEditor({ contacts, setContacts }: ServiceContacts
                                         file: contact.photoFile || null,
                                         url: contact.photoMode === 'url' ? contact.photo : ''
                                     }}
-                                    onChange={(value) => handlePhotoChange(index, value)}
+                                    onChange={(value: ImageUploadValue) => handlePhotoChange(index, value)}
                                 />
                             </Col>
 

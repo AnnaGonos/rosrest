@@ -29,7 +29,7 @@ import LinkExtension from '@tiptap/extension-link'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
 import RichTextEditorField from '../../components/RichTextEditorField'
-import ImageUploadInput, { type ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput'
 
 type Moderator = {
   name: string;
@@ -1128,7 +1128,7 @@ export default function EventsPage() {
                               file: null,
                               url: moderator.photoUrl || ''
                             }}
-                            onChange={(val) => {
+                            onChange={(val: ImageUploadValue) => {
                               const newSchedule = [...schedule];
 
                               newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].imageUploadValue = val;
@@ -1666,7 +1666,7 @@ export default function EventsPage() {
                               id={`editModeratorPhotoFile${dayIndex}-${blockIndex}-${moderatorIndex}`}
                               label={<>Фото модератора</>}
                               value={moderator.imageUploadValue || { mode: 'file', file: null, url: moderator.photoUrl || '' }}
-                              onChange={(val) => {
+                              onChange={(val: ImageUploadValue) => {
                                 const newSchedule = [...editSchedule];
 
                                 newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].imageUploadValue = val;
