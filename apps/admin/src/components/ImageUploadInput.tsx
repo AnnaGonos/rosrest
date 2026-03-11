@@ -110,8 +110,6 @@ export function ImageUploadInput({
                     onChange({ mode: 'url', file: null, url: file.url })
                     setFilePickerOpen(false)
                 }}
-                fileType="image"
-                folder="blocks"
             />
 
             <Tabs

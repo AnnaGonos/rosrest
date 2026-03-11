@@ -15,11 +15,9 @@ interface FilePickerModalProps {
     show: boolean;
     onHide: () => void;
     onSelect: (file: FileItem) => void;
-    fileType?: string;
-    folder?: string;
 }
 
-export default function FilePickerModal({ show, onHide, onSelect, fileType, folder }: FilePickerModalProps) {
+export default function FilePickerModal({ show, onHide, onSelect }: FilePickerModalProps) {
     const [files, setFiles] = useState<FileItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
