@@ -75,7 +75,7 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
           <div className="d-flex flex-wrap gap-3">
             {filteredFiles.map(file => (
               <div key={file.id} className="border rounded p-2" style={{ width: 180 }}>
-                {file.mimetype.startsWith('image/') ? (
+                {file.mimetype && file.mimetype.startsWith('image/') ? (
                   <img src={file.url} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
                 ) : (
                   <div className="bg-light text-center" style={{ height: 120, lineHeight: '120px' }}>
