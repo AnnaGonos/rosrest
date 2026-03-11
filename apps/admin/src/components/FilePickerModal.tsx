@@ -3,13 +3,13 @@ import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import { getFileUrl } from '../utils/getFileUrl';
 
 interface FileItem {
-    id: string;
-    url: string;
-    originalName: string;
-    filename?: string;
-    mimetype: string;
-    size: number;
-    createdAt: string;
+  id?: string;
+  url: string;
+  originalName?: string;
+  filename: string;
+  mimetype?: string;
+  size: number;
+  createdAt: string;
 }
 
 interface FilePickerModalProps {
@@ -67,13 +67,22 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
         });
         if (!resp.ok) throw new Error('Ошибка загрузки файлов');
         const data = await resp.json();
-        let items = Array.isArray(data.items) ? data.items : [];
+        // API returns array directly, not {items:[], total:...}
+        let items: FileItem[] = Array.isArray(data)
+          ? data.map((f: any) => ({
+              ...f,
+              originalName: f.originalName || undefined,
+              filename: f.filename || f.originalName || '',
+            }))
+          : [];
+        // Sort by createdAt DESC (newest first)
+        items = items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         if (searchValue) {
-          items = items.filter((f: { originalName?: string; filename?: string }): boolean => (f.originalName ?? f.filename ?? '').toLowerCase().includes(searchValue.toLowerCase()));
+          items = items.filter((f: FileItem): boolean => (f.originalName ?? f.filename ?? '').toLowerCase().includes(searchValue.toLowerCase()));
         }
         setFiles(prev => replace ? items : [...prev, ...items]);
-        setTotal(data.total || 0);
-        setHasMore((data.page * data.limit) < (data.total || 0));
+        setTotal(items.length);
+        setHasMore(items.length === limit); // If less than limit, no more pages
       } catch (err: any) {
         setError(err.message || 'Ошибка загрузки');
       } finally {
