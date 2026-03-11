@@ -423,7 +423,7 @@ export default function SubcategoriesPage() {
         formData.append('title', editDocTitle.trim())
         formData.append('isPublished', editDocIsPublished ? 'true' : 'false')
 
-        formData.append('pdfFile', editDocSource.file)
+        formData.append('file', editDocSource.file)
 
         res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
           method: 'PATCH',
