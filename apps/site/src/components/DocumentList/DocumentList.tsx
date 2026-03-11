@@ -5,7 +5,7 @@ import { getFileUrl } from '../../utils/getFileUrl'
 type DocItem = {
     id: string
     title: string
-    pdfUrl?: string | null
+    fileUrl?: string | null // универсальное поле для PDF/DOC/DOCX
     previewUrl?: string | null
     createdAt?: string
 }
@@ -20,7 +20,7 @@ type Props = {
 }
 
 export default function DocumentList({ items, loading, error, emptyMessage = 'Документы не найдены.', variant = 'list' }: Props) {
-    const resolvePdf = (raw?: string | null) => getFileUrl(raw) || undefined
+    const resolveFile = (raw?: string | null) => getFileUrl(raw) || undefined
     const resolvePreview = (raw?: string | null) => getFileUrl(raw) || undefined
 
     if (loading) return <div>Загрузка...</div>
@@ -34,7 +34,10 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
                 <ul>
                     {items.map((d) => (
                         <li key={d.id}>
-                            <a href={resolvePdf(d.pdfUrl)} target="_blank" rel="noopener noreferrer">{d.title} <i className="bi bi-arrow-up-right"></i></a>
+                            <a href={resolveFile(d.fileUrl)} target="_blank" rel="noopener noreferrer">
+                                {d.title}
+                                <i className="bi bi-arrow-up-right"></i>
+                            </a>
                         </li>
                     ))}
                 </ul>
@@ -50,7 +53,7 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
                         return (
                             <a
                                 key={d.id}
-                                href={resolvePdf(d.pdfUrl)}
+                                href={resolveFile(d.fileUrl)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="documents-grid__item"
@@ -60,7 +63,6 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
                                     <img src={preview} alt={d.title} className="documents-grid__image" />
                                 ) : (
                                     <div className="documents-grid__placeholder">
-                                        <i className="bi bi-file-earmark-pdf"></i>
                                         <span>{d.title}</span>
                                     </div>
                                 )}
