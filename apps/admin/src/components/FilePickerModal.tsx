@@ -79,15 +79,14 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
                 {file.mimetype && file.mimetype.startsWith('image/') ? (
                   <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
                 ) : file.mimetype && file.mimetype === 'application/pdf' ? (
-                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
-                    <i className="bi bi-file-earmark-pdf" style={{ fontSize: 48, color: '#d9534f' }}></i>
-                    <span className="small mt-1">PDF</span>
-                  </div>
+                  <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
                 ) : file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ? (
-                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
-                    <i className="bi bi-file-earmark-word" style={{ fontSize: 48, color: '#0275d8' }}></i>
-                    <span className="small mt-1">DOC</span>
-                  </div>
+                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                      <i className="bi bi-file-earmark-word" style={{ fontSize: 48, color: '#0275d8' }}></i>
+                      <span className="small mt-1">DOC</span>
+                    </div>
+                  </a>
                 ) : (
                   <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
                     <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
