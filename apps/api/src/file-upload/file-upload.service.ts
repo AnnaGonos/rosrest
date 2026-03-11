@@ -94,8 +94,17 @@ export class FileUploadService {
 			}
 		}
 
-		   let baseName = path.basename(file.originalname, path.extname(file.originalname));
-		   let ext = path.extname(file.originalname);
+		   let originalname = file.originalname;
+		   
+		   if (/^[\xC0-\xFF]/.test(originalname) || /Ð|Ñ|Ò|Ó|Ô|Õ|Ö|×|Ø|Ù|Ú|Û|Ü|Ý|Þ|ß/.test(originalname)) {
+			   try {
+				   const buf = Buffer.from(originalname, 'latin1');
+				   originalname = buf.toString('utf8');
+			   } catch (e) {
+			   }
+		   }
+		   let baseName = path.basename(originalname, path.extname(originalname));
+		   let ext = path.extname(originalname);
 		   // Нормализуем имя файла в NFC (Unicode)
 		   baseName = baseName.normalize('NFC');
 		   let safeName = `${baseName}${ext}`;
