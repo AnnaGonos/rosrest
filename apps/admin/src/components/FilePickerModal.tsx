@@ -89,7 +89,7 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
                 ) : (
                   <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
                     <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
-                    <span className="small mt-1">{file.originalName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
+                    <span className="small mt-1">{file.originalName ? (file.originalName.split('.').pop()?.toUpperCase() || 'FILE') : 'FILE'}</span>
                   </div>
                 )}
                 <div className="mt-2 small text-muted">{file.originalName}</div>
