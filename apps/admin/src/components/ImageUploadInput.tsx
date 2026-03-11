@@ -1,6 +1,7 @@
 import { getFileUrl } from '../utils/getFileUrl'
 import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Button, Form, Tabs, Tab } from 'react-bootstrap'
+import FilePickerModal from './FilePickerModal'
 
 export type ImageSourceMode = 'file' | 'url'
 
@@ -21,7 +22,7 @@ interface ImageUploadInputProps {
     accept?: string
 }
 
-export default function ImageUploadInput({
+export function ImageUploadInput({
     id,
     label,
     required = false,
@@ -32,6 +33,7 @@ export default function ImageUploadInput({
     accept = 'image/jpeg,image/png,image/webp,image/svg+xml,image/gif',
 }: ImageUploadInputProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const [filePickerOpen, setFilePickerOpen] = useState(false)
 
     const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
 
@@ -97,6 +99,20 @@ export default function ImageUploadInput({
             {helpText && (
                 <Form.Text className="text-muted mt-0 mb-2">{helpText}</Form.Text>
             )}
+
+            <Button variant="outline-secondary" size="sm" className="mb-2" onClick={() => setFilePickerOpen(true)}>
+                Выбрать из библиотеки
+            </Button>
+            <FilePickerModal
+                show={filePickerOpen}
+                onHide={() => setFilePickerOpen(false)}
+                onSelect={file => {
+                    onChange({ mode: 'url', file: null, url: file.url })
+                    setFilePickerOpen(false)
+                }}
+                fileType="image"
+                folder="blocks"
+            />
 
             <Tabs
                 activeKey={value.mode}

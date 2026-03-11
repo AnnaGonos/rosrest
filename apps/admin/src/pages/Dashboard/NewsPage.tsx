@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS, API_BASE_URL } from '../../config/api'
 import { PageBlocksEditor } from '../../components/PageBlocksEditor'
-import ImageUploadInput, { ImageUploadValue } from '../../components/ImageUploadInput'
+import { ImageUploadInput, ImageUploadValue } from '../../components/ImageUploadInput'
 
 interface Block {
     id: string
@@ -916,7 +916,7 @@ export default function NewsPage() {
                                     id="newsPreviewImage"
                                     label={<>Превью изображения</>}
                                     value={newsPreviewImage}
-                                    onChange={(value) => {
+                                    onChange={(value: ImageUploadValue) => {
                                         setNewsPreviewImage(value)
                                         setUnsavedChanges(true)
                                     }}
