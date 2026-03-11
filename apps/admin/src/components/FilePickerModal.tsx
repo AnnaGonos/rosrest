@@ -27,15 +27,14 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
 
   useEffect(() => {
     if (show) loadFiles();
-  }, [show, fileType, folder]);
+  }, [show]);
 
   const loadFiles = async () => {
     setLoading(true);
     setError('');
     try {
       const token = localStorage.getItem('admin_token');
-      let url = `/api/files?folder=${folder || ''}`;
-      if (fileType) url += `&type=${fileType}`;
+      const url = `/api/files`;
       const resp = await fetch(url, {
         headers: token ? { 'Authorization': `Bearer ${token}` } : {},
       });
@@ -76,10 +75,47 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
           <div className="d-flex flex-wrap gap-3">
             {filteredFiles.map(file => (
               <div key={file.id} className="border rounded p-2" style={{ width: 180 }}>
-                {file.mimetype && file.mimetype.startsWith('image/') ? (
-                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                    <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
-                  </a>
+                {(() => {
+                  // Определяем изображение по mimetype или расширению
+                  const ext = file.originalName ? file.originalName.split('.').pop()?.toLowerCase() : '';
+                  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                  const isImage = (file.mimetype && file.mimetype.startsWith('image/')) || imageExts.includes(ext);
+                  if (isImage) {
+                    return (
+                      <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                        <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                      </a>
+                    );
+                  }
+                  if (file.mimetype && file.mimetype === 'application/pdf') {
+                    return (
+                      <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                        <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
+                      </a>
+                    );
+                  }
+                  if (file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+                    return (
+                      <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                        <iframe
+                          src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
+                          style={{ width: '100%', height: 120, border: 'none', background: '#f8f9fa', borderRadius: 4 }}
+                          title={file.originalName}
+                        />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                      <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                        <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
+                        {file.originalName && (
+                          <span className="small mt-1">{file.originalName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
+                        )}
+                      </div>
+                    </a>
+                  );
+                })()}
                 ) : file.mimetype && file.mimetype === 'application/pdf' ? (
                   <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
                     <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
@@ -96,7 +132,9 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
                   <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                     <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
                       <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
-                      <span className="small mt-1">{file.originalName ? (file.originalName.split('.').pop()?.toUpperCase() || 'FILE') : 'FILE'}</span>
+                      {file.originalName && (
+                        <span className="small mt-1">{file.originalName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
+                      )}
                     </div>
                   </a>
                 )}
