@@ -518,7 +518,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
         const [editImgIdx, setEditImgIdx] = useState<number | null>(null);
         const images = Array.isArray(block.content.images) ? block.content.images : [];
         const columns = block.content.columns || 3;
-        const imageHeight = block.content.imageHeight || 240;
+        const imageHeight = block.content.imageHeight || 500;
         const galleryCaption = block.content.galleryCaption || '';
         const maxImages = block.content.maxImages || 20;
 
@@ -1373,7 +1373,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
         const [editItemIdx, setEditItemIdx] = useState<number | null>(null);
         const items = Array.isArray(block.content.items) ? block.content.items : [];
         const columns = block.content.columns || 3;
-        const imageHeight = block.content.imageHeight || 240;
+        const imageHeight = block.content.imageHeight || 500;
         const maxItems = block.content.maxItems || 12;
 
         const handleAddItem = () => {

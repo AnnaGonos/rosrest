@@ -432,7 +432,7 @@ export const BLOCK_VARIANTS = [
           defaultContent: {
             images: [],
             columns: 2,
-            imageHeight: 240,
+            imageHeight: 450,
             galleryCaption: '',
           },
           settings: {
@@ -453,7 +453,7 @@ export const BLOCK_VARIANTS = [
           defaultContent: {
             images: [],
             columns: 3,
-            imageHeight: 240,
+            imageHeight: 450,
             galleryCaption: '',
           },
           settings: {
@@ -494,7 +494,7 @@ export const BLOCK_VARIANTS = [
           preview: '/previews/gl04.bmp',
           defaultContent: {
             images: [],
-            imageHeight: 240,
+            imageHeight: 450,
             galleryCaption: '',
             maxImages: 2,
           },
@@ -517,7 +517,7 @@ export const BLOCK_VARIANTS = [
           defaultContent: {
             images: [],
             columns: 2,
-            imageHeight: 240,
+            imageHeight: 250,
             galleryCaption: '',
           },
           settings: {
@@ -538,7 +538,7 @@ export const BLOCK_VARIANTS = [
           defaultContent: {
             images: [],
             columns: 2,
-            imageHeight: 240,
+            imageHeight: 450,
             galleryCaption: '',
           },
           settings: {
@@ -584,7 +584,7 @@ export const BLOCK_VARIANTS = [
         defaultContent: {
           items: [],
           columns: 3,
-          imageHeight: 240,
+          imageHeight: 450,
         },
         settings: {
           maxItems: 12,
