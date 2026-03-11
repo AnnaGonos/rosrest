@@ -67,22 +67,34 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
         });
         if (!resp.ok) throw new Error('Ошибка загрузки файлов');
         const data = await resp.json();
-        // API returns array directly, not {items:[], total:...}
-        let items: FileItem[] = Array.isArray(data)
-          ? data.map((f: any) => ({
-              ...f,
-              originalName: f.originalName || undefined,
-              filename: f.filename || f.originalName || '',
-            }))
-          : [];
-        // Sort by createdAt DESC (newest first)
-        items = items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        let items: FileItem[] = [];
+        let totalCount = 0;
+        if (Array.isArray(data)) {
+          // API returns array directly (no pagination info)
+          items = data.map((f: any) => ({
+            ...f,
+            originalName: f.originalName || undefined,
+            filename: f.filename || f.originalName || '',
+          }));
+          // Emulate pagination client-side (fallback)
+          items = items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          totalCount = items.length;
+          items = items.slice((pageToLoad - 1) * limit, pageToLoad * limit);
+        } else if (Array.isArray(data.items)) {
+          // API returns {items, total, ...}
+          items = data.items.map((f: any) => ({
+            ...f,
+            originalName: f.originalName || undefined,
+            filename: f.filename || f.originalName || '',
+          }));
+          totalCount = data.total || items.length;
+        }
         if (searchValue) {
           items = items.filter((f: FileItem): boolean => (f.originalName ?? f.filename ?? '').toLowerCase().includes(searchValue.toLowerCase()));
         }
         setFiles(prev => replace ? items : [...prev, ...items]);
-        setTotal(items.length);
-        setHasMore(items.length === limit); // If less than limit, no more pages
+        setTotal(totalCount);
+        setHasMore(pageToLoad * limit < totalCount);
       } catch (err: any) {
         setError(err.message || 'Ошибка загрузки');
       } finally {
@@ -118,7 +130,7 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
             onChange={e => setSearch(e.target.value)}
             className="mb-3"
           />
-          <div className="d-flex flex-wrap gap-3">
+          <div className="row g-3">
             {filteredFiles.map((file, idx) => {
               const ext = (file.originalName ?? file.filename ?? '').split('.').pop()?.toLowerCase() || '';
               const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
@@ -126,29 +138,30 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
               const isPdf = ext === 'pdf';
               const isDoc = ['doc', 'docx'].includes(ext);
               const displayName = file.originalName ?? file.filename ?? '';
+              const colClass = 'col-6 col-sm-4 col-md-3 col-lg-2'; // 5 per row on lg (>=992px)
               if (filteredFiles.length === idx + 1) {
                 return (
-                  <div ref={lastFileRef} key={file.id || file.url || idx} className="border rounded p-2" style={{ width: 180 }}>
+                  <div ref={lastFileRef} key={file.id || file.url || idx} className={`border rounded p-2 ${colClass}`} style={{ minWidth: 180 }}>
                     <div className="small fw-bold text-center mb-1" style={{ minHeight: 32, wordBreak: 'break-all' }}>{displayName}</div>
                     {isImage ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                        <img src={getFileUrl(file.url)} alt={displayName} style={{ width: 150, height: 100, objectFit: 'contain', display: 'block', margin: '0 auto', background: '#f8f9fa', borderRadius: 4 }} />
+                        <img src={getFileUrl(file.url)} alt={displayName} style={{ width: 100, height: 150, objectFit: 'contain', display: 'block', margin: '0 auto', background: '#f8f9fa', borderRadius: 4 }} />
                       </a>
                     ) : isPdf ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                        <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: 150, height: 100, background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }} />
+                        <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: 100, height: 150, background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }} />
                       </a>
                     ) : isDoc ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
                         <iframe
                           src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
-                          style={{ width: 150, height: 100, border: 'none', background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }}
+                          style={{ width: 100, height: 150, border: 'none', background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }}
                           title={displayName}
                         />
                       </a>
                     ) : (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                        <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 100 }}>
+                        <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 150, width: 100 }}>
                           <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
                           <span className="small mt-1">{ext.toUpperCase() || 'FILE'}</span>
                         </div>
@@ -161,27 +174,27 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
                 );
               } else {
                 return (
-                  <div key={file.id || file.url || idx} className="border rounded p-2" style={{ width: 180 }}>
+                  <div key={file.id || file.url || idx} className={`border rounded p-2 ${colClass}`} style={{ minWidth: 180 }}>
                     <div className="small fw-bold text-center mb-1" style={{ minHeight: 32, wordBreak: 'break-all' }}>{displayName}</div>
                     {isImage ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                        <img src={getFileUrl(file.url)} alt={displayName} style={{ width: 150, height: 100, objectFit: 'contain', display: 'block', margin: '0 auto', background: '#f8f9fa', borderRadius: 4 }} />
+                        <img src={getFileUrl(file.url)} alt={displayName} style={{ width: 100, height: 150, objectFit: 'contain', display: 'block', margin: '0 auto', background: '#f8f9fa', borderRadius: 4 }} />
                       </a>
                     ) : isPdf ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
-                        <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: 150, height: 100, background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }} />
+                        <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: 100, height: 150, background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }} />
                       </a>
                     ) : isDoc ? (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
                         <iframe
                           src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
-                          style={{ width: 150, height: 100, border: 'none', background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }}
+                          style={{ width: 100, height: 150, border: 'none', background: '#f8f9fa', borderRadius: 4, display: 'block', margin: '0 auto' }}
                           title={displayName}
                         />
                       </a>
                     ) : (
                       <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                        <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 100 }}>
+                        <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 150, width: 100 }}>
                           <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
                           <span className="small mt-1">{ext.toUpperCase() || 'FILE'}</span>
                         </div>

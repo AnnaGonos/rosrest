@@ -30,15 +30,34 @@ export class FileUploadController {
 		return { url };
 	}
 
-	@Get()
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
-	@ApiOkResponse({ description: 'Список всех загруженных файлов' })
+		@Get()
+		@UseGuards(JwtAuthGuard)
+		@ApiBearerAuth()
+		@ApiOkResponse({ description: 'Пагинированный список всех файлов' })
+		@ApiQuery({ name: 'folder', required: false, description: 'Подпапка внутри uploads' })
+		@ApiQuery({ name: 'page', required: false, description: 'Номер страницы (начиная с 1)', type: Number })
+		@ApiQuery({ name: 'limit', required: false, description: 'Размер страницы (кол-во элементов)', type: Number })
+		listFiles(
+			@Query('folder') folder?: string,
+			@Query('page') page: string = '1',
+			@Query('limit') limit: string = '50',
+		) {
+			const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+			const limitNum = Math.max(Math.min(parseInt(limit, 10) || 50, 200), 1);
 
+			const allFiles = this.fileUploadService.listFiles(folder);
+			const total = allFiles.length;
+			const start = (pageNum - 1) * limitNum;
+			const end = start + limitNum;
+			const items = allFiles.slice(start, end);
 
-	listFiles(@Query('folder') folder?: string) {
-		return this.fileUploadService.listFiles(folder);
-	}
+			return {
+				items,
+				total,
+				page: pageNum,
+				limit: limitNum,
+			};
+		}
 
 	@Get('library')
 	@UseGuards(JwtAuthGuard)
