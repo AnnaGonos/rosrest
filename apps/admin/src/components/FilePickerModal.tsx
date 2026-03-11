@@ -61,7 +61,7 @@ export default function FilePickerModal({ show, onHide, onSelect }: FilePickerMo
       try {
         const token = localStorage.getItem('admin_token');
         const params = new URLSearchParams({ page: String(pageToLoad), limit: String(limit) });
-        const url = `/api/files/library?${params.toString()}`;
+        const url = `/api/files?${params.toString()}`;
         const resp = await fetch(url, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         });
