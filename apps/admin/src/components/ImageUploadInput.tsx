@@ -48,6 +48,9 @@ export function ImageUploadInput({
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files && event.target.files[0] ? event.target.files[0] : null
+        if (file) {
+            console.log('Выбран файл:', file.name)
+        }
         onChange({
             ...value,
             mode: 'file',
