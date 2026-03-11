@@ -30,7 +30,7 @@ export function ImageUploadInput({
     value,
     onChange,
     disabled = false,
-    accept = 'image/jpeg,image/png,image/webp,image/svg+xml,image/gif',
+    accept = 'image/jpeg,image/png,image/webp,image/svg+xml,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 }: ImageUploadInputProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [filePickerOpen, setFilePickerOpen] = useState(false)
@@ -126,16 +126,21 @@ export function ImageUploadInput({
                                 accept={accept}
                                 disabled={disabled}
                                 onChange={handleFileChange}
+                                key={accept}
                             />
                         </div>
 
                         {previewUrl && value.mode === 'file' && (
                             <div className="mt-3">
-                                <img
-                                    src={getFileUrl(previewUrl)}
-                                    alt="Предпросмотр изображения"
-                                    style={{ maxWidth: '100%', maxHeight: 150, borderRadius: 4, objectFit: 'contain' }}
-                                />
+                                {value.file && value.file.type.startsWith('image/') ? (
+                                    <img
+                                        src={getFileUrl(previewUrl)}
+                                        alt="Предпросмотр изображения"
+                                        style={{ maxWidth: '100%', maxHeight: 150, borderRadius: 4, objectFit: 'contain' }}
+                                    />
+                                ) : (
+                                    <div className="text-muted small">Файл выбран: {value.file?.name}</div>
+                                )}
                             </div>
                         )}
                         {value.file && (
