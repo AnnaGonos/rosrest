@@ -5,5 +5,10 @@ export function getFileUrl(url?: string | null): string | null {
         const base = 'https://document.rosrest.com';
         return base + url;
     }
+    if (url.match(/^\/((documents|files|docs|pdf|docx|doc)\/?)/)) {
+        const base = 'https://document.rosrest.com';
+        return base + url;
+    }
+   
     return url;
 }

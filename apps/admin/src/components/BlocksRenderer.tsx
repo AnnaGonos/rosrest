@@ -152,10 +152,12 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 }
                 // Кнопочные блоки
                 if (block.type.startsWith('BF')) {
-                    const { text = '', url = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-                    // тип ссылки pdf, используем getFileUrl(pdfUrl), иначе getFileUrl(url) для файлов, либо url для внутренних
+                    const { text = '', url = '', fileUrl = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
+                    // Если есть fileUrl (универсальное поле), используем его
                     let buttonHref: string | undefined;
-                    if (linkType === 'pdf') {
+                    if (fileUrl) {
+                        buttonHref = getFileUrl(fileUrl) || '';
+                    } else if (linkType === 'pdf' && pdfUrl) {
                         buttonHref = getFileUrl(pdfUrl) || '';
                     } else if (linkType === 'internal') {
                         buttonHref = url ? (url.startsWith('/') ? url : `/${url}`) : '#';
@@ -356,7 +358,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
 
                 // TL01: Изображение-ссылка
                 if (block.type === 'TL01') {
-                    const { src = '', alt = '', width, height, alignH = 'center', url = '', pdfUrl = '', linkType = 'url', openInNewTab = true } = block.content || {};
+                    const { src = '', alt = '', width, height, alignH = 'center', url = '', fileUrl = '', pdfUrl = '', linkType = 'url', openInNewTab = true } = block.content || {};
                     const imageSrc = getFileUrl(src);
 
                     const getAlignValue = (align: string) => {
@@ -365,7 +367,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return 'center';
                     };
 
-                    const finalUrl = linkType === 'pdf' ? getFileUrl(pdfUrl) : url;
+                   
+                    const finalUrl = fileUrl ? getFileUrl(fileUrl) : (linkType === 'pdf' ? getFileUrl(pdfUrl) : url);
 
                     return (
                         <div key={block.id} className="tile-link-block tile-link-block--tl01 mb-40" style={{ display: 'flex', justifyContent: getAlignValue(alignH) }}>
@@ -444,7 +447,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                 )}
                                 {items.map((item: any, idx: number) => {
                                     const imageSrc = getFileUrl(item.src);
-                                    const itemUrl = item.linkType === 'pdf' ? getFileUrl(item.pdfUrl) : item.url;
+                                    const itemUrl = item.fileUrl ? getFileUrl(item.fileUrl) : (item.linkType === 'pdf' ? getFileUrl(item.pdfUrl) : item.url);
 
                                     const ImageContent = (
                                         <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
