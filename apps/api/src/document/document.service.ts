@@ -156,49 +156,64 @@ export class DocumentService {
 		return document
 	}
 
-	async updateDocument(id: string, dto: UpdateDocumentDto) {
-		const document = await this.documentRepo.findOne({ where: { id } })
-		if (!document) {
-			throw new NotFoundException(`Document with ID ${id} not found`)
-		}
+	       async updateDocument(
+		       id: string,
+		       dto: UpdateDocumentDto,
+		       file?: UploadFile,
+		       fileUploadService?: FileUploadService,
+		       previewFile?: UploadFile,
+	       ) {
+		       const document = await this.documentRepo.findOne({ where: { id } })
+		       if (!document) {
+			       throw new NotFoundException(`Document with ID ${id} not found`)
+		       }
 
-		if (dto.type) {
-			document.type = dto.type
-		}
+		       if (dto.type) {
+			       document.type = dto.type
+		       }
 
-		if (dto.subcategoryId !== undefined) {
-			if (dto.subcategoryId === null) {
-				document.category = null
-				document.subcategory = null
-			} else {
-				const subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] })
-				if (!subcategory) {
-					throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`)
-				}
-				if (!subcategory.parent) {
-					throw new BadRequestException('У подкатегории должен быть родитель (категория)')
-				}
-				document.subcategory = subcategory
-				document.category = subcategory.parent
-			}
-		}
+		       if (dto.subcategoryId !== undefined) {
+			       if (dto.subcategoryId === null) {
+				       document.category = null
+				       document.subcategory = null
+			       } else {
+				       const subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] })
+				       if (!subcategory) {
+					       throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`)
+				       }
+				       if (!subcategory.parent) {
+					       throw new BadRequestException('У подкатегории должен быть родитель (категория)')
+				       }
+				       document.subcategory = subcategory
+				       document.category = subcategory.parent
+			       }
+		       }
 
-		if (dto.title !== undefined) {
-			document.title = dto.title
-		}
+		       if (dto.title !== undefined) {
+			       document.title = dto.title
+		       }
 
-		if (dto.isPublished !== undefined) {
-			document.isPublished = dto.isPublished
-		}
+		       if (dto.isPublished !== undefined) {
+			       document.isPublished = dto.isPublished
+		       }
 
-		if (dto.fileUrl !== undefined) {
-			document.fileUrl = dto.fileUrl
-		}
+		       // Handle file upload or fileUrl update
+		       if (file && fileUploadService) {
+			       let type: 'pdf' | 'doc' = 'pdf';
+			       if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+				       type = 'doc';
+			       }
+			       document.fileUrl = await fileUploadService.upload(file, type, 'documents/files');
+		       } else if (dto.fileUrl !== undefined) {
+			       document.fileUrl = dto.fileUrl;
+		       }
 
-		const saved = await this.documentRepo.save(document)
-		await this.invalidateCache()
-		return saved
-	}
+		       // Optionally handle previewFile/previewUrl update if needed
+
+		       const saved = await this.documentRepo.save(document)
+		       await this.invalidateCache()
+		       return saved
+	       }
 
 	async removeDocument(id: string) {
 		const document = await this.documentRepo.findOne({ where: { id } })

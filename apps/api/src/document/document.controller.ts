@@ -123,18 +123,51 @@ export class DocumentController {
 		return await this.documentService.create(dto, fileMap.file, this.fileUploadService, fileMap.previewFile);
 	}
 
-	@Patch(':id')
-	@UseGuards(JwtAuthGuard)
-	@ApiBearerAuth()
-	@ApiOkResponse({ type: Document })
-	@ApiResponse({ status: 400, description: 'Bad request' })
-	@ApiResponse({ status: 404, description: 'Document not found' })
-	async update(
-		@Param('id', new ParseUUIDPipe()) id: string,
-		@Body(new ValidationPipe({ transform: true, whitelist: false })) dto: UpdateDocumentDto,
-	) {
-		return await this.documentService.updateDocument(id, dto);
-	}
+	       @Patch(':id')
+	       @UseGuards(JwtAuthGuard)
+	       @UseInterceptors(AnyFilesInterceptor())
+	       @ApiBearerAuth()
+	       @ApiConsumes('multipart/form-data')
+	       @ApiBody({
+		       description: 'Обновление документа: загрузите файл (PDF, DOC, DOCX и др.) и/или укажите ссылку',
+		       schema: {
+			       type: 'object',
+			       properties: {
+				       title: { type: 'string', example: 'Письмо Минэкономразвития от 25.06.2012' },
+				       type: { type: 'string', enum: ['charter', 'contracts', 'documents'], example: 'charter' },
+				       categoryId: { type: 'number', example: 1, description: 'ID категории (используется когда нет подкатегории)' },
+				       subcategoryId: { type: 'number', example: 2, description: 'ID подкатегории (категория берётся из parent)' },
+				       fileUrl: { type: 'string', example: 'https://drive.google.com/file/d/abc/document.pdf', description: 'URL на файл документа (либо загрузите file)' },
+				       previewUrl: { type: 'string', example: 'https://drive.google.com/file/d/xyz/preview.jpg', description: 'URL на превью изображение (либо загрузите previewFile)' },
+				       isPublished: { type: 'boolean', example: true },
+				       file: { type: 'string', format: 'binary', description: 'Файл документа (PDF, DOC, DOCX и др.) (либо укажите fileUrl)' },
+				       previewFile: { type: 'string', format: 'binary', description: 'Превью изображение (JPG, PNG)' },
+			       },
+			       required: ['title'],
+		       },
+	       })
+	       @ApiOkResponse({ type: Document })
+	       @ApiResponse({ status: 400, description: 'Bad request' })
+	       @ApiResponse({ status: 404, description: 'Document not found' })
+	       async update(
+		       @Param('id', new ParseUUIDPipe()) id: string,
+		       @Body(new ValidationPipe({ transform: true, whitelist: false })) dto: UpdateDocumentDto,
+		       @UploadedFiles() files?: UploadFile | UploadFile[]
+	       ) {
+		       const fileMap: { file?: UploadFile, previewFile?: UploadFile } = {};
+		       if (files) {
+			       if (Array.isArray(files)) {
+				       for (const f of files) {
+					       if (f.fieldname === 'file') fileMap.file = f;
+					       if (f.fieldname === 'previewFile') fileMap.previewFile = f;
+				       }
+			       } else {
+				       if (files.fieldname === 'file') fileMap.file = files;
+				       if (files.fieldname === 'previewFile') fileMap.previewFile = files;
+			       }
+		       }
+		       return await this.documentService.updateDocument(id, dto, fileMap.file, this.fileUploadService, fileMap.previewFile);
+	       }
 
 	@Delete(':id')
 	@UseGuards(JwtAuthGuard)

@@ -616,7 +616,14 @@ export default function SubcategoriesPage() {
                             onClick={() => {
                               setEditingDocument(doc)
                               setEditDocTitle(doc.title)
-                              setEditDocSource({ mode: 'file', file: null, url: '' })
+                              // Pre-fill editDocSource with current file or URL
+                              if (doc.pdfUrl && (doc.pdfUrl.startsWith('http://') || doc.pdfUrl.startsWith('https://'))) {
+                                setEditDocSource({ mode: 'url', file: null, url: doc.pdfUrl })
+                              } else if (doc.pdfUrl) {
+                                setEditDocSource({ mode: 'file', file: null, url: doc.pdfUrl })
+                              } else {
+                                setEditDocSource({ mode: 'file', file: null, url: '' })
+                              }
                               setEditDocIsPublished(doc.isPublished)
                               setEditDocFormError('')
                               setEditDocModalOpened(true)
@@ -1117,40 +1124,34 @@ export default function SubcategoriesPage() {
                   />
                 </Form.Group>
                 <ImageUploadInput
-                  id="editDocSource"
-                  label="Обновить файл/ссылку (необязательно)"
-                  helpText="Оставьте пустым, если не нужно менять файл. Поддерживаются PDF, DOC, DOCX."
-                  value={editDocSource}
-                  onChange={setEditDocSource}
-                  disabled={isEditingDoc}
-                  accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                />
-
-                <Form.Label className="mb-1 mt-4">Статус публикации (Опубликовать / Черновик)</Form.Label>
-                <Form.Check
-                  type="checkbox"
-                  id="editDocIsPublished"
-                  label="Опубликовать документ"
-                  className="mb-0"
-                  checked={editDocIsPublished}
-                  onChange={(e) => setEditDocIsPublished(e.currentTarget.checked)}
-                  disabled={isEditingDoc}
-                />
-              </Form>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setEditDocModalOpened(false)
-                  setEditingDocument(null)
-                  setEditDocTitle('')
-                  setEditDocSource({ mode: 'file', file: null, url: '' })
-                  setEditDocIsPublished(true)
-                  setEditDocFormError('')
-                }}
-                disabled={isEditingDoc}
-              >
+                  if (editDocSource.file) {
+                    const formData = new FormData()
+                    formData.append('title', editDocTitle.trim())
+                    formData.append('isPublished', editDocIsPublished ? 'true' : 'false')
+                    formData.append('file', editDocSource.file)
+                    res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
+                      method: 'PATCH',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
+                    })
+                  } else {
+                    const formData = new FormData()
+                    formData.append('title', editDocTitle.trim())
+                    formData.append('isPublished', editDocIsPublished ? 'true' : 'false')
+                    const trimmedUrl = editDocSource.url.trim()
+                    if (editDocSource.mode === 'url' && trimmedUrl) {
+                      formData.append('fileUrl', trimmedUrl)
+                    }
+                    res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
+                      method: 'PATCH',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: formData,
+                    })
+                  }
                 Отмена
               </Button>
               <Button variant="primary" onClick={handleEditDocument} disabled={isEditingDoc}>
