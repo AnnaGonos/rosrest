@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Button, Form, Spinner } from 'react-bootstrap';
+import { getFileUrl } from '../utils/getFileUrl';
 
 interface FileItem {
   id: string;
@@ -76,10 +77,21 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
             {filteredFiles.map(file => (
               <div key={file.id} className="border rounded p-2" style={{ width: 180 }}>
                 {file.mimetype && file.mimetype.startsWith('image/') ? (
-                  <img src={file.url} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                  <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                ) : file.mimetype && file.mimetype === 'application/pdf' ? (
+                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                    <i className="bi bi-file-earmark-pdf" style={{ fontSize: 48, color: '#d9534f' }}></i>
+                    <span className="small mt-1">PDF</span>
+                  </div>
+                ) : file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ? (
+                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                    <i className="bi bi-file-earmark-word" style={{ fontSize: 48, color: '#0275d8' }}></i>
+                    <span className="small mt-1">DOC</span>
+                  </div>
                 ) : (
-                  <div className="bg-light text-center" style={{ height: 120, lineHeight: '120px' }}>
-                    <span>{file.originalName}</span>
+                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                    <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
+                    <span className="small mt-1">{file.originalName.split('.').pop()?.toUpperCase() || 'FILE'}</span>
                   </div>
                 )}
                 <div className="mt-2 small text-muted">{file.originalName}</div>
