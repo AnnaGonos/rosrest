@@ -117,7 +117,7 @@ export const BLOCK_VARIANTS = [
         title: 'Закрашенная кнопка',
         description: 'Закрашенная кнопка синего цвета.',
         preview: '/previews/bf01.bmp',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
       {
         id: 'BF02',
@@ -125,7 +125,7 @@ export const BLOCK_VARIANTS = [
         title: 'Кнопка прозрачная',
         description: '',
         preview: '/previews/bf02.bmp',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
       {
         id: 'BF03',
@@ -133,7 +133,7 @@ export const BLOCK_VARIANTS = [
         title: 'Кнопка прозрачная со стрелкой',
         description: '',
         preview: '/previews/bf03.bmp',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
       {
         id: 'BF04',
@@ -141,7 +141,7 @@ export const BLOCK_VARIANTS = [
         title: 'Необычная кнопка',
         description: '',
         preview: '/previews/bf04.bmp',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
       {
         id: 'BF05',
@@ -149,7 +149,7 @@ export const BLOCK_VARIANTS = [
         title: 'Минималистичная кнопка',
         description: 'Выглядит как просто текст с подчёркиванием.',
         preview: '/previews/bf05.bmp',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
       {
         id: 'BF06',
@@ -157,7 +157,7 @@ export const BLOCK_VARIANTS = [
         title: 'Минималистичная кнопка со стрелкой',
         description: 'Более интересный вариант предыдущей кнопки, с иконкой стрелки.',
         preview: '/previews/bf06.png',
-        defaultContent: { text: '', url: '' },
+        defaultContent: { text: '', url: '', fileUrl: '' },
       },
     ],
   },
@@ -571,6 +571,7 @@ export const BLOCK_VARIANTS = [
           alignH: 'center',
           url: '',
           pdfUrl: '',
+          fileUrl: '',
           linkType: 'url',
           openInNewTab: true,
         },
@@ -585,6 +586,7 @@ export const BLOCK_VARIANTS = [
           items: [],
           columns: 3,
           imageHeight: 450,
+          fileUrl: '',
         },
         settings: {
           maxItems: 12,

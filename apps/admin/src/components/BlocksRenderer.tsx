@@ -170,19 +170,21 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     else alignClass = 'text-center';
                     return (
                         <div key={block.id} className={`${alignClass} mb-40`}>
-                            <a
-                                href={buttonHref}
-                                target={openInNewTab ? "_blank" : undefined}
-                                rel={openInNewTab ? "noopener noreferrer" : undefined}
-                                className={`button-link ${variant}`}
-                            >
-                                <span>{text || 'Кнопка'}</span>
-                                {
-                                    (block.type === 'BF03' || block.type === 'BF04' || block.type === 'BF06') && (
+                            {buttonHref && buttonHref !== '' ? (
+                                <a
+                                    href={buttonHref}
+                                    target={openInNewTab ? "_blank" : undefined}
+                                    rel={openInNewTab ? "noopener noreferrer" : undefined}
+                                    className={`button-link ${variant}`}
+                                >
+                                    <span>{text || 'Кнопка'}</span>
+                                    {(block.type === 'BF03' || block.type === 'BF04' || block.type === 'BF06') && (
                                         <i className="bi bi-arrow-up-right"></i>
-                                    )
-                                }
-                            </a>
+                                    )}
+                                </a>
+                            ) : (
+                                <span className={`button-link ${variant} disabled`} style={{ pointerEvents: 'none', opacity: 0.5 }}>{text || 'Кнопка'}</span>
+                            )}
                         </div>
                     );
                 }
