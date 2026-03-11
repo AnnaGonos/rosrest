@@ -94,28 +94,28 @@ export class FileUploadService {
 			}
 		}
 
-		   let originalname = file.originalname;
-		   
-		   if (/^[\xC0-\xFF]/.test(originalname) || /Ð|Ñ|Ò|Ó|Ô|Õ|Ö|×|Ø|Ù|Ú|Û|Ü|Ý|Þ|ß/.test(originalname)) {
-			   try {
-				   const buf = Buffer.from(originalname, 'latin1');
-				   originalname = buf.toString('utf8');
-			   } catch (e) {
-			   }
-		   }
-		   let baseName = path.basename(originalname, path.extname(originalname));
-		   let ext = path.extname(originalname);
-		   // Нормализуем имя файла в NFC (Unicode)
-		   baseName = baseName.normalize('NFC');
-		   let safeName = `${baseName}${ext}`;
-		   let filepath = path.join(targetDir, safeName);
-		   // Если файл с таким именем уже есть, добавляем timestamp
-		   if (fs.existsSync(filepath)) {
-			   safeName = `${baseName}_${Date.now()}${ext}`;
-			   filepath = path.join(targetDir, safeName);
-		   }
-		   await fs.promises.writeFile(filepath, file.buffer);
-		   return `${urlPrefix}/${safeName}`;
+		let originalname = file.originalname;
+
+		if (/^[\xC0-\xFF]/.test(originalname) || /Ð|Ñ|Ò|Ó|Ô|Õ|Ö|×|Ø|Ù|Ú|Û|Ü|Ý|Þ|ß/.test(originalname)) {
+			try {
+				const buf = Buffer.from(originalname, 'latin1');
+				originalname = buf.toString('utf8');
+			} catch (e) {
+			}
+		}
+		let baseName = path.basename(originalname, path.extname(originalname));
+		let ext = path.extname(originalname);
+
+		baseName = baseName.normalize('NFC');
+		let safeName = `${baseName}${ext}`;
+		let filepath = path.join(targetDir, safeName);
+
+		if (fs.existsSync(filepath)) {
+			safeName = `${baseName}_${Date.now()}${ext}`;
+			filepath = path.join(targetDir, safeName);
+		}
+		await fs.promises.writeFile(filepath, file.buffer);
+		return `${urlPrefix}/${safeName}`;
 	}
 
 	delete(filePath: string): void {
@@ -137,35 +137,35 @@ export class FileUploadService {
 		filePaths.forEach((filePath) => this.delete(filePath));
 	}
 
-	       listFiles(subfolder?: string) {
-		       const collectFiles = (dir: string, urlPrefix: string): any[] => {
-			       if (!fs.existsSync(dir)) return [];
-			       const entries = fs.readdirSync(dir);
-			       let result: any[] = [];
-			       for (const entry of entries) {
-				       const fullPath = path.join(dir, entry);
-				       const stat = fs.statSync(fullPath);
-				       if (stat.isFile()) {
-					       result.push({
-						       filename: entry,
-						       url: `${urlPrefix}/${entry}`,
-						       size: stat.size,
-						       createdAt: stat.birthtime,
-					       });
-				       } else if (stat.isDirectory()) {
-					       result = result.concat(collectFiles(fullPath, `${urlPrefix}/${entry}`));
-				       }
-			       }
-			       return result;
-		       };
+	listFiles(subfolder?: string) {
+		const collectFiles = (dir: string, urlPrefix: string): any[] => {
+			if (!fs.existsSync(dir)) return [];
+			const entries = fs.readdirSync(dir);
+			let result: any[] = [];
+			for (const entry of entries) {
+				const fullPath = path.join(dir, entry);
+				const stat = fs.statSync(fullPath);
+				if (stat.isFile()) {
+					result.push({
+						filename: entry,
+						url: `${urlPrefix}/${entry}`,
+						size: stat.size,
+						createdAt: stat.birthtime,
+					});
+				} else if (stat.isDirectory()) {
+					result = result.concat(collectFiles(fullPath, `${urlPrefix}/${entry}`));
+				}
+			}
+			return result;
+		};
 
-		       if (subfolder) {
-			       const targetDir = path.join(this.uploadDir, subfolder);
-			       const urlPrefix = `/uploads/${subfolder}`;
-			       return collectFiles(targetDir, urlPrefix).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-		       } else {
-			       return collectFiles(this.uploadDir, '/uploads').sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-		       }
-	       }
+		if (subfolder) {
+			const targetDir = path.join(this.uploadDir, subfolder);
+			const urlPrefix = `/uploads/${subfolder}`;
+			return collectFiles(targetDir, urlPrefix).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+		} else {
+			return collectFiles(this.uploadDir, '/uploads').sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+		}
+	}
 }
 
