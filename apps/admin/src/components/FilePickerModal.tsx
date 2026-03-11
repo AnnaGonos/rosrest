@@ -77,20 +77,28 @@ export default function FilePickerModal({ show, onHide, onSelect, fileType, fold
             {filteredFiles.map(file => (
               <div key={file.id} className="border rounded p-2" style={{ width: 180 }}>
                 {file.mimetype && file.mimetype.startsWith('image/') ? (
-                  <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                    <img src={getFileUrl(file.url)} alt={file.originalName} style={{ width: '100%', height: 120, objectFit: 'cover' }} />
+                  </a>
                 ) : file.mimetype && file.mimetype === 'application/pdf' ? (
-                  <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
+                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                    <embed src={getFileUrl(file.url)} type="application/pdf" style={{ width: '100%', height: 120, background: '#f8f9fa', borderRadius: 4 }} />
+                  </a>
                 ) : file.mimetype && (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ? (
-                  <iframe
-                    src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
-                    style={{ width: '100%', height: 120, border: 'none', background: '#f8f9fa', borderRadius: 4 }}
-                    title={file.originalName}
-                  />
+                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer">
+                    <iframe
+                      src={`https://docs.google.com/gview?url=${encodeURIComponent(getFileUrl(file.url))}&embedded=true`}
+                      style={{ width: '100%', height: 120, border: 'none', background: '#f8f9fa', borderRadius: 4 }}
+                      title={file.originalName}
+                    />
+                  </a>
                 ) : (
-                  <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
-                    <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
-                    <span className="small mt-1">{file.originalName ? (file.originalName.split('.').pop()?.toUpperCase() || 'FILE') : 'FILE'}</span>
-                  </div>
+                  <a href={getFileUrl(file.url)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    <div className="d-flex flex-column align-items-center justify-content-center bg-light" style={{ height: 120 }}>
+                      <i className="bi bi-file-earmark" style={{ fontSize: 48, color: '#888' }}></i>
+                      <span className="small mt-1">{file.originalName ? (file.originalName.split('.').pop()?.toUpperCase() || 'FILE') : 'FILE'}</span>
+                    </div>
+                  </a>
                 )}
                 <div className="mt-2 small text-muted">{file.originalName}</div>
                 <Button variant="outline-primary" size="sm" className="mt-2 w-100" onClick={() => onSelect(file)}>
