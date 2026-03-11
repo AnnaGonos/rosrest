@@ -31,14 +31,17 @@ export class CreateDocumentDto {
 	@IsNumber()
 	subcategoryId?: number;
 
-	@ApiProperty({ example: 'https://drive.google.com/file/d/abc123/document.pdf', required: false, description: 'URL на PDF файл в облаке (либо загрузите pdfFile)' })
+
+	@ApiProperty({ example: 'https://drive.google.com/file/d/abc123/document.pdf', required: false, description: 'URL на файл документа (PDF, DOC, DOCX и др.) (либо загрузите file)' })
 	@IsOptional()
 	@IsString()
-	pdfUrl?: string;
+	fileUrl?: string;
+
 	@ApiProperty({ example: 'https://drive.google.com/file/d/abc123/preview.jpg', required: false, description: 'URL на превью изображение' })
 	@IsOptional()
 	@IsString()
 	previewUrl?: string;
+	
 	@ApiProperty({ example: true, required: false })
 	@IsOptional()
 	@Transform(({ value }) => {

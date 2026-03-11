@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PdfUploadField from './PdfUploadField';
+import DocUploadField from './DocUploadField';
 import { Modal, Form, Button, Alert } from 'react-bootstrap';
 import { IconLink, IconX, IconExternalLink, IconHash } from '@tabler/icons-react';
 
@@ -11,19 +12,25 @@ interface LinkModalProps {
 }
 
 export default function LinkModal({ show, onHide, onSetLink, existingUrl = '' }: LinkModalProps) {
-  const initialType: 'external' | 'pdf' = existingUrl && existingUrl.endsWith('.pdf') ? 'pdf' : 'external';
-  const [linkType, setLinkType] = useState<'external' | 'pdf'>(initialType);
-  const [url, setUrl] = useState(initialType === 'pdf' ? '' : existingUrl);
+  let initialType: 'external' | 'pdf' | 'doc' = 'external';
+  if (existingUrl && existingUrl.endsWith('.pdf')) initialType = 'pdf';
+  if (existingUrl && (existingUrl.endsWith('.doc') || existingUrl.endsWith('.docx'))) initialType = 'doc';
+  const [linkType, setLinkType] = useState<'external' | 'pdf' | 'doc'>(initialType);
+  const [url, setUrl] = useState(initialType === 'external' ? existingUrl : '');
   const [pdfUrl, setPdfUrl] = useState(initialType === 'pdf' ? existingUrl : '');
+  const [docUrl, setDocUrl] = useState(initialType === 'doc' ? existingUrl : '');
   const [openInNewTab, setOpenInNewTab] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (show) {
-      const isPdf = existingUrl && existingUrl.endsWith('.pdf');
-      setLinkType(isPdf ? 'pdf' : 'external');
-      setUrl(isPdf ? '' : existingUrl || '');
-      setPdfUrl(isPdf ? existingUrl : '');
+      let type: 'external' | 'pdf' | 'doc' = 'external';
+      if (existingUrl && existingUrl.endsWith('.pdf')) type = 'pdf';
+      if (existingUrl && (existingUrl.endsWith('.doc') || existingUrl.endsWith('.docx'))) type = 'doc';
+      setLinkType(type);
+      setUrl(type === 'external' ? existingUrl || '' : '');
+      setPdfUrl(type === 'pdf' ? existingUrl : '');
+      setDocUrl(type === 'doc' ? existingUrl : '');
       setOpenInNewTab(false);
       setError(null);
     }
@@ -47,6 +54,13 @@ export default function LinkModal({ show, onHide, onSetLink, existingUrl = '' }:
         return;
       }
       onSetLink(pdfUrl, openInNewTab);
+      handleClose();
+    } else if (linkType === 'doc') {
+      if (!docUrl) {
+        setError('Пожалуйста, загрузите DOC/DOCX файл или вставьте ссылку');
+        return;
+      }
+      onSetLink(docUrl, openInNewTab);
       handleClose();
     }
   };
@@ -91,6 +105,7 @@ export default function LinkModal({ show, onHide, onSetLink, existingUrl = '' }:
                 onChange={() => {
                   setLinkType('external');
                   setPdfUrl('');
+                  setDocUrl('');
                   setError(null);
                 }}
               />
@@ -102,6 +117,19 @@ export default function LinkModal({ show, onHide, onSetLink, existingUrl = '' }:
                 onChange={() => {
                   setLinkType('pdf');
                   setUrl('');
+                  setDocUrl('');
+                  setError(null);
+                }}
+              />
+              <Form.Check
+                type="radio"
+                id="link-type-doc"
+                label="DOC/DOCX файл (загрузить или вставить ссылку)"
+                checked={linkType === 'doc'}
+                onChange={() => {
+                  setLinkType('doc');
+                  setUrl('');
+                  setPdfUrl('');
                   setError(null);
                 }}
               />
@@ -140,6 +168,17 @@ export default function LinkModal({ show, onHide, onSetLink, existingUrl = '' }:
                 value={pdfUrl}
                 onChange={val => {
                   setPdfUrl(val);
+                  setError(null);
+                }}
+              />
+            </Form.Group>
+          )}
+          {linkType === 'doc' && (
+            <Form.Group className="mb-3">
+              <DocUploadField
+                value={docUrl}
+                onChange={val => {
+                  setDocUrl(val);
                   setError(null);
                 }}
               />

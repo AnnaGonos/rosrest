@@ -22,9 +22,10 @@ export class Document {
 
 	@ApiProperty({
 		example: 'https://rosrest.com/wp-content/uploads/2025/06/letter.pdf',
+		description: 'Ссылка на файл документа (PDF, DOC, DOCX и др.)',
 	})
 	@Column({ type: 'text' })
-	pdfUrl!: string;
+	fileUrl!: string;
 
 	@ApiProperty({ enum: DocumentType, example: DocumentType.CHARTER })
 	@Column({ type: 'varchar', length: 50 })

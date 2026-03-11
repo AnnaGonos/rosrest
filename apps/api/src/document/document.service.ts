@@ -64,66 +64,56 @@ export class DocumentService {
 		fileUploadService?: FileUploadService,
 		previewFile?: UploadFile,
 	) {
-		if (!file && !dto.pdfUrl) {
-			throw new BadRequestException('Необходимо либо загрузить PDF файл, либо указать pdfUrl')
-		}
-
-		if (file && dto.pdfUrl) {
-			throw new BadRequestException('Укажите либо pdfFile (загрузка), либо pdfUrl, но не оба одновременно')
-		}
-
-		let pdfUrl: string
+		let fileUrl: string | undefined = undefined;
 		if (file) {
-			if (!fileUploadService) {
-				throw new BadRequestException('FileUploadService is required')
+			if (!fileUploadService) throw new BadRequestException('FileUploadService is required');
+			// Определяем тип файла по mime
+			let type: 'pdf' | 'doc' = 'pdf';
+			if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+				type = 'doc';
 			}
-			pdfUrl = await fileUploadService.upload(file, 'pdf', 'documents/pdfs')
-		} else {
-			pdfUrl = dto.pdfUrl as string
+			fileUrl = await fileUploadService.upload(file, type, 'documents/files');
+		} else if (dto.fileUrl) {
+			fileUrl = dto.fileUrl;
+		}
+		if (!fileUrl) {
+			throw new BadRequestException('Необходимо загрузить файл документа или указать ссылку');
 		}
 
-		let previewUrl: string | undefined
+		let previewUrl: string | undefined;
 		if (previewFile) {
-			if (!fileUploadService) {
-				throw new BadRequestException('FileUploadService is required')
-			}
-			previewUrl = await fileUploadService.upload(previewFile, 'image', 'documents/preview')
+			if (!fileUploadService) throw new BadRequestException('FileUploadService is required');
+			previewUrl = await fileUploadService.upload(previewFile, 'image', 'documents/preview');
 		} else if (dto.previewUrl) {
-			previewUrl = dto.previewUrl
+			previewUrl = dto.previewUrl;
 		}
 
-		let category: DocumentCategory | null = null
-		let subcategory: DocumentCategory | null = null
+		let category: DocumentCategory | null = null;
+		let subcategory: DocumentCategory | null = null;
 
 		if (dto.subcategoryId) {
-			subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] })
-			if (!subcategory) {
-				throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`)
-			}
-			if (!subcategory.parent) {
-				throw new BadRequestException('У подкатегории должен быть родитель (категория)')
-			}
-			category = subcategory.parent
+			subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] });
+			if (!subcategory) throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`);
+			if (!subcategory.parent) throw new BadRequestException('У подкатегории должен быть родитель (категория)');
+			category = subcategory.parent;
 		} else if (dto.categoryId) {
-			category = await this.categoryTreeRepo.findOne({ where: { id: dto.categoryId } })
-			if (!category) {
-				throw new BadRequestException(`Category with ID ${dto.categoryId} not found`)
-			}
+			category = await this.categoryTreeRepo.findOne({ where: { id: dto.categoryId } });
+			if (!category) throw new BadRequestException(`Category with ID ${dto.categoryId} not found`);
 		}
 
 		const document = this.documentRepo.create({
 			title: dto.title,
 			type: dto.type,
-			pdfUrl,
+			fileUrl,
 			previewUrl,
 			category,
 			subcategory,
 			isPublished: dto.isPublished ?? true,
-		})
+		});
 
-		const saved = await this.documentRepo.save(document)
-		await this.invalidateCache()
-		return saved
+		const saved = await this.documentRepo.save(document);
+		await this.invalidateCache();
+		return saved;
 	}
 
 	async findAllDocuments(
@@ -201,8 +191,8 @@ export class DocumentService {
 			document.isPublished = dto.isPublished
 		}
 
-		if (dto.pdfUrl !== undefined) {
-			document.pdfUrl = dto.pdfUrl
+		if (dto.fileUrl !== undefined) {
+			document.fileUrl = dto.fileUrl
 		}
 
 		const saved = await this.documentRepo.save(document)

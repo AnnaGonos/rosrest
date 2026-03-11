@@ -9,7 +9,7 @@ interface UploadFile {
 	size: number;
 }
 
-export type FileType = 'image' | 'pdf';
+export type FileType = 'image' | 'pdf' | 'doc';
 
 @Injectable()
 export class FileUploadService {
@@ -30,9 +30,28 @@ export class FileUploadService {
 			return await this.uploadImage(file, subfolder);
 		} else if (type === 'pdf') {
 			return await this.uploadPdf(file, subfolder);
+		} else if (type === 'doc') {
+			return await this.uploadDoc(file, subfolder);
 		}
 
 		throw new BadRequestException('Invalid file type');
+	}
+
+	private async uploadDoc(file: UploadFile, subfolder?: string): Promise<string> {
+		const allowedMimes = [
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		];
+		if (!allowedMimes.includes(file.mimetype)) {
+			throw new BadRequestException('Можно загружать только DOC или DOCX файлы');
+		}
+
+		const maxSize = 20 * 1024 * 1024; // 20MB
+		if (file.size > maxSize) {
+			throw new BadRequestException('Размер DOC/DOCX не должен превышать 20MB');
+		}
+
+		return await this.saveFile(file, subfolder);
 	}
 
 	private async uploadImage(file: UploadFile, subfolder?: string): Promise<string> {

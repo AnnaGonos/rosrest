@@ -8,6 +8,7 @@ import './PageBlocksEditor.css';
 import RichTextEditorField from './RichTextEditorField';
 import ImageUploadField from './ImageUploadField';
 import PdfUploadField from './PdfUploadField';
+import DocUploadField from './DocUploadField';
 import { BLOCK_VARIANTS } from './blockVariants';
 
 
@@ -934,8 +935,10 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
     }
     // Кнопочные блоки (BF01–BF07)
     if (block.type.startsWith('BF')) {
-        const { text = '', url = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-        const buttonHref = linkType === 'pdf' ? pdfUrl : url;
+        const { text = '', url = '', pdfUrl = '', docUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
+        let buttonHref = url;
+        if (linkType === 'pdf') buttonHref = pdfUrl;
+        else if (linkType === 'doc') buttonHref = docUrl;
 
         const getButtonLink = (href: string) => {
             if (!href) return '#';
@@ -998,6 +1001,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                         >
                             <option value="external">Внешняя ссылка (URL)</option>
                             <option value="pdf">PDF файл</option>
+                            <option value="doc">DOC/DOCX файл</option>
                         </select>
                     </div>
                     {linkType === 'external' && (
@@ -1021,6 +1025,16 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                                 value={pdfUrl}
                                 onChange={val => {
                                     onUpdate({ ...block.content, pdfUrl: val, linkType: 'pdf' });
+                                }}
+                            />
+                        </div>
+                    )}
+                    {linkType === 'doc' && (
+                        <div className="mb-3">
+                            <DocUploadField
+                                value={docUrl}
+                                onChange={val => {
+                                    onUpdate({ ...block.content, docUrl: val, linkType: 'doc' });
                                 }}
                             />
                         </div>

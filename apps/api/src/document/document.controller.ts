@@ -85,7 +85,7 @@ export class DocumentController {
 	@ApiBearerAuth()
 	@ApiConsumes('multipart/form-data')
 	@ApiBody({
-		description: 'Создание документа: загрузите PDF файл и/или превью изображение',
+		description: 'Создание документа: загрузите файл (PDF, DOC, DOCX и др.) и/или превью изображение',
 		schema: {
 			type: 'object',
 			properties: {
@@ -93,10 +93,10 @@ export class DocumentController {
 				type: { type: 'string', enum: ['charter', 'contracts', 'documents'], example: 'charter' },
 				categoryId: { type: 'number', example: 1, description: 'ID категории (используется когда нет подкатегории)' },
 				subcategoryId: { type: 'number', example: 2, description: 'ID подкатегории (категория берётся из parent)' },
-				pdfUrl: { type: 'string', example: 'https://drive.google.com/file/d/abc/doc.pdf', description: 'URL на PDF (либо загрузите pdfFile)' },
+				fileUrl: { type: 'string', example: 'https://drive.google.com/file/d/abc/document.pdf', description: 'URL на файл документа (либо загрузите file)' },
 				previewUrl: { type: 'string', example: 'https://drive.google.com/file/d/xyz/preview.jpg', description: 'URL на превью изображение (либо загрузите previewFile)' },
 				isPublished: { type: 'boolean', example: true },
-				pdfFile: { type: 'string', format: 'binary', description: 'PDF файл документа (либо укажите pdfUrl)' },
+				file: { type: 'string', format: 'binary', description: 'Файл документа (PDF, DOC, DOCX и др.) (либо укажите fileUrl)' },
 				previewFile: { type: 'string', format: 'binary', description: 'Превью изображение (JPG, PNG)' },
 			},
 			required: ['title', 'type'],
@@ -108,19 +108,19 @@ export class DocumentController {
 		@Body(new ValidationPipe({ transform: true, whitelist: false })) dto: CreateDocumentDto,
 		@UploadedFiles() files?: UploadFile | UploadFile[]
 	) {
-		const fileMap: { pdfFile?: UploadFile, previewFile?: UploadFile } = {};
+		const fileMap: { file?: UploadFile, previewFile?: UploadFile } = {};
 		if (files) {
 			if (Array.isArray(files)) {
 				for (const f of files) {
-					if (f.fieldname === 'pdfFile') fileMap.pdfFile = f;
+					if (f.fieldname === 'file') fileMap.file = f;
 					if (f.fieldname === 'previewFile') fileMap.previewFile = f;
 				}
 			} else {
-				if (files.fieldname === 'pdfFile') fileMap.pdfFile = files;
+				if (files.fieldname === 'file') fileMap.file = files;
 				if (files.fieldname === 'previewFile') fileMap.previewFile = files;
 			}
 		}
-		return await this.documentService.create(dto, fileMap.pdfFile, this.fileUploadService, fileMap.previewFile);
+		return await this.documentService.create(dto, fileMap.file, this.fileUploadService, fileMap.previewFile);
 	}
 
 	@Patch(':id')
