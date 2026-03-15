@@ -2,7 +2,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import { getFileUrl } from '../../utils/getFileUrl';
 import ContentSection from '../../components/ContentSection/ContentSection'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
-import './Projectpage.css'
+import './ProjectPage.css'
 import { useEffect, useState } from 'react'
 
 interface Project {
