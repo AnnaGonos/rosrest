@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository } from 'typeorm';
+import { Repository, TreeRepository, IsNull } from 'typeorm';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { CreateDocumentCategoryDto } from './dto/create-document-category.dto';
@@ -234,9 +234,15 @@ export class DocumentService {
 			}
 		}
 
-		const existingByName = await this.categoryTreeRepo.findOne({ where: { name: dto.name } })
+		// Only enforce unique name among siblings (same parent).
+		let existingByName: DocumentCategory | null = null
+		if (parent) {
+			existingByName = await this.categoryTreeRepo.findOne({ where: { name: dto.name, parent: { id: parent.id } }, relations: ['parent'] })
+		} else {
+			existingByName = await this.categoryTreeRepo.findOne({ where: { name: dto.name, parent: IsNull() } })
+		}
 		if (existingByName) {
-			throw new BadRequestException(`Category with name "${dto.name}" already exists`)
+			throw new BadRequestException(`Category with name "${dto.name}" already exists in the same parent`) 
 		}
 
 		let slug: string | null = null
@@ -300,7 +306,18 @@ export class DocumentService {
 		}
 
 		if (dto.name !== undefined && dto.name.trim()) {
-			category.name = dto.name.trim()
+			const newName = dto.name.trim()
+			// Ensure no sibling has the same name
+			let siblingConflict: DocumentCategory | null = null
+			if (category.parent) {
+				siblingConflict = await this.categoryTreeRepo.findOne({ where: { name: newName, parent: { id: category.parent.id } } })
+			} else {
+				siblingConflict = await this.categoryTreeRepo.findOne({ where: { name: newName, parent: IsNull() } })
+			}
+			if (siblingConflict && siblingConflict.id !== category.id) {
+				throw new BadRequestException(`Category with name "${newName}" already exists in the same parent`)
+			}
+			category.name = newName
 		}
 
         if (dto.blocks !== undefined) {
