@@ -80,7 +80,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                     <BlocksRenderer blocks={tab.children} />
                                                 </div>
                                             )}
-                                            
+
                                         </div>
                                     );
                                 })}
@@ -160,7 +160,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 // Кнопочные блоки
                 if (block.type.startsWith('BF')) {
                     const { text = '', url = '', fileUrl = '', docUrl = '', pdfUrl = '', linkType = 'external', openInNewTab = true, align = 'center' } = block.content || {};
-                    
+
                     let buttonHref: string | undefined;
                     if (fileUrl) {
                         buttonHref = getFileUrl(fileUrl) || '';
@@ -171,7 +171,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     } else if (linkType === 'internal') {
                         buttonHref = url ? (url.startsWith('/') ? url : `/${url}`) : '#';
                     } else {
-                        buttonHref = getFileUrl(url) || url ;
+                        buttonHref = getFileUrl(url) || url;
                     }
                     let alignClass = '';
                     if (align === 'left') alignClass = 'text-start';
@@ -212,7 +212,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             </div>
                         );
                     }
-                    
+
                     return (
                         <div key={block.id} className={`${variant} mb-40`}>
                             {columns.map((col, idx) => (
@@ -378,7 +378,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return 'center';
                     };
 
-                   
+
                     const finalUrl = fileUrl ? getFileUrl(fileUrl) : (linkType === 'pdf' ? getFileUrl(pdfUrl) : url);
 
                     return (
@@ -446,17 +446,14 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     const columns = block.content.columns || (block.type === 'TL04' ? 4 : 3);
                     const imageHeight = block.content.imageHeight || 240;
 
-                    
-                    const containerStyle: React.CSSProperties = block.type === 'TL04' ? {
+
+                    const effectiveColumns = isMobile ? (block.type === 'TL03' ? 2 : Math.min(columns, 2)) : columns;
+                    const containerStyle: React.CSSProperties = {
                         display: 'grid',
-                        gridTemplateColumns: `repeat(4, 1fr)`,
-                        gridAutoRows: `${imageHeight}px`,
+                        gridTemplateColumns: `repeat(${effectiveColumns}, 1fr)`,
                         gap: '20px',
-                        alignItems: 'stretch'
-                    } : {
-                        display: 'grid',
-                        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-                        gap: '20px'
+                        ...(block.type === 'TL04' ? { gridAutoRows: `${imageHeight}px`, alignItems: 'stretch' } : {}),
+                        ...(block.type === 'TL03' && isMobile ? { gridAutoRows: `${Math.min(imageHeight, 220)}px` } : {})
                     };
 
                     let posIndex: Record<string, number> = {};
@@ -610,7 +607,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     const imgHeight = image?.height ?? null;
 
                     const getHrefFor = (c: any) => {
-                       
+
                         return c?.href || '';
                     };
 
