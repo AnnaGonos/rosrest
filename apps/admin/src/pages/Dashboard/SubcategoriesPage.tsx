@@ -51,10 +51,6 @@ export default function SubcategoriesPage() {
   const [error, setError] = useState('')
 
   const token = localStorage.getItem('admin_token')
-
-
-
-
   const [modalOpened, setModalOpened] = useState(false)
   const [subcategoryName, setSubcategoryName] = useState('')
   const [formError, setFormError] = useState('')
