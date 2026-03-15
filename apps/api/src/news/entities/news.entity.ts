@@ -27,4 +27,7 @@ export class News {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastIncludedInNewsletterAt?: Date;
 }

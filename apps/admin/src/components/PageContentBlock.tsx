@@ -513,6 +513,122 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
         );
     }
 
+                // CN01: контактная карточка
+                if (block.type === 'CN01') {
+                    const [editOpen, setEditOpen] = useState(false);
+                    const image = block.content?.image || { src: '', alt: '' };
+                    const name = block.content?.name || '';
+                    const position = block.content?.position || '';
+                    const contacts = Array.isArray(block.content?.contacts) ? block.content.contacts : [];
+
+                    const handleAddContact = () => {
+                        const newContacts = [...contacts, { id: `c-${Date.now()}`, type: 'phone', label: 'Телефон', value: '', href: '' }];
+                        onUpdate({ ...block.content, contacts: newContacts });
+                    };
+
+                    const handleRemoveContact = (idx: number) => {
+                        const newContacts = contacts.filter((_, i) => i !== idx);
+                        onUpdate({ ...block.content, contacts: newContacts });
+                    };
+
+                    const handleUpdateContact = (idx: number, data: any) => {
+                        const newContacts = contacts.map((c: any, i: number) => i === idx ? { ...c, ...data } : c);
+                        onUpdate({ ...block.content, contacts: newContacts });
+                    };
+
+                    const getHrefFor = (c: any) => {
+                        // only use explicit href provided by editor
+                        return c?.href || '';
+                    };
+
+                    return (
+                        <div className="card">
+                            <div className="d-flex align-items-center mb-20 gap-2">
+                                <span className="badge bg-light text-dark" style={{ height: '100%', fontSize: 13, fontWeight: 500, borderRadius: '40px', border: '1px solid #000000', padding: '6px 8px' }}>{block.type}</span>
+                                <Button variant="primary" size="sm" className="d-flex align-items-center px-3 py-1" onClick={() => setEditOpen(true)}>
+                                    <i className="bi bi-person me-2"></i>
+                                    <span className="fw-bold">Контакт</span>
+                                </Button>
+                                <Button variant="outline-danger" size="sm" className="d-flex align-items-center px-2 py-1 ms-1" title="Удалить блок" onClick={onRemove}>
+                                    <i className="bi bi-trash"></i>
+                                </Button>
+                                <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1 ms-2" title="Вверх" onClick={onMoveUp} disabled={order === 1}>
+                                    <i className="bi bi-arrow-up"></i>
+                                </Button>
+                                <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1" title="Вниз" onClick={onMoveDown}>
+                                    <i className="bi bi-arrow-down"></i>
+                                </Button>
+                            </div>
+
+                            <div className="d-flex gap-3 align-items-center mb-3">
+                                <div style={{ width: 96, height: 96, background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderRadius: 6 }}>
+                                    {image?.src ? <img src={getFileUrl(image.src)} alt={image.alt} style={{ maxWidth: '100%', maxHeight: '100%' }} /> : <i className="bi bi-person" style={{ fontSize: 28, color: '#bbb' }} />}
+                                </div>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: 16 }}>{name || <span style={{ color: '#bbb' }}>Имя</span>}</div>
+                                    <div className="small text-muted">{position || <span style={{ color: '#bbb' }}>Должность</span>}</div>
+                                    <div style={{ marginTop: 8 }}>
+                                        {contacts.length === 0 && <div className="small text-muted">Нет контактов</div>}
+                                        {contacts.map((c: any, idx: number) => (
+                                            <div key={c.id || idx} className="small">
+                                                {getHrefFor(c) ? (
+                                                    <a href={getHrefFor(c)} target="_blank" rel="noopener noreferrer">{c.label ? `${c.label}: ` : ''}{c.value || c.href}</a>
+                                                ) : (
+                                                    <>{c.label ? `${c.label}: ` : ''}{c.value || c.href}</>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <EditModal show={editOpen} onHide={() => setEditOpen(false)} title="Редактирование контакта">
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">Фото</label>
+                                    <ImageUploadField
+                                        value={image}
+                                        onChange={(val: any) => onUpdate({ ...block.content, image: val })}
+                                        hideAdvancedFields={false}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">ФИО</label>
+                                    <input type="text" className="form-control" value={name} onChange={e => onUpdate({ ...block.content, name: e.target.value })} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">Должность</label>
+                                    <input type="text" className="form-control" value={position} onChange={e => onUpdate({ ...block.content, position: e.target.value })} />
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label fw-bold">Контакты</label>
+                                    <div className="d-flex flex-column gap-2">
+                                        {contacts.map((c: any, idx: number) => (
+                                            <div key={c.id || idx} className="d-flex gap-2 align-items-start">
+                                                <select className="form-select form-select-sm" value={c.type} onChange={e => handleUpdateContact(idx, { type: e.target.value })} style={{ width: 120 }}>
+                                                    <option value="phone">Телефон</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="url">Ссылка</option>
+                                                    <option value="other">Другое</option>
+                                                </select>
+                                                <input className="form-control form-control-sm" placeholder="Метка (Телефон, Email)" value={c.label || ''} onChange={e => handleUpdateContact(idx, { label: e.target.value })} />
+                                                <input className="form-control form-control-sm" placeholder="Значение" value={c.value || ''} onChange={e => handleUpdateContact(idx, { value: e.target.value })} />
+                                                <input className="form-control form-control-sm" placeholder="href (опционально)" value={c.href || ''} onChange={e => handleUpdateContact(idx, { href: e.target.value })} />
+                                                <Button size="sm" variant="outline-danger" onClick={() => handleRemoveContact(idx)}>
+                                                    <i className="bi bi-trash"></i>
+                                                </Button>
+                                            </div>
+                                        ))}
+                                        <div>
+                                            <Button size="sm" variant="outline-primary" onClick={handleAddContact}><i className="bi bi-plus"></i> Добавить контакт</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* auto-href removed — editor must provide explicit href if a link is desired */}
+                            </EditModal>
+                        </div>
+                    );
+                }
+
         // Галерея: gallery, GL01, GL02
     if (block.type === 'gallery' || block.type.startsWith('GL')) {
         const [editOpen, setEditOpen] = useState(false);
@@ -1392,7 +1508,15 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
 
         const handleAddItem = () => {
             if (items.length >= maxItems) return;
-            const newItems = [...items, { src: '', alt: '', url: '', pdfUrl: '', linkType: 'url', openInNewTab: true }];
+            const positions = items.map((it: any) => it?.position).filter(Boolean);
+            const slots = ['p1', 'p2', 'p3', 'p4'];
+            let assignedPos: string | undefined = undefined;
+            for (const s of slots) {
+                if (!positions.includes(s)) { assignedPos = s; break; }
+            }
+            const newItem: any = { src: '', alt: '', url: '', pdfUrl: '', linkType: 'url', openInNewTab: true };
+            if (assignedPos) newItem.position = assignedPos;
+            const newItems = [...items, newItem];
             onUpdate({ ...block.content, items: newItems });
         };
 
@@ -1577,6 +1701,427 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                                     onChange={e => handleUpdateItem(editItemIdx, { openInNewTab: e.target.checked })}
                                 />
                                 <label className="form-check-label" htmlFor={`openInNewTab-item-${editItemIdx}`}>
+                                    Открывать в новой вкладке
+                                </label>
+                            </div>
+                        </div>
+                        {editItemIdx !== null && editItemIdx < 4 && (
+                            <div className="mt-3">
+                                <label className="form-label fw-bold">Позиция плитки (для первых 4)</label>
+                                <select
+                                    className="form-select"
+                                    value={items[editItemIdx]?.position || ''}
+                                    onChange={e => handleUpdateItem(editItemIdx, { position: e.target.value })}
+                                >
+                                    <option value="">(по умолчанию - заполнение слева направо)</option>
+                                    <option value="p1">Позиция 1 — верхний левый</option>
+                                    <option value="p2">Позиция 2 — верхний второй</option>
+                                    <option value="p3">Позиция 3 — правый большой</option>
+                                    <option value="p4">Позиция 4 — второй ряд, слева (широкая)</option>
+                                </select>
+                                <div className="form-text">Выберите позицию, чтобы закрепить плитку на месте.</div>
+                            </div>
+                        )}
+                    </EditModal>
+                )}
+            </div>
+        );
+    }
+
+    // TL03: Плитки-ссылки с настраиваемыми колонками (1-5)
+    if (block.type === 'TL03') {
+        const [editOpen, setEditOpen] = useState(false);
+        const [editItemIdx, setEditItemIdx] = useState<number | null>(null);
+        const items = Array.isArray(block.content.items) ? block.content.items : [];
+        const columns = block.content.columns || 3;
+        const imageHeight = block.content.imageHeight || 300;
+        const maxItems = block.content.maxItems || 20;
+
+        const handleAddItem = () => {
+            if (items.length >= maxItems) return;
+            const newItems = [...items, { src: '', alt: '', url: '', pdfUrl: '', linkType: 'url', openInNewTab: true }];
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleRemoveItem = (idx: number) => {
+            const newItems = items.filter((_: any, i: number) => i !== idx);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleMoveItem = (from: number, to: number) => {
+            if (to < 0 || to >= items.length) return;
+            const newItems = [...items];
+            const [item] = newItems.splice(from, 1);
+            newItems.splice(to, 0, item);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleUpdateItem = (idx: number, data: any) => {
+            const newItems = items.map((item: any, i: number) => i === idx ? { ...item, ...data } : item);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        return (
+            <div className="card">
+                <div className="d-flex align-items-center mb-20 gap-2">
+                    <span className="badge bg-light text-dark" style={{ height: '100%', fontSize: 13, fontWeight: 500, borderRadius: '40px', border: '1px solid #000000', padding: '6px 8px' }}>TL03</span>
+                    <Button variant="primary" size="sm" className="d-flex align-items-center px-3 py-1" onClick={() => setEditOpen(true)}>
+                        <i className="bi bi-grid-3x3-gap me-2"></i>
+                        <span className="fw-bold">Плитки-ссылки (TL03)</span>
+                    </Button>
+                    <Button variant="outline-danger" size="sm" className="d-flex align-items-center px-2 py-1 ms-1" title="Удалить блок" onClick={onRemove}>
+                        <i className="bi bi-trash"></i>
+                    </Button>
+                    <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1 ms-2" title="Вверх" onClick={onMoveUp} disabled={order === 1}>
+                        <i className="bi bi-arrow-up"></i>
+                    </Button>
+                    <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1" title="Вниз" onClick={onMoveDown}>
+                        <i className="bi bi-arrow-down"></i>
+                    </Button>
+                </div>
+
+                <div className="d-flex flex-wrap gap-3 mb-3" style={{ columnGap: 16, rowGap: 24 }}>
+                    {items.length === 0 && (
+                        <div className="text-muted mb-2">Нет плиток</div>
+                    )}
+                    {items.map((item: any, idx: number) => (
+                        <div key={idx} style={{ width: `calc(${100 / columns}% - 12px)`, minWidth: 120, maxWidth: 360, position: 'relative' }}>
+                            <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {item.src ? (
+                                    <img src={getFileUrl(item.src)} alt={item.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
+                                ) : (
+                                    <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
+                                )}
+                                {item.url && (
+                                    <div style={{ 
+                                        position: 'absolute', 
+                                        top: 6, 
+                                        right: 6, 
+                                        backgroundColor: 'rgba(0,0,0,0.7)', 
+                                        color: 'white', 
+                                        padding: '4px 8px', 
+                                        borderRadius: 4,
+                                        fontSize: 11,
+                                        zIndex: 1
+                                    }}>
+                                        <i className="bi bi-link-45deg"></i>
+                                    </div>
+                                )}
+                                <Button size="sm" variant="outline-primary" style={{ position: 'absolute', top: 6, left: 6, zIndex: 2 }} onClick={() => setEditItemIdx(idx)}>
+                                    <i className="bi bi-pencil"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-danger" style={{ position: 'absolute', bottom: 6, left: 6, zIndex: 2 }} onClick={() => handleRemoveItem(idx)}>
+                                    <i className="bi bi-trash"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-secondary" style={{ position: 'absolute', bottom: 6, right: 40, zIndex: 2 }} onClick={() => handleMoveItem(idx, idx - 1)} disabled={idx === 0}>
+                                    <i className="bi bi-arrow-left"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-secondary" style={{ position: 'absolute', bottom: 6, right: 6, zIndex: 2 }} onClick={() => handleMoveItem(idx, idx + 1)} disabled={idx === items.length - 1}>
+                                    <i className="bi bi-arrow-right"></i>
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="d-flex gap-2">
+                    <Button size="sm" variant="outline-primary" onClick={handleAddItem} disabled={items.length >= maxItems}>
+                        <i className="bi bi-plus"></i> Добавить плитку
+                    </Button>
+                    <Button size="sm" variant="outline-secondary" onClick={() => setEditOpen(true)}>
+                        <i className="bi bi-pencil"></i> Настройки плиток
+                    </Button>
+                </div>
+
+                <EditModal show={editOpen} onHide={() => setEditOpen(false)} title="Настройки плиток TL03">
+                    <div className="mb-3">
+                        <label className="form-label fw-bold">Количество колонок</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={columns}
+                            min={1}
+                            max={5}
+                            onChange={e => onUpdate({ ...block.content, columns: Math.max(1, Math.min(5, Number(e.target.value))) })}
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label fw-bold">Высота изображений (px)</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={imageHeight}
+                            min={60}
+                            max={1200}
+                            onChange={e => onUpdate({ ...block.content, imageHeight: Number(e.target.value) })}
+                        />
+                    </div>
+                </EditModal>
+
+                {editItemIdx !== null && (
+                    <EditModal show={true} onHide={() => setEditItemIdx(null)} title={`Плитка ${editItemIdx + 1}`}>
+                        <ImageUploadField
+                            value={items[editItemIdx]}
+                            onChange={val => handleUpdateItem(editItemIdx, val)}
+                            hideAdvancedFields={true}
+                        />
+                        <div className="mt-3">
+                            <label className="form-label fw-bold">Тип ссылки</label>
+                            <div className="btn-group w-100 mb-3" role="group">
+                                <input
+                                    type="radio"
+                                    className="btn-check"
+                                    name={`linkType-tl03-item-${editItemIdx}`}
+                                    id={`linkType-url-item-tl03-${editItemIdx}`}
+                                    checked={(items[editItemIdx]?.linkType || 'url') === 'url'}
+                                    onChange={() => handleUpdateItem(editItemIdx, { linkType: 'url' })}
+                                />
+                                <label className="btn btn-outline-primary" htmlFor={`linkType-url-item-tl03-${editItemIdx}`}>URL ссылка</label>
+                                
+                                <input
+                                    type="radio"
+                                    className="btn-check"
+                                    name={`linkType-tl03-item-${editItemIdx}`}
+                                    id={`linkType-pdf-item-tl03-${editItemIdx}`}
+                                    checked={items[editItemIdx]?.linkType === 'pdf'}
+                                    onChange={() => handleUpdateItem(editItemIdx, { linkType: 'pdf' })}
+                                />
+                                <label className="btn btn-outline-primary" htmlFor={`linkType-pdf-item-tl03-${editItemIdx}`}>PDF файл</label>
+                            </div>
+                            {(items[editItemIdx]?.linkType || 'url') === 'url' ? (
+                                <>
+                                    <label className="form-label fw-bold">URL ссылки</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={items[editItemIdx]?.url || ''}
+                                        onChange={e => handleUpdateItem(editItemIdx, { url: e.target.value })}
+                                        placeholder="https://example.com"
+                                    />
+                                    <small className="text-muted">
+                                        Укажите полный URL (например: https://example.com)
+                                    </small>
+                                </>
+                            ) : (
+                                <PdfUploadField
+                                    value={items[editItemIdx]?.pdfUrl || ''}
+                                    onChange={(url) => handleUpdateItem(editItemIdx, { pdfUrl: url })}
+                                    label="PDF файл"
+                                />
+                            )}
+                        </div>
+                        <div className="mt-3">
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id={`openInNewTab-item-tl03-${editItemIdx}`}
+                                    checked={items[editItemIdx]?.openInNewTab ?? true}
+                                    onChange={e => handleUpdateItem(editItemIdx, { openInNewTab: e.target.checked })}
+                                />
+                                <label className="form-check-label" htmlFor={`openInNewTab-item-tl03-${editItemIdx}`}>
+                                    Открывать в новой вкладке
+                                </label>
+                            </div>
+                        </div>
+                    </EditModal>
+                )}
+            </div>
+        );
+    }
+
+    // TL04: Плитки - нестандартная раскладка 4 колонки (админ-редактор)
+    if (block.type === 'TL04') {
+        const [editOpen, setEditOpen] = useState(false);
+        const [editItemIdx, setEditItemIdx] = useState<number | null>(null);
+        const items = Array.isArray(block.content.items) ? block.content.items : [];
+        const columns = block.content.columns || 4;
+        const imageHeight = block.content.imageHeight || 300;
+        const maxItems = block.content.maxItems || 20;
+
+        const handleAddItem = () => {
+            if (items.length >= maxItems) return;
+            const newItems = [...items, { src: '', alt: '', url: '', pdfUrl: '', linkType: 'url', openInNewTab: true }];
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleRemoveItem = (idx: number) => {
+            const newItems = items.filter((_: any, i: number) => i !== idx);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleMoveItem = (from: number, to: number) => {
+            if (to < 0 || to >= items.length) return;
+            const newItems = [...items];
+            const [item] = newItems.splice(from, 1);
+            newItems.splice(to, 0, item);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        const handleUpdateItem = (idx: number, data: any) => {
+            const newItems = items.map((item: any, i: number) => i === idx ? { ...item, ...data } : item);
+            onUpdate({ ...block.content, items: newItems });
+        };
+
+        return (
+            <div className="card">
+                <div className="d-flex align-items-center mb-20 gap-2">
+                    <span className="badge bg-light text-dark" style={{ height: '100%', fontSize: 13, fontWeight: 500, borderRadius: '40px', border: '1px solid #000000', padding: '6px 8px' }}>TL04</span>
+                    <Button variant="primary" size="sm" className="d-flex align-items-center px-3 py-1" onClick={() => setEditOpen(true)}>
+                        <i className="bi bi-grid-3x3-gap me-2"></i>
+                        <span className="fw-bold">Плитки TL04</span>
+                    </Button>
+                    <Button variant="outline-danger" size="sm" className="d-flex align-items-center px-2 py-1 ms-1" title="Удалить блок" onClick={onRemove}>
+                        <i className="bi bi-trash"></i>
+                    </Button>
+                    <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1 ms-2" title="Вверх" onClick={onMoveUp} disabled={order === 1}>
+                        <i className="bi bi-arrow-up"></i>
+                    </Button>
+                    <Button variant="outline-success" size="sm" className="d-flex align-items-center px-2 py-1" title="Вниз" onClick={onMoveDown}>
+                        <i className="bi bi-arrow-down"></i>
+                    </Button>
+                </div>
+
+                <div className="d-flex flex-wrap gap-3 mb-3" style={{ columnGap: 16, rowGap: 24 }}>
+                    {items.length === 0 && (
+                        <div className="text-muted mb-2">Нет плиток</div>
+                    )}
+                    {items.map((item: any, idx: number) => (
+                        <div key={idx} style={{ width: `calc(${100 / columns}% - 12px)`, minWidth: 120, maxWidth: 360, position: 'relative' }}>
+                            <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {item.src ? (
+                                    <img src={getFileUrl(item.src)} alt={item.alt} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover', height: imageHeight }} />
+                                ) : (
+                                    <div style={{ color: '#bbb', fontSize: 32 }}><i className="bi bi-image"></i></div>
+                                )}
+                                {item.url && (
+                                    <div style={{ 
+                                        position: 'absolute', 
+                                        top: 6, 
+                                        right: 6, 
+                                        backgroundColor: 'rgba(0,0,0,0.7)', 
+                                        color: 'white', 
+                                        padding: '4px 8px', 
+                                        borderRadius: 4,
+                                        fontSize: 11,
+                                        zIndex: 1
+                                    }}>
+                                        <i className="bi bi-link-45deg"></i>
+                                    </div>
+                                )}
+                                <Button size="sm" variant="outline-primary" style={{ position: 'absolute', top: 6, left: 6, zIndex: 2 }} onClick={() => setEditItemIdx(idx)}>
+                                    <i className="bi bi-pencil"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-danger" style={{ position: 'absolute', bottom: 6, left: 6, zIndex: 2 }} onClick={() => handleRemoveItem(idx)}>
+                                    <i className="bi bi-trash"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-secondary" style={{ position: 'absolute', bottom: 6, right: 40, zIndex: 2 }} onClick={() => handleMoveItem(idx, idx - 1)} disabled={idx === 0}>
+                                    <i className="bi bi-arrow-left"></i>
+                                </Button>
+                                <Button size="sm" variant="outline-secondary" style={{ position: 'absolute', bottom: 6, right: 6, zIndex: 2 }} onClick={() => handleMoveItem(idx, idx + 1)} disabled={idx === items.length - 1}>
+                                    <i className="bi bi-arrow-right"></i>
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="d-flex gap-2">
+                    <Button size="sm" variant="outline-primary" onClick={handleAddItem} disabled={items.length >= maxItems}>
+                        <i className="bi bi-plus"></i> Добавить плитку
+                    </Button>
+                    <Button size="sm" variant="outline-secondary" onClick={() => setEditOpen(true)}>
+                        <i className="bi bi-pencil"></i> Настройки плиток
+                    </Button>
+                </div>
+
+                <EditModal show={editOpen} onHide={() => setEditOpen(false)} title="Настройки плиток TL04">
+                    <div className="mb-3">
+                        <label className="form-label fw-bold">Колонок (фиксировано)</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={columns}
+                            min={4}
+                            max={4}
+                            readOnly
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label fw-bold">Высота изображений (px)</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={imageHeight}
+                            min={60}
+                            max={1200}
+                            onChange={e => onUpdate({ ...block.content, imageHeight: Number(e.target.value) })}
+                        />
+                    </div>
+                </EditModal>
+
+                {editItemIdx !== null && (
+                    <EditModal show={true} onHide={() => setEditItemIdx(null)} title={`Плитка ${editItemIdx + 1}`}>
+                        <ImageUploadField
+                            value={items[editItemIdx]}
+                            onChange={val => handleUpdateItem(editItemIdx, val)}
+                            hideAdvancedFields={true}
+                        />
+                        <div className="mt-3">
+                            <label className="form-label fw-bold">Тип ссылки</label>
+                            <div className="btn-group w-100 mb-3" role="group">
+                                <input
+                                    type="radio"
+                                    className="btn-check"
+                                    name={`linkType-tl04-item-${editItemIdx}`}
+                                    id={`linkType-url-item-tl04-${editItemIdx}`}
+                                    checked={(items[editItemIdx]?.linkType || 'url') === 'url'}
+                                    onChange={() => handleUpdateItem(editItemIdx, { linkType: 'url' })}
+                                />
+                                <label className="btn btn-outline-primary" htmlFor={`linkType-url-item-tl04-${editItemIdx}`}>URL ссылка</label>
+                                
+                                <input
+                                    type="radio"
+                                    className="btn-check"
+                                    name={`linkType-tl04-item-${editItemIdx}`}
+                                    id={`linkType-pdf-item-tl04-${editItemIdx}`}
+                                    checked={items[editItemIdx]?.linkType === 'pdf'}
+                                    onChange={() => handleUpdateItem(editItemIdx, { linkType: 'pdf' })}
+                                />
+                                <label className="btn btn-outline-primary" htmlFor={`linkType-pdf-item-tl04-${editItemIdx}`}>PDF файл</label>
+                            </div>
+                            {(items[editItemIdx]?.linkType || 'url') === 'url' ? (
+                                <>
+                                    <label className="form-label fw-bold">URL ссылки</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        value={items[editItemIdx]?.url || ''}
+                                        onChange={e => handleUpdateItem(editItemIdx, { url: e.target.value })}
+                                        placeholder="https://example.com"
+                                    />
+                                    <small className="text-muted">
+                                        Укажите полный URL (например: https://example.com)
+                                    </small>
+                                </>
+                            ) : (
+                                <PdfUploadField
+                                    value={items[editItemIdx]?.pdfUrl || ''}
+                                    onChange={(url) => handleUpdateItem(editItemIdx, { pdfUrl: url })}
+                                    label="PDF файл"
+                                />
+                            )}
+                        </div>
+                        <div className="mt-3">
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    id={`openInNewTab-item-tl04-${editItemIdx}`}
+                                    checked={items[editItemIdx]?.openInNewTab ?? true}
+                                    onChange={e => handleUpdateItem(editItemIdx, { openInNewTab: e.target.checked })}
+                                />
+                                <label className="form-check-label" htmlFor={`openInNewTab-item-tl04-${editItemIdx}`}>
                                     Открывать в новой вкладке
                                 </label>
                             </div>

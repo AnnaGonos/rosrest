@@ -127,12 +127,13 @@ export class EmailService {
     subject: string,
     html: string,
     text?: string,
-  ): Promise<{ sent: number; failed: number }> {
+  ): Promise<{ sent: number; failed: number; results: { email: string; success: boolean; error?: string | null }[] }> {
     if (!this.transporter) {
       this.logger.warn(
         `Bulk email not sent (SMTP not configured). Recipients: ${recipients.length}`,
       );
-      return { sent: 0, failed: recipients.length };
+      const results = recipients.map((email) => ({ email, success: false, error: 'SMTP not configured' }));
+      return { sent: 0, failed: recipients.length, results };
     }
 
     let sent = 0;
@@ -140,17 +141,23 @@ export class EmailService {
 
     this.logger.log(`Starting bulk email send to ${recipients.length} recipients...`);
 
-    for (const email of recipients) {
-      const success = await this.sendEmail({
-        to: email,
-        subject,
-        html,
-        text,
-      });
+    const results: { email: string; success: boolean; error?: string | null }[] = [];
 
-      if (success) {
-        sent++;
-      } else {
+    for (const email of recipients) {
+      try {
+        const success = await this.sendEmail({
+          to: email,
+          subject,
+          html,
+          text,
+        });
+
+        results.push({ email, success, error: success ? null : 'send failed' });
+
+        if (success) sent++; else failed++;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        results.push({ email, success: false, error: msg });
         failed++;
       }
 
@@ -159,11 +166,9 @@ export class EmailService {
       }
     }
 
-    this.logger.log(
-      `Bulk email campaign completed. Sent: ${sent}, Failed: ${failed}`,
-    );
+    this.logger.log(`Bulk email campaign completed. Sent: ${sent}, Failed: ${failed}`);
 
-    return { sent, failed };
+    return { sent, failed, results };
   }
 
   isConfigured(): boolean {

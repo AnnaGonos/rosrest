@@ -23,6 +23,7 @@ import MonitoringZakonPage from './pages/Dashboard/MonitoringZakonPage'
 import CommentsPage from './pages/Dashboard/CommentsPage'
 import RarMembersPage from './pages/Dashboard/RarMembersPage'
 import NewsPage from './pages/Dashboard/NewsPage'
+import NewsletterPage from './pages/Dashboard/NewsletterPage'
 import SubscriptionsPage from './pages/Dashboard/SubscriptionsPage'
 import TemplatePreviewPage from './pages/Dashboard/TemplatePreviewPage'
 import ForJournalistPage from './pages/Dashboard/ForJournalistPage'
@@ -55,6 +56,7 @@ function App() {
           <Route path="/" element={<ProtectedRoute element={<OverviewPage />} />} />
           <Route path="/documents" element={<ProtectedRoute element={<DocumentsPage />} />} />
           <Route path="/documents/:categoryId" element={<ProtectedRoute element={<SubcategoriesPage />} />} />
+          
           <Route path="/charter" element={<ProtectedRoute element={<CharterPage />} />} />
           <Route path="/contracts" element={<ProtectedRoute element={<ContractsPage />} />} />
           <Route path="/partners" element={<ProtectedRoute element={<PartnersPage />} />} />
@@ -72,6 +74,7 @@ function App() {
         <Route path="/menus" element={<ProtectedRoute element={<MenusPage />} />} />
         <Route path="/rar-members" element={<ProtectedRoute element={<RarMembersPage />} />} />
         <Route path="/news" element={<ProtectedRoute element={<NewsPage />} />} />
+        <Route path="/newsletter" element={<ProtectedRoute element={<NewsletterPage />} />} />
         <Route path="/subscriptions" element={<ProtectedRoute element={<SubscriptionsPage />} />} />
         <Route path="/for-journalist" element={<ProtectedRoute element={<ForJournalistPage />} />} />
         <Route path="/template-preview" element={<ProtectedRoute element={<TemplatePreviewPage />} />} />

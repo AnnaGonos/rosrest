@@ -330,11 +330,15 @@ export class DocumentService {
 			}
 		}
 
-		await this.categoryTreeRepo.update(id, {
+		const updatePayload: any = {
 			name: category.name,
 			slug: category.slug,
 			icon: category.icon,
-		})
+		}
+		if ((dto as any).blocks !== undefined) {
+			updatePayload.blocks = (category as any).blocks
+		}
+		await this.categoryTreeRepo.update(id, updatePayload)
 
 		const result = await this.categoryTreeRepo.findOne({ where: { id } })
 		await this.invalidateCache()

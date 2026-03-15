@@ -102,12 +102,14 @@ export class DigestService {
     }
 
     const recipientEmails = subscribers.map((s) => s.email);
-    return await this.emailService.sendBulkEmail(
+    const result = await this.emailService.sendBulkEmail(
       recipientEmails,
       subject,
       html,
       text,
     );
+
+    return { sent: result.sent, failed: result.failed };
   }
 
 

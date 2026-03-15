@@ -30,6 +30,8 @@ const navItems: NavItem[] = [
     submenu: [{ label: 'Слайдер', path: '/home-slider' }],
   },
 
+  { iconClass: 'bi bi-envelope-check', label: 'Рассылка', path: '/newsletter' },
+
   {
     iconClass: 'bi bi-people',
     label: 'Ассоциация',
@@ -158,7 +160,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
                   title={item.label}
                   style={{ position: 'relative' }}
                 >
-                  <i className={item.iconClass} style={{ fontSize: 25, lineHeight: 1 }} />
+                  <i className={item.iconClass} style={{ fontSize: 22, lineHeight: 1 }} />
                   {item.path === '/comments' && newCommentsCount > 0 && (
                     <span style={{
                       position: 'absolute',
@@ -241,7 +243,7 @@ export default function DashboardLayout({ children, title }: DashboardLayoutProp
   style={{
     marginLeft: submenuOpen ? 260 : 60,
     marginTop: 60,
-    padding: '20px 24px',
+    padding: '15px 24px',
   }}
 >
   {children}

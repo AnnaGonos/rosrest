@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -26,6 +27,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { DigestModule } from './digest/digest.module';
 import { EmailModule } from './email/email.module';
 import { ForJournalistModule } from './for-journalist/for-journalist.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
 import { redisStore } from 'cache-manager-redis-yet';
 
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
@@ -63,6 +65,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
       synchronize: true,
       logging: process.env.NODE_ENV === 'development',
     }),
+    ScheduleModule.forRoot(),
     AdminModule,
     PartnerModule,
     EmployeeModule,
@@ -84,6 +87,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
     SubscriptionModule,
     DigestModule,
     EmailModule,
+    NewsletterModule,
     ForJournalistModule,
   ],
 })

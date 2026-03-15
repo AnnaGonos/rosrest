@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getFileUrl } from '../../utils/getFileUrl'
 import { Container, Row, Col, Card, Button, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap'
 import DatePicker from 'react-datepicker'
@@ -40,6 +40,7 @@ interface News {
     previewImage: string
     page: Page
     tags: NewsTag[]
+    lastIncludedInNewsletterAt?: string
     createdAt: string
     updatedAt: string
 }
@@ -54,6 +55,20 @@ export default function NewsPage() {
     const [editingNewsId, setEditingNewsId] = useState<string | null>(null)
     const [savingNews, setSavingNews] = useState(false)
     const [newsFormError, setNewsFormError] = useState<string | null>(null)
+    const [newsFormSuccess, setNewsFormSuccess] = useState<string | null>(null)
+    const [newsFormSuccessVariant, setNewsFormSuccessVariant] = useState<'success' | 'info'>('success')
+    const [showAddToNewsletterConfirm, setShowAddToNewsletterConfirm] = useState(false)
+    const [selectedNewsIdForNewsletter, setSelectedNewsIdForNewsletter] = useState<string | null>(null)
+    
+    const [savingNewsletter, setSavingNewsletter] = useState(false)
+    type NewsletterStatus = 'none' | 'queued' | 'sent'
+    const [newsletterStatusMap, setNewsletterStatusMap] = useState<Record<string, NewsletterStatus>>({})
+    const [showNewsletterInfoModal, setShowNewsletterInfoModal] = useState(false)
+    const [newsletterInfoMessage, setNewsletterInfoMessage] = useState<string>('')
+    const confirmNewsIdRef = useRef<string | null>(null)
+    const [lastAddDebug, setLastAddDebug] = useState<string | null>(null)
+    const [showDraftWarningModal, setShowDraftWarningModal] = useState(false)
+    const draftWarningNewsIdRef = useRef<string | null>(null)
 
     // Tag management state
     const [addTagModalOpened, setAddTagModalOpened] = useState(false)
@@ -68,6 +83,7 @@ export default function NewsPage() {
     const [newsSlug, setNewsSlug] = useState('')
     const [newsPublishedAt, setNewsPublishedAt] = useState<Date | null>(() => new Date())
     const [newsIsDraft, setNewsIsDraft] = useState(true)
+    
     const [newsPreviewImage, setNewsPreviewImage] = useState<ImageUploadValue>({ mode: 'file', file: null, url: '' })
     const [newsBlocks, setNewsBlocks] = useState<Block[]>([])
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
@@ -130,7 +146,32 @@ export default function NewsPage() {
     useEffect(() => {
         loadNews()
         loadTags()
+        loadNewsletterStatus()
     }, [])
+
+    const loadNewsletterStatus = async () => {
+        try {
+            const token = localStorage.getItem('admin_token')
+            const res = await fetch(API_ENDPOINTS.NEWSLETTER.list, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {}
+            })
+            if (!res.ok) return
+            const items = await res.json().catch(() => [])
+            const map: Record<string, NewsletterStatus> = {}
+            for (const it of Array.isArray(items) ? items : []) {
+                if (!it || !it.newsId) continue
+                const id = String(it.newsId)
+                if (it.isSent) {
+                    map[id] = 'sent'
+                } else if (map[id] !== 'sent') {
+                    map[id] = 'queued'
+                }
+            }
+            setNewsletterStatusMap(map)
+        } catch (e) {
+            // ignore
+        }
+    }
 
     const loadNews = async () => {
         try {
@@ -341,12 +382,83 @@ export default function NewsPage() {
                 throw new Error(errorData.message || 'Не удалось сохранить новость')
             }
 
+            // consume response body if present
+            await response.json().catch(() => null)
+
             await loadNews()
             closeNewsModal()
         } catch (err: any) {
             setNewsFormError(err.message)
         } finally {
             setSavingNews(false)
+        }
+    }
+
+    // removed unused handleAddToNewsletter; using inline handlers instead
+
+    const performAddToNewsletter = async (newsId: string | null) => {
+        const idToSend = newsId || confirmNewsIdRef.current || selectedNewsIdForNewsletter
+        if (!idToSend) return
+        try {
+            setSavingNewsletter(true)
+            console.log('Добавление в рассылку, newsId=', idToSend)
+            console.log('state selectedNewsIdForNewsletter=', selectedNewsIdForNewsletter, 'confirmRef=', confirmNewsIdRef.current)
+            const token = localStorage.getItem('admin_token')
+            const body: any = { newsId: idToSend }
+
+            const res = await fetch(API_ENDPOINTS.NEWSLETTER.add, {
+                method: 'POST',
+                headers: token ? { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } : { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            })
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({ message: 'Ошибка' }))
+                setNewsFormError(err.message || 'Ошибка при добавлении в рассылку')
+                setNewsFormSuccess(null)
+                setShowAddToNewsletterConfirm(false)
+                confirmNewsIdRef.current = null
+                return
+            }
+
+            const data = await res.json().catch(() => ({}))
+            console.log('Response addToQueue', data)
+            setNewsFormError(null)
+            if (data && data.existed) {
+                setNewsFormSuccess('Новость уже в очереди рассылки')
+                setNewsFormSuccessVariant('info')
+            } else {
+                setNewsFormSuccess('Новость добавлена в очередь рассылки')
+                setNewsFormSuccessVariant('success')
+            }
+            // debug info for mismatched ids
+            try {
+                const respNewsId = data?.item?.newsId || data?.newsId || null
+                setLastAddDebug(`sent: ${idToSend} → resp: ${respNewsId} (existed=${!!data?.existed})`)
+                setTimeout(() => setLastAddDebug(null), 8000)
+            } catch (e) {}
+            
+            try {
+                // API may return { item, existed } or item directly
+                const item = data?.item || data
+                const isSent = !!item?.isSent
+                const status: NewsletterStatus = isSent ? 'sent' : 'queued'
+                setNewsletterStatusMap(prev => ({ ...prev, [String(item?.newsId || idToSend)]: status }))
+            } catch (e) {}
+
+            // notify other UI (newsletter page) to reload queue
+            try { window.dispatchEvent(new CustomEvent('newsletter:queue:changed')) } catch (e) {}
+            setShowAddToNewsletterConfirm(false)
+            confirmNewsIdRef.current = null
+            setSelectedNewsIdForNewsletter(null)
+            setTimeout(() => setNewsFormSuccess(null), 4000)
+        } catch (err: any) {
+            setNewsFormError(err?.message || 'Ошибка при добавлении в рассылку')
+            setNewsFormSuccess(null)
+            setShowAddToNewsletterConfirm(false)
+            confirmNewsIdRef.current = null
+        } finally {
+            setSavingNewsletter(false)
         }
     }
 
@@ -563,6 +675,12 @@ export default function NewsPage() {
                     </a>
                 </div>
 
+                {lastAddDebug && (
+                    <Alert variant="info" onClose={() => setLastAddDebug(null)} dismissible>
+                        {lastAddDebug}
+                    </Alert>
+                )}
+
                 <div className="d-flex gap-2 mb-4">
                     <Button variant="primary" onClick={handleOpenCreateModal}>
                         <i className="bi bi-plus-lg me-2"></i>Добавить новость
@@ -630,6 +748,8 @@ export default function NewsPage() {
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </Form.Group>
+
+                                
                             </Col>
                             <Col md={3}>
                                 <Form.Group>
@@ -738,9 +858,14 @@ export default function NewsPage() {
                                                 <small className="text-muted d-block mb-1">
                                                     <strong>Дата:</strong> {formatDate(newsItem.page.publishedAt)}
                                                 </small>
-                                                <small className="text-muted">
-                                                    /{newsItem.page.slug}
-                                                </small>
+                                                    <small className="text-muted">
+                                                        /{newsItem.page.slug}
+                                                    </small>
+                                                    {newsItem.lastIncludedInNewsletterAt && (
+                                                        <div>
+                                                            <small className="text-muted">Последняя в рассылке: {new Date(newsItem.lastIncludedInNewsletterAt).toLocaleString('ru-RU')}</small>
+                                                        </div>
+                                                    )}
                                             </div>
 
                                             {newsItem.tags.length > 0 && (
@@ -766,6 +891,33 @@ export default function NewsPage() {
                                                     )}
                                                 </div>
                                                 <div className="btn-group">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            const status = newsletterStatusMap[newsItem.id] || 'none'
+                                                            // if draft, show a warning modal that allows editing
+                                                            if (newsItem.page?.isDraft) {
+                                                                draftWarningNewsIdRef.current = newsItem.id
+                                                                setShowDraftWarningModal(true)
+                                                                return
+                                                            }
+                                                            setSelectedNewsIdForNewsletter(newsItem.id)
+                                                            confirmNewsIdRef.current = newsItem.id
+                                                            if (status === 'none') {
+                                                                setShowAddToNewsletterConfirm(true)
+                                                            } else if (status === 'queued') {
+                                                                setNewsletterInfoMessage('Письмо добавлено в очередь рассылки')
+                                                                setShowNewsletterInfoModal(true)
+                                                            } else if (status === 'sent') {
+                                                                setNewsletterInfoMessage('Письмо уже отправлено')
+                                                                setShowNewsletterInfoModal(true)
+                                                            }
+                                                        }}
+                                                        title={newsItem.page?.isDraft ? 'Новость — черновик' : 'Добавить в рассылку'}
+                                                    >
+                                                        <i className={newsletterStatusMap[newsItem.id] === 'sent' ? 'bi bi-inbox' : (newsletterStatusMap[newsItem.id] === 'queued' ? 'bi bi-mailbox-flag' : 'bi bi-envelope-check')}></i>
+                                                    </Button>
                                                     <Button
                                                         variant="outline-primary"
                                                         size="sm"
@@ -891,6 +1043,13 @@ export default function NewsPage() {
                                     <Alert variant="danger" className="mb-4">
                                         <i className="bi bi-exclamation-circle me-2"></i>
                                         {newsFormError}
+                                    </Alert>
+                                )}
+
+                                {newsFormSuccess && (
+                                    <Alert variant={newsFormSuccessVariant} className="mb-4" dismissible onClose={() => { setNewsFormSuccess(null); setNewsFormSuccessVariant('success') }}>
+                                        <i className={newsFormSuccessVariant === 'success' ? 'bi bi-check-circle me-2' : 'bi bi-info-circle me-2'}></i>
+                                        {newsFormSuccess}
                                     </Alert>
                                 )}
 
@@ -1045,6 +1204,7 @@ export default function NewsPage() {
                             <i className="bi bi-floppy me-2"></i>
                             Сохранить
                         </Button>
+                        
                         <Button
                             variant="secondary"
                             onClick={handleRequestCloseModal}
@@ -1082,6 +1242,67 @@ export default function NewsPage() {
                         </Button>
                     </Modal.Footer>
                 </Modal>
+            </Modal>
+
+            <Modal
+                show={showAddToNewsletterConfirm}
+                onHide={() => setShowAddToNewsletterConfirm(false)}
+                centered
+            >
+                    <Modal.Body className="text-center py-4">
+                        <p>Добавить письмо в рассылку?</p>
+                    </Modal.Body>
+                <Modal.Footer className="d-flex justify-content-end gap-2">
+                    <Button variant="secondary" onClick={() => { setShowAddToNewsletterConfirm(false); setSelectedNewsIdForNewsletter(null) }}>
+                        Отмена
+                    </Button>
+                    <Button variant="primary" disabled={savingNewsletter} onClick={async () => { await performAddToNewsletter(confirmNewsIdRef.current); confirmNewsIdRef.current = null; setSelectedNewsIdForNewsletter(null); }}>
+                        {savingNewsletter ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Добавление...
+                            </>
+                        ) : 'Да, добавить'}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                show={showNewsletterInfoModal}
+                onHide={() => { setShowNewsletterInfoModal(false); setNewsletterInfoMessage('') }}
+                centered
+            >
+                <Modal.Body className="text-center py-4">
+                    <p>{newsletterInfoMessage}</p>
+                </Modal.Body>
+                <Modal.Footer className="d-flex justify-content-end gap-2">
+                    <Button variant="primary" onClick={() => { setShowNewsletterInfoModal(false); setNewsletterInfoMessage('') }}>
+                        ОК
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal
+                show={showDraftWarningModal}
+                onHide={() => { setShowDraftWarningModal(false); draftWarningNewsIdRef.current = null }}
+                centered
+            >
+                <Modal.Body className="text-center py-4">
+                    <p>Эта новость помечена как черновик. Опубликуйте её перед добавлением в рассылку.</p>
+                </Modal.Body>
+                <Modal.Footer className="d-flex justify-content-end gap-2">
+                    <Button variant="secondary" onClick={() => { setShowDraftWarningModal(false); draftWarningNewsIdRef.current = null }}>ОК</Button>
+                    <Button variant="primary" onClick={() => {
+                        const id = draftWarningNewsIdRef.current
+                        setShowDraftWarningModal(false)
+                        draftWarningNewsIdRef.current = null
+                        if (id) {
+                            // open edit modal for this news
+                            const newsItem = news.find(n => n.id === id)
+                            if (newsItem) handleOpenEditModal(newsItem)
+                        }
+                    }}>Редактировать</Button>
+                </Modal.Footer>
             </Modal>
 
             <Modal

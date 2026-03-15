@@ -178,7 +178,7 @@ export const BLOCK_VARIANTS = [
             { question: 'Вопрос номер 1', answer: { html: '<p>ответ на первый вопрос </p>' } }
           ]
         },
-      },{
+      }, {
         id: 'QA02',
         name: 'QA02',
         title: 'Ответ в раскрывающихся карточках',
@@ -192,6 +192,7 @@ export const BLOCK_VARIANTS = [
       },
     ],
   },
+
   {
     type: 'note',
     label: 'Заметка',
@@ -223,7 +224,7 @@ export const BLOCK_VARIANTS = [
         defaultContent: {
           html: '',
           variant: 'NT02',
-          noteType: 'info', 
+          noteType: 'info',
           icon: 'bi bi-info-lg',
           text: ''
         },
@@ -242,7 +243,7 @@ export const BLOCK_VARIANTS = [
         defaultContent: {
           html: '',
           variant: 'NT03',
-          noteType: 'info', 
+          noteType: 'info',
           icon: 'bi bi-info-lg',
           text: ''
         },
@@ -401,7 +402,7 @@ export const BLOCK_VARIANTS = [
         defaultContent: {
           title: '',
           text: '',
-          src: '', 
+          src: '',
           alt: '',
           variant: 'IM04',
           type: 'image-section',
@@ -424,132 +425,132 @@ export const BLOCK_VARIANTS = [
     icon: 'gallery',
     subvariants: [
       {
-          id: 'GL01',
-          name: 'GL01',
-          title: 'Изображения в 2 колонки',
-          description: '',
-          preview: '/previews/gl01.bmp',
-          defaultContent: {
-            images: [],
-            columns: 2,
-            imageHeight: 450,
-            galleryCaption: '',
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: true,
-            allowGalleryCaption: true,
-          }
+        id: 'GL01',
+        name: 'GL01',
+        title: 'Изображения в 2 колонки',
+        description: '',
+        preview: '/previews/gl01.bmp',
+        defaultContent: {
+          images: [],
+          columns: 2,
+          imageHeight: 450,
+          galleryCaption: '',
         },
-        {
-          id: 'GL02',
-          name: 'GL02',
-          title: 'Изображения в 3 колонки',
-          description: '',
-          preview: '/previews/gl02.bmp',
-          defaultContent: {
-            images: [],
-            columns: 3,
-            imageHeight: 450,
-            galleryCaption: '',
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: true,
-            allowGalleryCaption: true,
-          }
-        },
-        {
-          id: 'GL03',
-          name: 'GL03',
-          title: 'Комбинация: большое и маленькое изображения',
-          description: 'Два изображения: одно большое, одно маленькое. Нельзя задать высоту и ширину.',
-          preview: '/previews/gl03.bmp',
-          defaultContent: {
-            images: [],
-            galleryCaption: '',
-            maxImages: 2,
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: false,
-            allowGalleryCaption: true,
-            maxImages: 2,
-          }
-        },
-        {
-          id: 'GL04',
-          name: 'GL04',
-          title: 'Комбинация: 2 изображения со смещением',
-          description: 'Два изображения со смещением. Можно задать одну высоту для обоих изображений.',
-          preview: '/previews/gl04.bmp',
-          defaultContent: {
-            images: [],
-            imageHeight: 450,
-            galleryCaption: '',
-            maxImages: 2,
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: true,
-            allowGalleryCaption: true,
-            maxImages: 2,
-          }
-        },
-        {
-          id: 'GL05',
-          name: 'GL05',
-          title: 'Комбинация изображений',
-          description: 'Комбинация изображений (как в вариантах 1 и 2). Можно загрузить до 5 изображений, задать подписи и одну высоту.',
-          preview: '/previews/gl05.bmp',
-          defaultContent: {
-            images: [],
-            columns: 2,
-            imageHeight: 250,
-            galleryCaption: '',
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: false,
-            allowGalleryCaption: true,
-          }
-        },
-        {
-          id: 'GL06',
-          name: 'GL06',
-          title: 'Комбинация вертикальных и горизонтальных',
-          description: 'Комбинация вертикальных и горизонтальных изображений. Можно загрузить до 5 изображений, задать подписи и одну высоту.',
-          preview: '/previews/gl06.bmp',
-          defaultContent: {
-            images: [],
-            columns: 2,
-            imageHeight: 450,
-            galleryCaption: '',
-          },
-          settings: {
-            allowUrl: true,
-            allowUpload: true,
-            allowReorder: true,
-            allowDelete: true,
-            allowImageHeight: true,
-            allowGalleryCaption: true,
-          }
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: true,
+          allowGalleryCaption: true,
         }
+      },
+      {
+        id: 'GL02',
+        name: 'GL02',
+        title: 'Изображения в 3 колонки',
+        description: '',
+        preview: '/previews/gl02.bmp',
+        defaultContent: {
+          images: [],
+          columns: 3,
+          imageHeight: 450,
+          galleryCaption: '',
+        },
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: true,
+          allowGalleryCaption: true,
+        }
+      },
+      {
+        id: 'GL03',
+        name: 'GL03',
+        title: 'Комбинация: большое и маленькое изображения',
+        description: 'Два изображения: одно большое, одно маленькое. Нельзя задать высоту и ширину.',
+        preview: '/previews/gl03.bmp',
+        defaultContent: {
+          images: [],
+          galleryCaption: '',
+          maxImages: 2,
+        },
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: false,
+          allowGalleryCaption: true,
+          maxImages: 2,
+        }
+      },
+      {
+        id: 'GL04',
+        name: 'GL04',
+        title: 'Комбинация: 2 изображения со смещением',
+        description: 'Два изображения со смещением. Можно задать одну высоту для обоих изображений.',
+        preview: '/previews/gl04.bmp',
+        defaultContent: {
+          images: [],
+          imageHeight: 450,
+          galleryCaption: '',
+          maxImages: 2,
+        },
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: true,
+          allowGalleryCaption: true,
+          maxImages: 2,
+        }
+      },
+      {
+        id: 'GL05',
+        name: 'GL05',
+        title: 'Комбинация изображений',
+        description: 'Комбинация изображений (как в вариантах 1 и 2). Можно загрузить до 5 изображений, задать подписи и одну высоту.',
+        preview: '/previews/gl05.bmp',
+        defaultContent: {
+          images: [],
+          columns: 2,
+          imageHeight: 250,
+          galleryCaption: '',
+        },
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: false,
+          allowGalleryCaption: true,
+        }
+      },
+      {
+        id: 'GL06',
+        name: 'GL06',
+        title: 'Комбинация вертикальных и горизонтальных',
+        description: 'Комбинация вертикальных и горизонтальных изображений. Можно загрузить до 5 изображений, задать подписи и одну высоту.',
+        preview: '/previews/gl06.bmp',
+        defaultContent: {
+          images: [],
+          columns: 2,
+          imageHeight: 450,
+          galleryCaption: '',
+        },
+        settings: {
+          allowUrl: true,
+          allowUpload: true,
+          allowReorder: true,
+          allowDelete: true,
+          allowImageHeight: true,
+          allowGalleryCaption: true,
+        }
+      }
     ]
   },
   {
@@ -587,9 +588,35 @@ export const BLOCK_VARIANTS = [
           columns: 3,
           imageHeight: 450,
           fileUrl: '',
+        }
+      },
+      {
+        id: 'TL03',
+        name: 'TL03',
+        title: 'Плитки-ссылки (настраиваемые колонки)',
+        description: 'Плитки-ссылки с настраиваемым количеством колонок (1–5).',
+        preview: '/previews/tl03.bmp',
+        defaultContent: {
+          items: [],
+          columns: 3,
+          imageHeight: 300,
+          fileUrl: '',
+        }
+      },
+      {
+        id: 'TL04',
+        name: 'TL04',
+        title: 'Плитки: нестандартная раскладка 4 колонки',
+        description: 'Специальная раскладка на 4 колонки: первые 4 плитки занимают заданные позиции, остальные идут по ячейкам.',
+        preview: '/previews/tl04.bmp',
+        defaultContent: {
+          items: [],
+          columns: 4,
+          imageHeight: 300,
+          fileUrl: '',
         },
         settings: {
-          maxItems: 12,
+          maxItems: 2000,
         }
       }
     ]
@@ -630,5 +657,33 @@ export const BLOCK_VARIANTS = [
         },
       },
     ],
+  },
+  {
+    type: 'contact',
+    label: 'Контакт',
+    icon: 'person',
+    subvariants: [
+      {
+        id: 'CN01',
+        name: 'CN01',
+        title: 'Карточка сотрудника (контактный блок)',
+        description: 'Фото, имя, должность и произвольный список контактов: телефоны, почта, соцсети и прочее.',
+        preview: '/previews/cn01.bmp',
+        defaultContent: {
+          image: { src: '', alt: '', width: null, height: null },
+          name: '',
+          position: '',
+          contacts: [
+            { id: `c-${Date.now()}-1`, type: 'phone', label: 'Телефон', value: '', href: '' },
+            { id: `c-${Date.now()}-2`, type: 'email', label: 'Email', value: '', href: '' }
+          ],
+          variant: 'CN01'
+        },
+        settings: {
+          allowMultipleContacts: true,
+          contactTypes: ['phone', 'email', 'url', 'other']
+        }
+      }
+    ]
   },
 ];

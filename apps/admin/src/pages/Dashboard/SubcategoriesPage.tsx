@@ -17,6 +17,7 @@ import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageUploadInput';
+import { PageBlocksEditor } from '../../components/PageBlocksEditor'
 
 
 type Category = {
@@ -98,6 +99,39 @@ export default function SubcategoriesPage() {
   const [editDocIsPublished, setEditDocIsPublished] = useState(true)
   const [editDocFormError, setEditDocFormError] = useState('')
   const [isEditingDoc, setIsEditingDoc] = useState(false)
+
+  // Page blocks editor modal
+  const [pageEditorOpened, setPageEditorOpened] = useState(false)
+  const [editingCategoryForBlocks, setEditingCategoryForBlocks] = useState<Category | null>(null)
+  const [editingBlocks, setEditingBlocks] = useState<any[] | undefined>(undefined)
+
+  const handleSavePageBlocks = async () => {
+    if (!editingCategoryForBlocks) return
+    try {
+      const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_UPDATE(editingCategoryForBlocks.id), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ blocks: editingBlocks || [] }),
+      })
+      if (!res.ok) {
+        const text = await res.text()
+        throw new Error(`Ошибка сохранения: ${res.status} ${text}`)
+      }
+      const updated = await res.json()
+      if (parentCategory && updated.id === parentCategory.id) {
+        setParentCategory(updated as any)
+      } else {
+        setSubcategories((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+      }
+      setPageEditorOpened(false)
+    } catch (err: any) {
+      console.error('Save page blocks error:', err)
+      alert(err.message || 'Ошибка при сохранении')
+    }
+  }
 
   useEffect(() => {
     if (categoryId) {
@@ -537,10 +571,18 @@ export default function SubcategoriesPage() {
               </a>
             </div>
             <div className="d-flex gap-2">
-              <Button variant="primary" onClick={() => setModalOpened(true)}>
+                <Button variant="primary" onClick={() => setModalOpened(true)}>
                 <i className="bi bi-plus-lg me-2" />
                 Добавить подкатегорию
               </Button>
+                <Button variant="outline-secondary" onClick={() => {
+                  setEditingCategoryForBlocks(parentCategory)
+                  setEditingBlocks((parentCategory as any)?.blocks || [])
+                  setPageEditorOpened(true)
+                }}>
+                  <i className="bi bi-layout-text-sidebar-reverse me-2" />
+                  Редактировать страницу
+                </Button>
             </div>
           </div>
 
@@ -657,7 +699,7 @@ export default function SubcategoriesPage() {
             <Tabs defaultActiveKey="subcategories">
               <Tab eventKey="subcategories" title={`Подкатегории (${subcategories.length})`}>
                 {subcategories.length === 0 ? (
-                  <div className="bg-white border rounded p-4 text-center mt-3">
+                  <div className="d-flex flex-column bg-white border rounded p-4 text-center mt-3">
                     <p className="mb-1 text-muted">Подкатегорий не найдено</p>
                     <p className="mb-0 text-muted small">
                       Вы можете добавить документы напрямую в родительскую категорию через кнопку выше.
@@ -677,6 +719,18 @@ export default function SubcategoriesPage() {
                               </p>
                             </div>
                             <div className="d-flex gap-2">
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingCategoryForBlocks(subcategory)
+                                  setEditingBlocks((subcategory as any)?.blocks || [])
+                                  setPageEditorOpened(true)
+                                }}
+                                title="Редактировать страницу подкатегории"
+                              >
+                                <i className="bi bi-layout-text-sidebar-reverse" />
+                              </Button>
                               <Button
                                 variant="outline-success"
                                 size="sm"
@@ -849,6 +903,44 @@ export default function SubcategoriesPage() {
                 Создать
               </Button>
             </Modal.Footer>
+          </Modal>
+
+          {/* Page blocks editor modal (fullscreen like Projects/News) */}
+          <Modal
+            show={pageEditorOpened}
+            onHide={() => setPageEditorOpened(false)}
+            fullscreen={true}
+            backdrop="static"
+            dialogClassName="modal-fullscreen"
+            contentClassName="border-0"
+          >
+            <div className="d-flex flex-column h-100">
+              <div className="modal-body p-4" style={{ overflowY: 'auto' }}>
+                <div className="row g-4">
+                  <div className="col-md-4" style={{ background: '#F7FAFF', padding: '20px 40px 40px 60px', display: 'flex', flexDirection: 'column', height: '100%', minHeight: '400px' }}>
+                    <div className="mb-4">
+                      <span className="text-danger fs-5 me-2">*</span>
+                      <span className="text-muted">Обязательные поля помечены</span>
+                    </div>
+                    <h5 className="mb-3">{editingCategoryForBlocks?.name}</h5>
+                    <p className="text-muted small">Добавьте/измените блоки, которые будут отображаться над списком документов.</p>
+                  </div>
+
+                  <div className="col-md-8" style={{ padding: '10px 40px' }}>
+                    {editingBlocks !== undefined ? (
+                      <PageBlocksEditor blocks={editingBlocks} setBlocks={(b: any[]) => setEditingBlocks(b)} />
+                    ) : (
+                      <div>Загрузка...</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer border-top d-flex justify-content-end gap-2">
+                <Button variant="secondary" onClick={() => setPageEditorOpened(false)}>Отмена</Button>
+                <Button variant="outline-primary" onClick={async () => await handleSavePageBlocks()}>Сохранить</Button>
+              </div>
+            </div>
           </Modal>
 
 

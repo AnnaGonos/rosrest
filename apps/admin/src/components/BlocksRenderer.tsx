@@ -433,19 +433,36 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     );
                 }
 
-                // TL02: Галерея изображений-ссылок
-                if (block.type === 'TL02') {
+                // Плитки-ссылки
+                if (block.type === 'TL02' || block.type === 'TL03' || block.type === 'TL04') {
                     const items = block.content.items || [];
-                    const columns = block.content.columns || 3;
+                    const columns = block.content.columns || (block.type === 'TL04' ? 4 : 3);
                     const imageHeight = block.content.imageHeight || 240;
 
+                    
+                    const containerStyle: React.CSSProperties = block.type === 'TL04' ? {
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(4, 1fr)`,
+                        gridAutoRows: `${imageHeight}px`,
+                        gap: '20px',
+                        alignItems: 'stretch'
+                    } : {
+                        display: 'grid',
+                        gridTemplateColumns: `repeat(${columns}, 1fr)`,
+                        gap: '20px'
+                    };
+
+                    let posIndex: Record<string, number> = {};
+                    if (block.type === 'TL04') {
+                        ['p1', 'p2', 'p3', 'p4'].forEach(p => {
+                            const found = items.findIndex((it: any) => it && it.position === p);
+                            if (found !== -1) posIndex[p] = found;
+                        });
+                    }
+
                     return (
-                        <div key={block.id} className="tile-link-block tile-link-block--tl02 mb-40">
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: `repeat(${columns}, 1fr)`,
-                                gap: '20px'
-                            }}>
+                        <div key={block.id} className={`tile-link-block tile-link-block--${block.type.toLowerCase()} mb-40`}>
+                            <div style={containerStyle}>
                                 {items.length === 0 && (
                                     <div className="text-muted">Нет изображений</div>
                                 )}
@@ -453,8 +470,38 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     const imageSrc = getFileUrl(item.src);
                                     const itemUrl = item.fileUrl ? getFileUrl(item.fileUrl) : (item.linkType === 'pdf' ? getFileUrl(item.pdfUrl) : item.url);
 
+                                    let itemStyle: React.CSSProperties = {};
+                                    let contentStyle: React.CSSProperties = {
+                                        position: 'relative',
+                                        height: '100%',
+                                        background: '#f8f9fa',
+                                        overflow: 'hidden',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    };
+
+                                    if (block.type === 'TL04') {
+                                        const isP1 = posIndex['p1'] === idx || (!posIndex['p1'] && idx === 0);
+                                        const isP2 = posIndex['p2'] === idx || (!posIndex['p2'] && idx === 1 && !posIndex['p1']);
+                                        const isP3 = posIndex['p3'] === idx || (!posIndex['p3'] && idx === 2 && !posIndex['p1'] && !posIndex['p2']);
+                                        const isP4 = posIndex['p4'] === idx || (!posIndex['p4'] && idx === 3 && !posIndex['p1'] && !posIndex['p2'] && !posIndex['p3']);
+
+                                        if (isP1) {
+                                            itemStyle = { gridColumn: '1 / 2', gridRow: '1 / 2' };
+                                        } else if (isP2) {
+                                            itemStyle = { gridColumn: '2 / 3', gridRow: '1 / 2' };
+                                        } else if (isP3) {
+                                            itemStyle = { gridColumn: '3 / 5', gridRow: '1 / 3' }; 
+                                        } else if (isP4) {
+                                            itemStyle = { gridColumn: '1 / 3', gridRow: '2 / 3' }; 
+                                        } else {
+                                            itemStyle = {};
+                                        }
+                                    }
+
                                     const ImageContent = (
-                                        <div style={{ position: 'relative', height: imageHeight, background: '#f8f9fa', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={contentStyle}>
                                             {imageSrc ? (
                                                 <img
                                                     src={imageSrc}
@@ -476,13 +523,13 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                     );
 
                                     return (
-                                        <div key={idx} className="tile-link-item">
+                                        <div key={idx} className="tile-link-item" style={itemStyle}>
                                             {itemUrl ? (
                                                 <a
                                                     href={itemUrl || '#'}
                                                     target={item.openInNewTab ? "_blank" : undefined}
                                                     rel={item.openInNewTab ? "noopener noreferrer" : undefined}
-                                                    style={{ display: 'block', cursor: 'pointer', textDecoration: 'none', color: 'inherit' }}
+                                                    style={{ display: 'block', cursor: 'pointer', textDecoration: 'none', color: 'inherit', height: '100%' }}
                                                 >
                                                     {ImageContent}
                                                 </a>
@@ -497,7 +544,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     );
                 }
 
-                // TB01, TB02: Таблицы
+                // Таблицы
                 if (block.type.startsWith('TB')) {
                     const hasHeaders = block.content?.hasHeaders ?? false;
                     const rows: string[][] = Array.isArray(block.content?.rows) ? block.content.rows : [];
@@ -528,6 +575,68 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    );
+                }
+
+                // CN01: контактная карточка
+                if (block.type === 'CN01') {
+                    const image = block.content?.image || { src: '', alt: '', width: null, height: null, responsive: true };
+                    const name = block.content?.name || '';
+                    const position = block.content?.position || '';
+                    const contacts = Array.isArray(block.content?.contacts) ? block.content.contacts : [];
+
+                    const imgWidth = image?.width ?? null;
+                    const imgHeight = image?.height ?? null;
+
+                    const getHrefFor = (c: any) => {
+                       
+                        return c?.href || '';
+                    };
+
+                    const containerStyle: React.CSSProperties = { display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' };
+                    const wrapperStyle: React.CSSProperties = {
+                        width: imgWidth ? `${imgWidth}px` : 96,
+                        height: imgHeight ? `${imgHeight}px` : 96,
+                        background: '#f8f9fa',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        borderRadius: 6,
+                        maxWidth: '100%'
+                    };
+
+                    const imgStyle: React.CSSProperties = {
+                        width: '100%',
+                        maxWidth: imgWidth ? `${imgWidth}px` : '100%',
+                        height: imgHeight ? `${imgHeight}px` : 'auto',
+                        objectFit: 'cover'
+                    };
+
+                    return (
+                        <div key={block.id} className={`contact-block mb-40`}>
+                            <div style={containerStyle}>
+                                <div style={wrapperStyle}>
+                                    {image?.src ? <img src={getFileUrl(image.src)} alt={image.alt} style={imgStyle} /> : <i className="bi bi-person" style={{ fontSize: 28, color: '#bbb' }} />}
+                                </div>
+                                <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+                                    <div style={{ fontWeight: 700, fontSize: 16 }}>{name}</div>
+                                    <div className="small text-muted">{position}</div>
+                                    <div style={{ marginTop: 8 }}>
+                                        {contacts.length === 0 && <div className="small text-muted">Нет контактов</div>}
+                                        {contacts.map((c: any, idx: number) => (
+                                            <div key={c.id || idx} className="small">
+                                                {getHrefFor(c) ? (
+                                                    <a href={getHrefFor(c)} target="_blank" rel="noopener noreferrer">{c.label ? `${c.label}: ` : ''}{c.value || c.href}</a>
+                                                ) : (
+                                                    <>{c.label ? `${c.label}: ` : ''}{c.value || c.href}</>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     );

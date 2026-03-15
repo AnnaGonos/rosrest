@@ -160,6 +160,12 @@ export const API_ENDPOINTS = {
     send: buildApiUrl('digest/send'),
     preview: buildApiUrl('digest/preview'),
   },
+  NEWSLETTER: {
+    add: buildApiUrl('newsletter/queue/add'),
+    list: buildApiUrl('newsletter/queue'),
+    send: buildApiUrl('newsletter/queue/send'),
+    delete: (id: string | number) => buildApiUrl(`newsletter/queue/${id}`),
+  },
 }
 
 export default {
