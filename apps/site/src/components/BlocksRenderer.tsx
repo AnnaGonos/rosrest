@@ -496,13 +496,13 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
 
                                         if (isMobile) {
                                             if (isP1) {
-                                                itemStyle = { gridColumn: '1 / 2', gridRow: 'auto' };
+                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
                                             } else if (isP2) {
-                                                itemStyle = { gridColumn: '2 / 3', gridRow: 'auto' };
+                                                itemStyle = { gridColumn: '3 / 5', gridRow: 'auto' };
                                             } else if (isP3 || isP4) {
-                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
+                                                itemStyle = { gridColumn: '1 / 5', gridRow: 'auto' };
                                             } else {
-                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
+                                                itemStyle = { gridColumn: '1 / 5', gridRow: 'auto' };
                                             }
                                         } else {
                                             if (isP1) {
