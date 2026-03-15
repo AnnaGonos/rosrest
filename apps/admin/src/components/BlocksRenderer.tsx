@@ -27,6 +27,13 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
     const [openQA, setOpenQA] = React.useState<{ [blockId: string]: number | null }>({});
     const [selectedTabIndex, setSelectedTabIndex] = React.useState<{ [blockId: string]: number }>({});
     const [openTS02Tabs, setOpenTS02Tabs] = React.useState<{ [tabId: string]: boolean }>({});
+    const [isMobile, setIsMobile] = React.useState<boolean>(() => typeof window !== 'undefined' ? window.innerWidth < 800 : false);
+
+    React.useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 800);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
 
 
@@ -487,16 +494,28 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                         const isP3 = posIndex['p3'] === idx || (!posIndex['p3'] && idx === 2 && !posIndex['p1'] && !posIndex['p2']);
                                         const isP4 = posIndex['p4'] === idx || (!posIndex['p4'] && idx === 3 && !posIndex['p1'] && !posIndex['p2'] && !posIndex['p3']);
 
-                                        if (isP1) {
-                                            itemStyle = { gridColumn: '1 / 2', gridRow: '1 / 2' };
-                                        } else if (isP2) {
-                                            itemStyle = { gridColumn: '2 / 3', gridRow: '1 / 2' };
-                                        } else if (isP3) {
-                                            itemStyle = { gridColumn: '3 / 5', gridRow: '1 / 3' }; 
-                                        } else if (isP4) {
-                                            itemStyle = { gridColumn: '1 / 3', gridRow: '2 / 3' }; 
+                                        if (isMobile) {
+                                            if (isP1) {
+                                                itemStyle = { gridColumn: '1 / 2', gridRow: 'auto' };
+                                            } else if (isP2) {
+                                                itemStyle = { gridColumn: '2 / 3', gridRow: 'auto' };
+                                            } else if (isP3 || isP4) {
+                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
+                                            } else {
+                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
+                                            }
                                         } else {
-                                            itemStyle = {};
+                                            if (isP1) {
+                                                itemStyle = { gridColumn: '1 / 2', gridRow: '1 / 2' };
+                                            } else if (isP2) {
+                                                itemStyle = { gridColumn: '2 / 3', gridRow: '1 / 2' };
+                                            } else if (isP3) {
+                                                itemStyle = { gridColumn: '3 / 5', gridRow: '1 / 3' };
+                                            } else if (isP4) {
+                                                itemStyle = { gridColumn: '1 / 3', gridRow: '2 / 3' };
+                                            } else {
+                                                itemStyle = {};
+                                            }
                                         }
                                     }
 
