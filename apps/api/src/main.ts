@@ -12,6 +12,15 @@ const cookieParser = require('cookie-parser');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
+// Polyfill global crypto for Node versions that don't expose Web Crypto API on globalThis (e.g. Node 18)
+if (typeof (globalThis as any).crypto === 'undefined') {
+	try {
+		(globalThis as any).crypto = require('crypto');
+	} catch (e) {
+		// ignore if crypto cannot be required
+	}
+}
+
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
 
