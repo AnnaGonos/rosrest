@@ -613,7 +613,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return c?.href || '';
                     };
 
-                    const containerStyle: React.CSSProperties = { display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' };
+                    const containerStyle: React.CSSProperties = { display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', height: '100%' };
                     const wrapperStyle: React.CSSProperties = {
                         width: imgWidth ? `${imgWidth}px` : 96,
                         height: imgHeight ? `${imgHeight}px` : 96,
@@ -622,7 +622,6 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         overflow: 'hidden',
-                        borderRadius: 6,
                         maxWidth: '100%'
                     };
 
@@ -639,11 +638,15 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                 <div style={wrapperStyle}>
                                     {image?.src ? <img src={getFileUrl(image.src) || ''} alt={image.alt} style={imgStyle} /> : <i className="bi bi-person" style={{ fontSize: 28, color: '#bbb' }} />}
                                 </div>
-                                <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-                                    <div style={{ fontWeight: 700, fontSize: 16 }}>{name}</div>
-                                    <div className="small text-muted">{position}</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'space-between', alignItems: 'flex-start', height: '200px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flexWrap: 'wrap' }}>
+                                        <div style={{ fontWeight: 500, fontSize: 16 }}>{name}</div>
+                                        <div className="small text-muted">{position}</div>
+                                    </div>
+
+
                                     <div style={{ marginTop: 8 }}>
-                                        {contacts.length === 0 && <div className="small text-muted">Нет контактов</div>}
+                                        {contacts.length === 0 && <div className="small text-muted"></div>}
                                         {contacts.map((c: any, idx: number) => (
                                             <div key={c.id || idx} className="small">
                                                 {getHrefFor(c) ? (
