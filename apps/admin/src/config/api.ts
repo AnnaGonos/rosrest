@@ -166,6 +166,11 @@ export const API_ENDPOINTS = {
     send: buildApiUrl('newsletter/queue/send'),
     delete: (id: string | number) => buildApiUrl(`newsletter/queue/${id}`),
   },
+  MENUS: {
+    list: buildApiUrl('menus'),
+    item: (id: string | number) => buildApiUrl(`menus/item/${id}`),
+    saveMain: buildApiUrl('menus/main'),
+  },
 }
 
 export default {

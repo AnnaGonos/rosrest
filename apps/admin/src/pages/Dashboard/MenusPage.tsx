@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
-import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap'
+import { Modal, Button, Form, Container, Row, Col, Spinner, Alert } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
+import API from '../../config/api'
 import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -22,6 +23,9 @@ export default function MenusPage() {
     const idCounter = useRef(1)
     const lastSnapshotRef = useRef<MenuNode[] | null>(null)
 
+    const [loading, setLoading] = useState<boolean>(true)
+    const [error, setError] = useState<string | null>(null)
+
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { delay: 1000, tolerance: 1 } }),
         useSensor(TouchSensor, { activationConstraint: { delay: 1000, tolerance: 1 } })
@@ -41,12 +45,13 @@ export default function MenusPage() {
 
     const fetchMenu = async () => {
         try {
-            const API_BASE = (import.meta as any).env.VITE_API_URL || 'http://localhost:3002'
-            const res = await fetch(`${API_BASE}/menus`)
-            if (!res.ok) return
+            setLoading(true)
+            setError(null)
+            const res = await fetch(API.API_ENDPOINTS.MENUS.list)
+            if (!res.ok) throw new Error(`Ошибка загрузки меню: ${res.status}`)
             const data = await res.json()
             const items = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : [])
-    
+
             const list: MenuNode[] = items.map((it: any) => ({ tempId: `t${idCounter.current++}`, id: it.id, title: it.title ?? it.label ?? '', url: it.url ?? null, ord: it.ord ?? 0, children: [] }))
             const byId = new Map<string, MenuNode>()
             for (const n of list) byId.set(n.id || n.tempId, n)
@@ -63,8 +68,11 @@ export default function MenusPage() {
                 return !original || !original.parentId
             })
             setNodes(roots)
-        } catch (e) {
-            console.error(e)
+        } catch (e: any) {
+            console.error('Fetch menu error:', e)
+            setError(e.message || 'Ошибка загрузки меню')
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -118,15 +126,12 @@ export default function MenusPage() {
         }
 
         const res = findAndCollect(nodes, tempId)
-        const API_BASE = (import.meta as any).env.VITE_API_URL || 'http://localhost:3002'
-
         if (res.ids.length > 0) {
-            
             try {
                 for (const id of res.ids) {
-                    await fetch(`${API_BASE}/menus/item/${id}`, { method: 'DELETE' })
+                    await fetch(API.API_ENDPOINTS.MENUS.item(id), { method: 'DELETE' })
                 }
-               
+
                 await fetchMenu()
                 setMessage('Item deleted')
                 setTimeout(() => setMessage(null), 2000)
@@ -174,9 +179,8 @@ export default function MenusPage() {
 
     const saveItems = async (nodesToSave?: MenuNode[]) => {
         try {
-            const API_BASE = (import.meta as any).env.VITE_API_URL || 'http://localhost:3002'
             const payload = flatten(nodesToSave ?? lastSnapshotRef.current ?? nodes)
-            await fetch(`${API_BASE}/menus/main`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            await fetch(API.API_ENDPOINTS.MENUS.saveMain, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             setMessage('Обновлено')
             setTimeout(() => setMessage(null), 2000)
             fetchMenu()
@@ -263,6 +267,18 @@ export default function MenusPage() {
         closeEdit()
     }
 
+    if (loading) {
+        return (
+            <DashboardLayout title="Меню">
+                <Container className="py-4">
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 300 }}>
+                        <Spinner animation="border" role="status" />
+                    </div>
+                </Container>
+            </DashboardLayout>
+        )
+    }
+
     const renderNode = (n: MenuNode, depth = 0) => (
         <SortableItem key={n.tempId} id={n.tempId} depth={depth} node={n} openEdit={openEdit} moveNode={moveNode} deleteNode={deleteNode} />
     )
@@ -332,6 +348,12 @@ export default function MenusPage() {
                         <div>
                             <Button variant="success" onClick={() => startAddModal(null)}>Добавить заголовок</Button>
                         </div>
+                        {error && (
+                            <Alert variant="danger" className="mt-3 d-flex align-items-center gap-2">
+                                <i className="bi bi-exclamation-triangle-fill" />
+                                <span>{error}</span>
+                            </Alert>
+                        )}
                         {orderChanged && (
                             <div className="mt-3">
                                 <Button variant="warning" onClick={() => { saveItems(nodes); setOrderChanged(false); }}>Обновить порядок</Button>
