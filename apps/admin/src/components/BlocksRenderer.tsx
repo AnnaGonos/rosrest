@@ -452,8 +452,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         display: 'grid',
                         gridTemplateColumns: `repeat(${effectiveColumns}, 1fr)`,
                         gap: '20px',
-                        ...(block.type === 'TL04' ? { gridAutoRows: `${Math.min(imageHeight, 220)}px`, alignItems: 'stretch' } : {}),
-                        ...(block.type === 'TL03' && isMobile ? { gridAutoRows: `${Math.min(imageHeight, 220)}px` } : {})
+                        ...(block.type === 'TL04' ? { gridAutoRows: `${Math.min(imageHeight, 220)}px`, alignItems: 'stretch', gap: '10px' } : {}),
+                        ...(block.type === 'TL03' && isMobile ? { gridAutoRows: `${Math.min(imageHeight, 220)}px`, gap: '10px' } : {})
                     };
 
                     let posIndex: Record<string, number> = {};
@@ -496,10 +496,12 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                 itemStyle = { gridColumn: '1', gridRow: 'auto' };
                                             } else if (isP2) {
                                                 itemStyle = { gridColumn: '2', gridRow: 'auto' };
-                                            } else if (isP3 || isP4) {
-                                                itemStyle = { gridColumn: '1 / 2', gridRow: 'auto' };
+                                            } else if (isP3) {
+                                                itemStyle = { gridColumn: '1', gridRow: 'auto' };
+                                            } else if (isP4) {
+                                                itemStyle = { gridColumn: '2', gridRow: 'auto' };
                                             } else {
-                                                itemStyle = { gridColumn: '1 / 2', gridRow: 'auto' };
+                                                itemStyle = { gridColumn: '1 / 3', gridRow: 'auto' };
                                             }
                                         } else {
                                             if (isP1) {
