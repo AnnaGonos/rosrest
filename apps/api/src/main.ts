@@ -6,6 +6,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import helmet from 'helmet';
+import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 
 const cookieParser = require('cookie-parser');
@@ -54,6 +55,9 @@ async function bootstrap() {
 	app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
 	app.use(cookieParser());
+
+	app.use(bodyParser.json({ limit: process.env.BODY_LIMIT || '50mb' }));
+	app.use(bodyParser.urlencoded({ limit: process.env.BODY_LIMIT || '50mb', extended: true }));
 
 	const uploadsPath = path.join(__dirname, '..', 'uploads');
 	console.log(`[Uploads] Serving static files from: ${uploadsPath}`);

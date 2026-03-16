@@ -46,9 +46,9 @@ export class FileUploadService {
 			throw new BadRequestException('Можно загружать только DOC или DOCX файлы');
 		}
 
-		const maxSize = 20 * 1024 * 1024; // 20MB
+		const maxSize = 150 * 1024 * 1024;
 		if (file.size > maxSize) {
-			throw new BadRequestException('Размер DOC/DOCX не должен превышать 20MB');
+			throw new BadRequestException('Размер DOC/DOCX не должен превышать 150MB');
 		}
 
 		return await this.saveFile(file, subfolder);
@@ -60,9 +60,9 @@ export class FileUploadService {
 			throw new BadRequestException('Invalid image format. Allowed: jpg, png, gif, webp');
 		}
 
-		const maxSize = 150 * 1024 * 1024; // 15MB
+		const maxSize = 150 * 1024 * 1024;
 		if (file.size > maxSize) {
-			throw new BadRequestException('Image size must not exceed 15MB');
+			throw new BadRequestException('Image size must not exceed 150MB');
 		}
 
 		return await this.saveFile(file, subfolder);
@@ -74,7 +74,7 @@ export class FileUploadService {
 			throw new BadRequestException('Only PDF files are allowed');
 		}
 
-		const maxSize = 100 * 1024 * 1024;
+		const maxSize = 150 * 1024 * 1024;
 		if (file.size > maxSize) {
 			throw new BadRequestException('PDF size must not exceed 100MB');
 		}
