@@ -613,7 +613,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         return c?.href || '';
                     };
 
-                    const containerStyle: React.CSSProperties = { display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', height: '100%' };
+                    const containerStyle: React.CSSProperties = { display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap', height: '100%' };
                     const wrapperStyle: React.CSSProperties = {
                         width: imgWidth ? `${imgWidth}px` : 96,
                         height: imgHeight ? `${imgHeight}px` : 96,
@@ -638,9 +638,9 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                 <div style={wrapperStyle}>
                                     {image?.src ? <img src={getFileUrl(image.src) || ''} alt={image.alt} style={imgStyle} /> : <i className="bi bi-person" style={{ fontSize: 28, color: '#bbb' }} />}
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'space-between', alignItems: 'flex-start', height: '200px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'center', alignItems: 'flex-start' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flexWrap: 'wrap' }}>
-                                        <div style={{ fontWeight: 500, fontSize: 16 }}>{name}</div>
+                                        <div style={{ fontWeight: 600, fontSize: 16 }}>{name}</div>
                                         <div className="small text-muted">{position}</div>
                                     </div>
 
