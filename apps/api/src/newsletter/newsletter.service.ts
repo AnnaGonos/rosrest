@@ -100,15 +100,21 @@ export class NewsletterService {
       return { sent: 0, failed: 0 };
     }
 
-    const newsItems = items.map(i => ({
-      id: i.news.id,
-      slug: i.news.page?.slug || '',
-      title: i.news.page?.title || '',
-      excerpt: '',
-      publishedAt: i.news.page?.publishedAt ?? undefined,
-      previewImage: i.news.previewImage || undefined,
-      tags: i.news.tags ? i.news.tags.map(t => ({ id: t.id, name: t.name })) : [],
-    }));
+    const newsItems = items.map(i => {
+      const item = {
+        id: i.news.id,
+        slug: i.news.page?.slug || '',
+        title: i.news.page?.title || '',
+        excerpt: '',
+        publishedAt: i.news.page?.publishedAt ?? undefined,
+        previewImage: i.news.previewImage || undefined,
+        tags: i.news.tags ? i.news.tags.map(t => ({ id: t.id, name: t.name })) : [],
+      };
+      this.logger.log(
+        `Newsletter queue item: id=${item.id}, slug=${item.slug}, title=${item.title}, previewImage=${item.previewImage}`,
+      );
+      return item;
+    });
 
     const subscribers = await this.subscriptionService.getActiveSubscriptions();
     const recipientEmails = subscribers.map(s => s.email);
