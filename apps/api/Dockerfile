@@ -3,7 +3,6 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY apps/api/package*.json ./
-COPY .env .env
 
 RUN npm install
 

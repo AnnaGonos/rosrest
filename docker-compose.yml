@@ -59,14 +59,26 @@ services:
     ports:
       - "3002:3002"
     environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3002}
       DB_PROD_HOST: ${DB_PROD_HOST:-postgres_dev}
       DB_PROD_PORT: ${DB_PROD_PORT:-5432}
       DB_PROD_USER: ${DB_PROD_USER:-postgres}
       DB_PROD_PASSWORD: ${DB_PROD_PASSWORD}
       DB_PROD_NAME: ${DB_PROD_NAME:-rosrest_dev}
       DB_PROD_SSL: ${DB_PROD_SSL:-false}
-      REDIS_URL: redis://rosrest_redis:6379
-      API_PORT: 3002
+      REDIS_URL: ${REDIS_URL:-redis://rosrest_redis:6379}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_RATE_MS: ${MAIL_RATE_MS:-2000}
+      USE_SIMPLE_EMAIL: ${USE_SIMPLE_EMAIL:-false}
+      SITE_URL: ${SITE_URL}
+      API_URL: ${API_URL}
+      FILE_BASE_URL: ${VITE_FILES_BASE_URL:-https://document.rosrest.com}
+      CORS_ORIGIN: ${CORS_ORIGIN}
     depends_on:
       - postgres_dev
       - redis
