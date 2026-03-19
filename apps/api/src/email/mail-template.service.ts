@@ -15,6 +15,23 @@ export class MailTemplateService {
   private resolveTemplatePath(templateName: string): string {
     const fileName = `${templateName}.html`;
 
+    if (templateName === 'digest') {
+      const digestCandidates = [
+        path.join(process.cwd(), 'apps', 'api', 'src', 'email', 'templates', 'digest.html'),
+        path.join(process.cwd(), 'src', 'email', 'templates', 'digest.html'),
+        path.join(__dirname, 'templates', 'digest.html'),
+        path.join(process.cwd(), 'dist', 'email', 'templates', 'digest.html'),
+      ];
+
+      for (const digestPath of digestCandidates) {
+        if (fs.existsSync(digestPath)) {
+          return digestPath;
+        }
+      }
+
+      throw new Error(`Digest template not found. Checked: ${digestCandidates.join(', ')}`);
+    }
+
     for (const dir of this.templateSearchDirs) {
       const fullPath = path.join(dir, fileName);
       if (fs.existsSync(fullPath)) {
@@ -39,19 +56,6 @@ export class MailTemplateService {
           <p>Спасибо за подписку на новости Российской ассоциации реставраторов.</p>
           <p>Сайт: <a href="${variables.siteUrl}">${variables.siteUrl}</a></p>
           <p>Если хотите отписаться: <a href="${variables.unsubscribeUrl}">ссылка</a></p>
-        </body>
-      </html>
-      `;
-    }
-
-    if (templateName === 'digest') {
-      return `
-      <html>
-        <body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
-          <h2>Дайджест новостей</h2>
-          ${variables.newsItems || '<p>Пока нет новых публикаций.</p>'}
-          <p><a href="${variables.siteUrl}">Открыть сайт</a></p>
-          <p><a href="${variables.unsubscribeUrl}">Отписаться</a></p>
         </body>
       </html>
       `;
