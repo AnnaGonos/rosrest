@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дайджест новостей РАР</title>
+    <title>Дайджест новостей — РАР</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -11,172 +12,115 @@
             color: #333;
             background-color: #f5f5f5;
         }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background-color: white;
         }
+
         .header {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
             padding: 40px 20px;
             text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-        }
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 14px;
-        }
-        .content {
-            padding: 40px;
-        }
-        .intro {
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            padding: 15px;
-            margin-bottom: 30px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .news-item {
-            border-bottom: 1px solid #eee;
-            padding: 25px 0;
-        }
-        .news-item:last-child {
-            border-bottom: none;
-        }
-        .news-date {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        .news-title {
-            color: #007bff;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0 0 12px 0;
-            line-height: 1.4;
-        }
-        .news-title a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .news-title a:hover {
-            text-decoration: underline;
-        }
-        .news-excerpt {
-            color: #555;
-            font-size: 14px;
-            margin: 0 0 12px 0;
-            line-height: 1.6;
-        }
-        .news-link {
-            display: inline-block;
-            color: #007bff;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-            padding: 8px 16px;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-        }
-        .news-link:hover {
-            background-color: #007bff;
             color: white;
         }
-        .divider {
-            border: none;
-            border-top: 1px solid #eee;
-            margin: 30px 0;
-        }
-        .cta-button {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 12px 28px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            margin: 20px 0;
-            transition: background-color 0.3s ease;
-        }
-        .cta-button:hover {
-            background-color: #0056b3;
-        }
-        .footer {
-            background-color: #f8f9fa;
-            padding: 30px 40px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #eee;
-        }
-        .footer a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .footer p {
-            margin: 0 0 10px 0;
-        }
-        .footer p:last-child {
-            margin-bottom: 0;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
-        }
-        .empty-state p {
-            margin: 10px 0;
+
+        .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+        .header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 14px; }
+
+        .content { padding: 24px 28px; border-radius: 20px; background-color: white; }
+
+        .intro { background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 12px; margin-bottom: 20px; border-radius: 4px; font-size: 14px; }
+
+        .news-table { margin-bottom: 12px; border-collapse: separate; }
+        .news-table .news-row { padding: 12px 0; }
+        .news-table td { vertical-align: top; }
+        .news-table .thumb-td { width: 140px; padding-right: 12px; }
+        .news-table img { width: 140px; height: 90px; object-fit: cover; border-radius: 6px; display: block; }
+
+        .news-date { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .news-title { color: #007bff; font-size: 18px; font-weight: 600; margin: 0 0 8px 0; line-height: 1.4; }
+        .news-title a { color: #007bff; text-decoration: none; }
+        .news-tags { margin: 8px 0; }
+        .news-tags .tag { display: inline-block; background: #eef6ff; color: #007bff; padding: 4px 8px; border-radius: 12px; font-size: 12px; margin-right: 6px; }
+
+        .news-link { display: inline-block; color: #007bff; font-size: 13px; font-weight: 600; text-decoration: none; padding: 8px 16px; border: 1px solid #007bff; border-radius: 4px; }
+
+        .spacer-td { height: 12px; line-height: 12px; font-size: 12px; }
+
+        .cta-button { display: inline-block; background-color: #1D407C; color: white; padding: 12px 28px; text-decoration: none; border-radius: 40px; font-weight: 400; text-transform: uppercase; }
+
+        .footer { background-color: #ffffff; padding: 30px 40px; border-radius: 20px; }
+
+        @media only screen and (max-width: 600px) {
+            .container, .container table { width: 100% !important; max-width: 100% !important; }
+            .container { border-radius: 0 !important; }
+            .content { padding: 14px !important; }
+            .news-table, .news-table .news-row, .news-table td { display: block !important; width: 100% !important; }
+            .news-table .thumb-td { width: 100% !important; padding-right: 0 !important; }
+            .news-table img { width: 100% !important; height: auto !important; max-height: 220px; }
+            .news-title { font-size: 16px !important; }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📰 Дайджест новостей</h1>
-            <p>Российская ассоциация реставраторов</p>
-        </div>
 
-        <div class="content">
-            <div class="intro">
-                <strong>Здравствуйте!</strong> Вот последние новости за последнее время. Наслаждайтесь чтением!
-            </div>
+<body style="margin:0; padding:0; background-color:#f5f5f5;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td align="center">
+                <table class="container" role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td class="header">
+                            <h1>📰 Дайджест новостей</h1>
+                            <p>Российская ассоциация реставраторов</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:0; line-height:0;" height="18">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <div class="intro"><strong>Здравствуйте!</strong> Ниже — дайджест последних публикаций.</div>
 
-            {{newsItems}}
+                            {{newsItems}}
 
-            <hr class="divider">
+                            <hr class="divider">
 
-            <p>Хотите прочитать больше? Посетите наш сайт и получите доступ ко всем публикациям:</p>
-            <a href="{{siteUrl}}" class="cta-button">Перейти на сайт РАР</a>
+                            <p>Хотите прочитать больше? Посетите наш сайт и получите доступ ко всем публикациям:</p>
+                            <a href="{{siteUrl}}" class="cta-button">Перейти на сайт РАР</a>
 
-            <p style="color: #999; font-size: 13px; margin-top: 20px;">
-                Не хотите больше получать писма? Вы всегда можете 
-                <a href="{{unsubscribeUrl}}">отписаться от новостей</a>.
-            </p>
-        </div>
+                            <p style="color:#999; font-size:13px; margin-top:20px;">Не хотите больше получать письма? Вы всегда можете <a href="{{unsubscribeUrl}}">отписаться от новостей</a>.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size:0; line-height:0;" height="18">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="footer" align="center">
+                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="left" style="padding-bottom:12px; text-align:left;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td style="padding-right:12px;"><a href="https://vk.com/rosrest"><img src="https://cdn-icons-png.freepik.com/512/152/152813.png?ga=GA1.1.849431240.1772895308" alt="VK" width="30" height="30" style="display:block;border:0;"/></a></td>
+                                                <td style="padding-right:12px;"><a href="https://t.me/RussiaRestorationCommunity"><img src="https://cdn-icons-png.freepik.com/512/152/152827.png?ga=GA1.1.849431240.1772895308" alt="TG" width="30" height="30" style="display:block;border:0;"/></a></td>
+                                                <td><a href="https://www.youtube.com/channel/UCJ4P8EI0jlASbsMPsrFmYpw"><img src="https://cdn-icons-png.freepik.com/512/15047/15047433.png?ga=GA1.1.849431240.1772895308" alt="YT" width="30" height="30" style="display:block;border:0;"/></a></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
 
-        <div class="footer">
-            <p><strong>Российская ассоциация реставраторов</strong></p>
-            <p>
-                Эта рассылка содержит последние новости и обновления от РАР.<br>
-                Если у вас есть вопросы, <a href="{{siteUrl}}/contacts">свяжитесь с нами</a>.
-            </p>
-            <p style="color: #999; margin-top: 15px;">
-                Это письмо было отправлено автоматически. Пожалуйста, не отвечайте на него.
-            </p>
-        </div>
-    </div>
+                            <p style="margin:20px 0 15px 0; font-size:12px; color:#666;">Вы получили это письмо, потому что подписались на рассылку новостей на сайте Российской ассоциации реставраторов.<br>Если вы больше не хотите получать наши письма, нажмите здесь <a href="{{unsubscribeUrl}}" style="color:#007bff; text-decoration:none;">Отписаться от новостей</a></p>
+                            <p style="margin:0; font-size:12px; color:#999; line-height:1.6;">Это письмо было отправлено автоматически. Пожалуйста, не отвечайте на него.<br><br>© 2026 «Российская Ассоциация Реставраторов». Все права защищены.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
