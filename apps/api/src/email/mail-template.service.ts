@@ -31,7 +31,7 @@ export class MailTemplateService {
     templateName: string,
     variables: Record<string, string>,
   ): string {
-    if (templateName === 'welcome' || templateName === 'welcome-simple') {
+    if (templateName === 'welcome') {
       return `
       <html>
         <body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
