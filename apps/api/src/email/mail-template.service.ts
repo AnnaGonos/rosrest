@@ -5,14 +5,34 @@ import * as path from 'path';
 @Injectable()
 export class MailTemplateService {
   private readonly logger = new Logger(MailTemplateService.name);
-  private templatesDir = path.join(__dirname, 'templates');
+  private readonly templateSearchDirs = [
+    path.join(__dirname, 'templates'),
+    path.join(process.cwd(), 'dist', 'email', 'templates'),
+    path.join(process.cwd(), 'src', 'email', 'templates'),
+    path.join(process.cwd(), 'apps', 'api', 'src', 'email', 'templates'),
+  ];
+
+  private resolveTemplatePath(templateName: string): string {
+    const fileName = `${templateName}.html`;
+
+    for (const dir of this.templateSearchDirs) {
+      const fullPath = path.join(dir, fileName);
+      if (fs.existsSync(fullPath)) {
+        return fullPath;
+      }
+    }
+
+    throw new Error(
+      `Template ${fileName} not found. Checked: ${this.templateSearchDirs.join(', ')}`,
+    );
+  }
 
 
   renderTemplate(
     templateName: string,
     variables: Record<string, string>,
   ): string {
-    const templatePath = path.join(this.templatesDir, `${templateName}.html`);
+    const templatePath = this.resolveTemplatePath(templateName);
 
     try {
       let html = fs.readFileSync(templatePath, 'utf-8');

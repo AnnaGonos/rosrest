@@ -14,6 +14,8 @@ COPY apps/api/uploads ./uploads
 
 RUN npm run build
 
+RUN mkdir -p /app/dist/email/templates && cp -r /app/src/email/templates/* /app/dist/email/templates/
+
 EXPOSE 3002
 
 CMD ["npm", "run", "start:prod"]
