@@ -30,7 +30,19 @@ import { ForJournalistModule } from './for-journalist/for-journalist.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
 import { redisStore } from 'cache-manager-redis-yet';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+const envCandidates = [
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '../.env'),
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../../../.env'),
+];
+
+for (const envPath of envCandidates) {
+  const loaded = dotenv.config({ path: envPath });
+  if (!loaded.error) {
+    break;
+  }
+}
 
 @Module({
   imports: [

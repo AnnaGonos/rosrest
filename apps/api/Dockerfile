@@ -14,7 +14,7 @@ COPY apps/api/uploads ./uploads
 
 RUN npm run build
 
-RUN mkdir -p /app/dist/email/templates && cp -r /app/src/email/templates/* /app/dist/email/templates/
+RUN mkdir -p /app/dist/email/templates && cp -r /app/src/email/templates/. /app/dist/email/templates/ || true
 
 EXPOSE 3002
 

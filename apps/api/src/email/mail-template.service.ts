@@ -27,14 +27,46 @@ export class MailTemplateService {
     );
   }
 
+  private renderBuiltInTemplate(
+    templateName: string,
+    variables: Record<string, string>,
+  ): string {
+    if (templateName === 'welcome' || templateName === 'welcome-simple') {
+      return `
+      <html>
+        <body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
+          <h2>Добро пожаловать${variables.name ? `, ${variables.name}` : ''}!</h2>
+          <p>Спасибо за подписку на новости Российской ассоциации реставраторов.</p>
+          <p>Сайт: <a href="${variables.siteUrl}">${variables.siteUrl}</a></p>
+          <p>Если хотите отписаться: <a href="${variables.unsubscribeUrl}">ссылка</a></p>
+        </body>
+      </html>
+      `;
+    }
+
+    if (templateName === 'digest') {
+      return `
+      <html>
+        <body style="font-family:Arial,sans-serif;color:#222;line-height:1.5;">
+          <h2>Дайджест новостей</h2>
+          ${variables.newsItems || '<p>Пока нет новых публикаций.</p>'}
+          <p><a href="${variables.siteUrl}">Открыть сайт</a></p>
+          <p><a href="${variables.unsubscribeUrl}">Отписаться</a></p>
+        </body>
+      </html>
+      `;
+    }
+
+    return '';
+  }
+
 
   renderTemplate(
     templateName: string,
     variables: Record<string, string>,
   ): string {
-    const templatePath = this.resolveTemplatePath(templateName);
-
     try {
+      const templatePath = this.resolveTemplatePath(templateName);
       let html = fs.readFileSync(templatePath, 'utf-8');
 
       Object.entries(variables).forEach(([key, value]) => {
@@ -48,6 +80,13 @@ export class MailTemplateService {
         `Failed to load template ${templateName}: ${error instanceof Error ? error.message : String(error)
         }`,
       );
+
+      const fallback = this.renderBuiltInTemplate(templateName, variables);
+      if (fallback) {
+        this.logger.warn(`Using built-in fallback template for ${templateName}`);
+        return fallback;
+      }
+
       throw error;
     }
   }
