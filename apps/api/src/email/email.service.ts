@@ -95,7 +95,7 @@ export class EmailService {
     }
 
     try {
-      const from = process.env.MAIL_FROM || 'noreply@rosrestoration.ru';
+      const from = process.env.MAIL_FROM || 'noreply@rosrest.com';
       const authUser = process.env.MAIL_USER || process.env.SMTP_USER || '';
 
       // Nodemailer options: keep readable From header, but set envelope.from to authenticated user
