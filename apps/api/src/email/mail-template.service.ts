@@ -138,6 +138,38 @@ ${siteUrl}
     `;
   }
 
+  private getDigestFileUrl(url?: string | null): string | null {
+    if (!url) return null;
+
+    const raw = String(url).trim();
+    if (!raw) return null;
+
+    if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('//')) {
+      return raw;
+    }
+
+    const base = process.env.FILE_BASE_URL || process.env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
+
+    // Guard against accidentally passing news slug as image path.
+    if (raw.startsWith('news/')) {
+      return null;
+    }
+
+    if (raw.startsWith('/uploads')) {
+      return `${base}${raw}`;
+    }
+
+    if (raw.match(/^\/((documents|files|docs|pdf|docx|doc)\/?)/)) {
+      return `${base}${raw}`;
+    }
+
+    if (raw.startsWith('uploads/')) {
+      return `${base}/${raw}`;
+    }
+
+    return raw;
+  }
+
   private formatNewsItemHtml(newsItem: {
     id: string | number;
     slug?: string;
@@ -148,13 +180,17 @@ ${siteUrl}
     tags?: Array<{ id?: number; name?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
-    const excerptAsSlug = (newsItem.excerpt && /^news\//.test(String(newsItem.excerpt).trim()))
-      ? String(newsItem.excerpt).trim()
-      : '';
-    const rawPath = (newsItem.slug && String(newsItem.slug).trim())
-      ? String(newsItem.slug).trim()
-      : (excerptAsSlug || String(newsItem.id).trim());
-    const normalizedPath = rawPath.replace(/^\/+/, '').replace(/^news\//, '');
+    
+    // Determine URL path: prefer slug, fallback to id
+    let pathForUrl: string;
+    if (newsItem.slug && String(newsItem.slug).trim()) {
+      pathForUrl = String(newsItem.slug).trim();
+    } else {
+      pathForUrl = String(newsItem.id).trim();
+    }
+    
+    // Clean up the path (remove leading slashes and potential news/ prefix)
+    const normalizedPath = pathForUrl.replace(/^\/+/, '').replace(/^news\//, '');
     const newsUrl = `${siteUrl}/news/${normalizedPath}`;
     const publishedDate = newsItem.publishedAt
       ? new Date(newsItem.publishedAt).toLocaleDateString('ru-RU', {
@@ -164,22 +200,7 @@ ${siteUrl}
       })
       : '';
 
-    const fileBase = process.env.FILE_BASE_URL || process.env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
-    const makeImageUrl = (p?: string) => {
-      if (!p) return null;
-      const raw = String(p).trim();
-      if (!raw) return null;
-      if (raw.startsWith('http') || raw.startsWith('//')) return raw;
-      if (raw.startsWith('/uploads/')) return `${fileBase}${raw}`;
-      if (raw.startsWith('/')) return `${fileBase}${raw}`;
-      if (raw.startsWith('uploads/')) return `${fileBase}/${raw}`;
-      if (raw.startsWith('news/')) return `${fileBase}/uploads/${raw}`;
-      if (raw.startsWith('blocks/')) return `${fileBase}/uploads/${raw}`;
-      if (raw.includes('/')) return `${fileBase}/${raw}`;
-      return `${fileBase}/uploads/news/${raw}`;
-    };
-
-    const imageUrl = makeImageUrl(newsItem.previewImage || undefined);
+    const imageUrl = this.getDigestFileUrl(newsItem.previewImage || undefined);
 
     const tagsHtml = newsItem.tags && newsItem.tags.length > 0
       ? `<div class="news-tags">${newsItem.tags.map(t => `<span class="tag">${t.name}</span>`).join(' ')}</div>`
