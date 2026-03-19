@@ -1,7 +1,8 @@
-.page-main, .page-main * {
-	max-width: none !important;
-}
 @import '../../../site/src/index.css';
+
+.page-main, .page-main * {
+  max-width: none !important;
+}
 
 
 .admin-block {
