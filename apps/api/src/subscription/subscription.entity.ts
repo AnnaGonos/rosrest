@@ -9,6 +9,9 @@ export class NewsSubscription {
   @Column({ type: 'varchar', length: 255 })
   email!: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  name?: string;
+
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 

@@ -96,8 +96,10 @@ export class EmailService {
 
     try {
       const from = process.env.MAIL_FROM || 'noreply@rosrestoration.ru';
+      const authUser = process.env.MAIL_USER || process.env.SMTP_USER || '';
 
-      const info = await this.transporter.sendMail({
+      // Nodemailer options: keep readable From header, but set envelope.from to authenticated user
+      const mailOptions: any = {
         from: `Российская ассоциация реставраторов <${from}>`,
         to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
         subject: options.subject,
@@ -107,7 +109,20 @@ export class EmailService {
           'X-Mailer': 'RosRest Newsletter System',
           'List-Unsubscribe': `<${process.env.API_URL || 'http://localhost:3002'}/subscriptions/news/unsubscribe>`,
         },
-      });
+      };
+
+      // If we have an authenticated SMTP user (e.g. Beget), ensure MAIL FROM equals authenticated user
+      if (authUser) {
+        mailOptions.envelope = { from: authUser, to: mailOptions.to };
+        // also include Sender header for servers that check it
+        mailOptions.sender = authUser;
+        mailOptions.headers = {
+          ...mailOptions.headers,
+          Sender: authUser,
+        };
+      }
+
+      const info = await this.transporter.sendMail(mailOptions);
 
       this.logger.log(
         `✓ Email sent successfully. Message ID: ${info.messageId}`,
@@ -162,7 +177,8 @@ export class EmailService {
       }
 
       if (process.env.MAIL_HOST !== 'localhost' && process.env.MAIL_HOST !== '127.0.0.1') {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        const rateMs = parseInt(process.env.MAIL_RATE_MS || process.env.SMTP_RATE_MS || '2000', 10);
+        await new Promise((resolve) => setTimeout(resolve, rateMs));
       }
     }
 

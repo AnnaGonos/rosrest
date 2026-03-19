@@ -7,6 +7,7 @@ import NewsCard, { NewsCardItem } from '../../components/News/NewsCard'
 import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import './NewsPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import NewsSubscribeForm from '../../components/Subscribe/NewsSubscribeForm'
 
 const PAGE_SIZE = 21
 
@@ -27,7 +28,7 @@ export default function NewsPage() {
         return searchParams.get('tag') || null
     }, [searchParams])
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -144,9 +145,9 @@ export default function NewsPage() {
                     renderItem={(item) => <NewsCard news={item} />}
                 />
 
-                {/* <div style={{ margin: '60px 0 40px 0' }}>
+                <div style={{ margin: '60px 0 40px 0' }}>
                     <NewsSubscribeForm />
-                </div> */}
+                </div> 
 
                 <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
             </div>

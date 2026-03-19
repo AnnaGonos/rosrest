@@ -33,7 +33,7 @@ export class MailTemplateService {
   }
 
 
-  generateWelcomeEmail(email: string): string {
+  generateWelcomeEmail(email: string, name?: string): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
     const apiUrl = process.env.API_URL || 'http://localhost:3002';
 
@@ -42,16 +42,16 @@ export class MailTemplateService {
 
     return this.renderTemplate(templateName, {
       email,
+      name: name || '',
       siteUrl,
       unsubscribeUrl: `${apiUrl}/subscriptions/news/unsubscribe?email=${encodeURIComponent(email)}`,
     });
   }
 
-  generateWelcomeEmailText(email: string): string {
+  generateWelcomeEmailText(email: string, name?: string): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
-
     return `
-Добро пожаловать!
+Добро пожаловать${name ? ', ' + name : ''}!
 
 Спасибо за подписку на рассылку новостей Российской ассоциации реставраторов.
 
@@ -76,10 +76,12 @@ ${siteUrl}
   }
 
   private formatNewsItemHtml(newsItem: {
+    id: string | number;
     title: string;
     excerpt?: string;
-    publishedAt?: Date;
-    id: number;
+    publishedAt?: Date | string;
+    previewImage?: string;
+    tags?: Array<{ id?: number; name?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
     const newsUrl = `${siteUrl}/news/${newsItem.id}`;
@@ -91,15 +93,36 @@ ${siteUrl}
       })
       : '';
 
+    const fileBase = process.env.FILE_BASE_URL || process.env.API_URL || 'http://localhost:3002';
+    const makeImageUrl = (p?: string) => {
+      if (!p) return null;
+      if (p.startsWith('http') || p.startsWith('//')) return p;
+      if (p.startsWith('/')) return `${fileBase}${p}`;
+      return `${fileBase}/${p}`;
+    };
+
+    const imageUrl = makeImageUrl(newsItem.previewImage || undefined);
+
+    const tagsHtml = newsItem.tags && newsItem.tags.length > 0
+      ? `<div class="news-tags">${newsItem.tags.map(t => `<span class="tag">${t.name}</span>`).join(' ')}</div>`
+      : '';
+
+    // Use table-based markup for reliable email client rendering and omit excerpt/description
     return `
-    <div class="news-item">
-        ${publishedDate ? `<div class="news-date">${publishedDate}</div>` : ''}
-        <h3 class="news-title">
-            <a href="${newsUrl}">${newsItem.title}</a>
-        </h3>
-        ${newsItem.excerpt ? `<p class="news-excerpt">${newsItem.excerpt}</p>` : ''}
-        <a href="${newsUrl}" class="news-link">Читать полностью →</a>
-    </div>
+    <table class="news-table" role="presentation" cellpadding="0" cellspacing="0" width="100%">
+      <tr class="news-row">
+        <td class="thumb-td" width="140" valign="top">
+          ${imageUrl ? `<img src="${imageUrl}" alt="${newsItem.title}" width="140" height="90" />` : ''}
+        </td>
+        <td valign="top">
+          ${publishedDate ? `<div class="news-date">${publishedDate}</div>` : ''}
+          <h3 class="news-title"><a href="${newsUrl}">${newsItem.title}</a></h3>
+          ${tagsHtml}
+          <p style="margin:10px 0 0 0"><a href="${newsUrl}" class="news-link">Читать полностью →</a></p>
+        </td>
+      </tr>
+    </table>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td class="spacer-td">&nbsp;</td></tr></table>
     `;
   }
 
@@ -109,7 +132,7 @@ ${siteUrl}
       title: string;
       excerpt?: string;
       publishedAt?: Date;
-      id: number;
+      id: string | number;
     }>,
     subscriberEmail?: string,
   ): string {
@@ -149,7 +172,7 @@ ${siteUrl}
       title: string;
       excerpt?: string;
       publishedAt?: Date;
-      id: number;
+      id: string | number;
     }>,
   ): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';

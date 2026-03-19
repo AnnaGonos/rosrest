@@ -53,6 +53,27 @@ export class NewsletterService {
     return this.queueRepo.find({ order: { addedAt: 'DESC' }, relations });
   }
 
+  async getArchive() {
+    // fetch all sent items and group them by sentAt timestamp
+    const relations = ['news', 'news.page']
+    const items = await this.queueRepo.find({ where: { isSent: true }, order: { sentAt: 'DESC' }, relations });
+
+    const groups: Record<string, { sentAt: Date; count: number; items: { id: number; newsId: string; title: string; slug?: string }[] }> = {}
+
+    for (const it of items) {
+      const key = it.sentAt ? it.sentAt.toISOString() : 'unknown'
+      if (!groups[key]) {
+        groups[key] = { sentAt: it.sentAt || new Date(0), count: 0, items: [] }
+      }
+      groups[key].count += 1
+      groups[key].items.push({ id: it.id, newsId: it.newsId, title: it.news.page?.title || '', slug: it.news.page?.slug })
+    }
+
+    // convert to array sorted by sentAt desc
+    const result = Object.values(groups).sort((a, b) => (b.sentAt?.getTime() || 0) - (a.sentAt?.getTime() || 0))
+    return result
+  }
+
   async delete(id: number) {
     await this.queueRepo.delete(id);
   }
@@ -69,7 +90,7 @@ export class NewsletterService {
       return { scheduled: res.affected || 0 };
     }
 
-    const relations = ['news', 'news.page'];
+    const relations = ['news', 'news.page', 'news.tags'];
     const items = ids && ids.length > 0
       ? await this.queueRepo.find({ where: { id: In(ids) }, relations })
       : await this.queueRepo.find({ where: { isSent: false }, relations });
@@ -80,10 +101,12 @@ export class NewsletterService {
     }
 
     const newsItems = items.map(i => ({
-      id: parseInt(String(i.news.id)),
+      id: i.news.id,
       title: i.news.page?.title || '',
       excerpt: i.news.page?.slug || '',
       publishedAt: i.news.page?.publishedAt ?? undefined,
+      previewImage: i.news.previewImage || undefined,
+      tags: i.news.tags ? i.news.tags.map(t => ({ id: t.id, name: t.name })) : [],
     }));
 
     const subscribers = await this.subscriptionService.getActiveSubscriptions();

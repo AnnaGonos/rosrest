@@ -28,4 +28,10 @@ export class NewsletterController {
     await this.newsletterService.delete(parseInt(id, 10));
     return { ok: true };
   }
+
+  @Get('archive')
+  async getArchive() {
+    const data = await this.newsletterService.getArchive();
+    return { success: true, data };
+  }
 }

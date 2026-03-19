@@ -22,6 +22,7 @@ export class SubscriptionService {
     status: 'new' | 'reactivated' | 'already_active';
   }> {
     const email = dto.email.toLowerCase().trim();
+    const name = dto.name ? String(dto.name).trim() : undefined;
 
     let subscription = await this.subscriptionRepository.findOne({
       where: { email },
@@ -32,20 +33,22 @@ export class SubscriptionService {
     if (!subscription) {
       subscription = this.subscriptionRepository.create({
         email,
+        name,
         isActive: true,
       });
       await this.subscriptionRepository.save(subscription);
       this.logger.log(`New subscription: ${email}`);
       status = 'new';
 
-      await this.sendWelcomeEmail(email);
+      await this.sendWelcomeEmail(email, name);
     } else if (!subscription.isActive) {
       subscription.isActive = true;
+      if (name) subscription.name = name;
       await this.subscriptionRepository.save(subscription);
       this.logger.log(`Reactivated subscription: ${email}`);
       status = 'reactivated';
 
-      await this.sendWelcomeEmail(email);
+      await this.sendWelcomeEmail(email, name);
     } else {
       this.logger.log(`Already active subscription: ${email}`);
       status = 'already_active';
@@ -54,9 +57,9 @@ export class SubscriptionService {
     return { subscription, status };
   }
 
-  private async sendWelcomeEmail(email: string): Promise<void> {
-    const html = this.mailTemplateService.generateWelcomeEmail(email);
-    const text = this.mailTemplateService.generateWelcomeEmailText(email);
+  private async sendWelcomeEmail(email: string, name?: string): Promise<void> {
+    const html = this.mailTemplateService.generateWelcomeEmail(email, name);
+    const text = this.mailTemplateService.generateWelcomeEmailText(email, name);
 
     const success = await this.emailService.sendEmail({
       to: email,
@@ -85,6 +88,10 @@ export class SubscriptionService {
     return this.subscriptionRepository.find({
       where: { isActive: true },
     });
+  }
+
+  async getActiveCount(): Promise<number> {
+    return this.subscriptionRepository.count({ where: { isActive: true } });
   }
 
   async getAllSubscriptions(): Promise<NewsSubscription[]> {

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSubscriptionDto {
@@ -9,4 +9,13 @@ export class CreateSubscriptionDto {
   @IsEmail({}, { message: 'Введите корректный email адрес' })
   @IsNotEmpty()
   email!: string;
+
+  @ApiProperty({
+    description: 'Имя подписчика',
+    example: 'Анна',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  name?: string;
 }

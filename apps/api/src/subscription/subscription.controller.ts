@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Delete, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, Delete, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SubscriptionService } from './subscription.service';
 import { MailTemplateService } from '../email/mail-template.service';
@@ -52,6 +52,24 @@ export class SubscriptionController {
     };
   }
 
+  @Get('news/unsubscribe')
+  @ApiOperation({ summary: 'Отписаться от новостей (через ссылку в письме)' })
+  @ApiResponse({ status: 200, description: 'Успешно отписано' })
+  async unsubscribeFromNewsGet(@Query('email') email: string) {
+    if (!email) {
+      return {
+        success: false,
+        message: 'Email не указан',
+      };
+    }
+
+    await this.subscriptionService.unsubscribe(email);
+    return {
+      success: true,
+      message: 'Вы успешно отписались от новостей',
+    };
+  }
+
   @Get('preview/welcome')
   @ApiOperation({ summary: 'Предпросмотр шаблона приветственного письма (админ)' })
   @ApiResponse({ status: 200, description: 'Предпросмотр письма' })
@@ -71,14 +89,53 @@ export class SubscriptionController {
     };
   }
 
+  @Get('preview/digest')
+  @ApiOperation({ summary: 'Предпросмотр шаблона дайджеста (админ)' })
+  @ApiResponse({ status: 200, description: 'Предпросмотр дайджеста' })
+  async previewDigest() {
+    const sampleItems = [
+      {
+        id: '1773214778858',
+        title: 'Новость первая',
+        excerpt: 'Короткий анонс первой новости — краткое описание, которое покажет суть публикации.',
+        publishedAt: new Date('2026-03-14T00:00:00Z'),
+        previewImage: 'https://document.rosrest.com/uploads/news/1773214778858.jpg',
+        tags: [{ name: 'События' }, { name: 'Анонсы' }],
+      },
+      {
+        id: '1773214779999',
+        title: 'новость два',
+        excerpt: 'Короткий анонс второй новости — несколько слов о содержании и значимости материала.',
+        publishedAt: new Date('2026-03-14T00:00:00Z'),
+        previewImage: 'https://document.rosrest.com/uploads/news/1773214779999.jpg',
+        tags: [{ name: 'Новости' }],
+      },
+    ];
+
+    const html = this.mailTemplateService.generateDigestEmail(sampleItems as any);
+    const text = this.mailTemplateService.generateDigestText(sampleItems as any);
+
+    return {
+      success: true,
+      type: 'digest',
+      html,
+      text,
+      preview: {
+        generatedAt: new Date().toISOString(),
+        items: sampleItems.length,
+      },
+    };
+  }
+
   @Post('test/send-welcome')
   @ApiOperation({ summary: 'Отправить тестовое welcome-письмо на указанный email (для тестирования)' })
   @ApiResponse({ status: 200, description: 'Письмо отправлено' })
   async testSendWelcomeEmail(@Body() dto: CreateSubscriptionDto) {
     const email = dto.email.toLowerCase().trim();
-    
-    const html = this.mailTemplateService.generateWelcomeEmail(email);
-    const text = this.mailTemplateService.generateWelcomeEmailText(email);
+    const name = dto.name ? String(dto.name).trim() : undefined;
+
+    const html = this.mailTemplateService.generateWelcomeEmail(email, name);
+    const text = this.mailTemplateService.generateWelcomeEmailText(email, name);
 
     const success = await this.emailService.sendEmail({
       to: email,
@@ -106,6 +163,17 @@ export class SubscriptionController {
       success: true,
       data: subscriptions,
       count: subscriptions.length,
+    };
+  }
+
+  @Get('news/count')
+  @ApiOperation({ summary: 'Получить количество активных подписчиков (публично)' })
+  @ApiResponse({ status: 200, description: 'Количество активных подписчиков' })
+  async getActiveCount() {
+    const count = await this.subscriptionService.getActiveCount();
+    return {
+      success: true,
+      count,
     };
   }
 

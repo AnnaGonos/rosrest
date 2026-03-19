@@ -155,6 +155,7 @@ export const API_ENDPOINTS = {
     unsubscribe: buildApiUrl('subscriptions/news/unsubscribe'),
     delete: (id: number) => buildApiUrl(`subscriptions/${id}`),
     previewWelcome: buildApiUrl('subscriptions/preview/welcome'),
+    count: buildApiUrl('subscriptions/news/count'),
   },
   DIGEST: {
     send: buildApiUrl('digest/send'),
@@ -165,6 +166,7 @@ export const API_ENDPOINTS = {
     list: buildApiUrl('newsletter/queue'),
     send: buildApiUrl('newsletter/queue/send'),
     delete: (id: string | number) => buildApiUrl(`newsletter/queue/${id}`),
+    archive: buildApiUrl('newsletter/archive'),
   },
   MENUS: {
     list: buildApiUrl('menus'),

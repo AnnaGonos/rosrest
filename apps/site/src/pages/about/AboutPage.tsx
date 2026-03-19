@@ -99,7 +99,7 @@ export default function AboutPage() {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
-                    <PresentationButton href="/uploads/Презентация-РАР.pdf" label="Презентация" />
+                    <PresentationButton href="https://document.rosrest.com/uploads/Презентация-РАР.pdf" label="Презентация" />
                 </div>
 
             </div>

@@ -7,11 +7,13 @@ interface NewsSubscribeFormProps {
 
 export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps) {
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState<string | false>(false)
+  const [subscribedEmail, setSubscribedEmail] = useState<string | null>(null)
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002/api'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,22 +27,28 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name }),
       })
 
+      const data = await response.json()
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Ошибка при подписке')
+        throw new Error(data.message || 'Ошибка при подписке')
       }
 
-      setSuccess(true)
-      setEmail('')
+      if (data && data.status === 'already_active') {
+        setSuccess(data.message || 'Данная почта уже подписана на новости')
+      } else {
+        setSubscribedEmail(email)
+        setSuccess(data.message || `Ваша заявка принята. Мы отправили письмо на почту ${email} для подтверждения вашей эл. почты`)
+        setEmail('')
+        setName('')
 
-      if (onSuccess) {
-        onSuccess()
+        if (onSuccess) {
+          onSuccess()
+        }
       }
 
-      setTimeout(() => setSuccess(false), 5000)
+      setTimeout(() => setSuccess(false), 7000)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Ошибка при подписке'
       setError(message)
@@ -50,45 +58,76 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
   }
 
   return (
-    <form className="news-subscribe-form" onSubmit={handleSubmit}>
-      <div className="news-subscribe-form__title">
-        Подпишитесь на новости
-      </div>
+    <div className="news-subscribe-form-container">
 
-      <p className="news-subscribe-form__description">
-        Получайте дайджест новых публикаций на вашу почту
-      </p>
+      {!subscribedEmail && (
+        <form className="news-subscribe-form" onSubmit={handleSubmit}>
+          <div className="news-subscribe-form__title">
+            Будьте в курсе актуальных новостей
+          </div>
 
-      <div className="news-subscribe-form__input-group">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          className="news-subscribe-form__input"
-          required
-          disabled={loading}
-        />
-        <button
-          type="submit"
-          className="news-subscribe-form__button"
-          disabled={loading}
-        >
-          {loading ? 'Подписываем...' : 'Подписаться'}
-        </button>
-      </div>
+          <p className="news-subscribe-form__description">
+            Получайте дайджест новых публикаций на вашу почту
+          </p>
 
-      {error && (
-        <div className="news-subscribe-form__error">
-          {error}
-        </div>
+          <div className="news-subscribe-form__input-group">
+            <div className='news-subscribe-form__input-container'>
+
+
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ваше имя"
+                className="news-subscribe-form__input"
+                required
+                disabled={loading}
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Эл. почта"
+                className="news-subscribe-form__input"
+                required
+                disabled={loading}
+              />
+            </div>
+            <button
+              type="submit"
+              className="news-subscribe-form__button"
+              disabled={loading}
+            >
+              {loading ? 'Подписываем...' : 'Подписаться'}
+            </button>
+          </div>
+
+          {error && (
+            <div className="news-subscribe-form__error">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="news-subscribe-form__success">
+              ✓ {success}
+            </div>
+          )}
+
+        </form>
       )}
 
-      {success && (
-        <div className="news-subscribe-form__success">
-          ✓ Вы успешно подписались на новости
+      {subscribedEmail && (
+        <div className="news-subscribe-form__thanks" role="status">
+          <i className="bi bi-check-circle-fill news-subscribe-form__thanks-icon" aria-hidden="true"></i>
+          <div className="news-subscribe-form__thanks-title">Ваша заявка принята</div>
+          <div className="news-subscribe-form__thanks-text">Мы отправили приветственное письмо на почту {subscribedEmail}</div>
         </div>
       )}
-    </form>
+      <div className="news-subscribe-form__image-container">
+        <i className="bi bi-chevron-double-right"></i>
+        <img src="/cropped-LOGO-TRANSPARENT-BLUE.png" alt="Subscribe" className="news-subscribe-form__image" />
+      </div>
+    </div>
   )
 }
