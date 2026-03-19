@@ -8,8 +8,8 @@ export class MailTemplateService {
   private readonly templateSearchDirs = [
     path.join(__dirname, 'templates'),
     path.join(process.cwd(), 'dist', 'email', 'templates'),
-    path.join(process.cwd(), 'src', 'email', 'templates'),
     path.join(process.cwd(), 'apps', 'api', 'src', 'email', 'templates'),
+    path.join(process.cwd(), 'src', 'email', 'templates'),
   ];
 
   private resolveTemplatePath(templateName: string): string {
@@ -17,10 +17,10 @@ export class MailTemplateService {
 
     if (templateName === 'digest') {
       const digestCandidates = [
-        path.join(process.cwd(), 'apps', 'api', 'src', 'email', 'templates', 'digest.html'),
-        path.join(process.cwd(), 'src', 'email', 'templates', 'digest.html'),
         path.join(__dirname, 'templates', 'digest.html'),
         path.join(process.cwd(), 'dist', 'email', 'templates', 'digest.html'),
+        path.join(process.cwd(), 'apps', 'api', 'src', 'email', 'templates', 'digest.html'),
+        path.join(process.cwd(), 'src', 'email', 'templates', 'digest.html'),
       ];
 
       for (const digestPath of digestCandidates) {
@@ -177,7 +177,7 @@ ${siteUrl}
     excerpt?: string;
     publishedAt?: Date | string;
     previewImage?: string;
-    tags?: Array<{ id?: number; name?: string }>;
+    tags?: Array<{ id?: number; name?: string; title?: string; label?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
     
@@ -207,7 +207,15 @@ ${siteUrl}
     const imageUrl = this.getDigestFileUrl(newsItem.previewImage || undefined);
 
     const tagsHtml = newsItem.tags && newsItem.tags.length > 0
-      ? `<div class="news-tags">${newsItem.tags.map(t => `<span class="tag">${t.name}</span>`).join(' ')}</div>`
+      ? (() => {
+        const tags = newsItem.tags
+          .map((t) => (t?.name || t?.title || t?.label || '').trim())
+          .filter((tag) => !!tag)
+          .map((tag) => `<span class="tag">${tag}</span>`)
+          .join(' ');
+
+        return tags ? `<div class="news-tags">${tags}</div>` : '';
+      })()
       : '';
 
     // Use table-based markup for reliable email client rendering and omit excerpt/description

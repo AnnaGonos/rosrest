@@ -13,6 +13,10 @@ import { MailTemplateService } from '../email/mail-template.service';
 export class NewsletterService {
   private readonly logger = new Logger(NewsletterService.name);
 
+  private normalizeNewsSlug(slug?: string): string {
+    return (slug || '').trim().replace(/^\/+/, '').replace(/^news\//, '');
+  }
+
   private extractImageFromHtml(html?: string): string | undefined {
     if (!html) return undefined;
     const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -176,7 +180,7 @@ export class NewsletterService {
       const previewImage = i.news.previewImage || this.extractPreviewImageFromPage(i.news.page);
       const item = {
         id: i.news.id,
-        slug: i.news.page?.slug || '',
+        slug: this.normalizeNewsSlug(i.news.page?.slug || ''),
         title: i.news.page?.title || '',
         excerpt: '',
         publishedAt: i.news.page?.publishedAt ?? undefined,

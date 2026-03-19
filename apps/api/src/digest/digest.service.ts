@@ -18,6 +18,10 @@ interface DigestNews {
 export class DigestService {
   private readonly logger = new Logger(DigestService.name);
 
+  private normalizeNewsSlug(slug?: string): string {
+    return (slug || '').trim().replace(/^\/+/, '').replace(/^news\//, '');
+  }
+
   private extractImageFromHtml(html?: string): string | undefined {
     if (!html) return undefined;
     const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -126,7 +130,7 @@ export class DigestService {
       const digestNews = {
         id: n.id,
         title: n.page.title,
-        slug: n.page.slug,
+        slug: this.normalizeNewsSlug(n.page.slug),
         previewImage,
         publishedAt: n.page.publishedAt?.toISOString(),
       };

@@ -177,6 +177,17 @@ export class SubscriptionController {
     };
   }
 
+  @Get('count')
+  @ApiOperation({ summary: 'Получить количество активных подписчиков (совместимость с фронтом)' })
+  @ApiResponse({ status: 200, description: 'Количество активных подписчиков' })
+  async getActiveCountCompat() {
+    const count = await this.subscriptionService.getActiveCount();
+    return {
+      success: true,
+      count,
+    };
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Удалить подписчика по ID (админ)' })
   @ApiResponse({ status: 200, description: 'Подписчик удален' })
