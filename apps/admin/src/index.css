@@ -1,4 +1,4 @@
-@import '../../../site/src/index.css';
+@import '../../site/src/index.css';
 
 .page-main, .page-main * {
   max-width: none !important;
