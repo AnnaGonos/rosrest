@@ -102,8 +102,9 @@ export class NewsletterService {
 
     const newsItems = items.map(i => ({
       id: i.news.id,
+      slug: i.news.page?.slug || '',
       title: i.news.page?.title || '',
-      excerpt: i.news.page?.slug || '',
+      excerpt: '',
       publishedAt: i.news.page?.publishedAt ?? undefined,
       previewImage: i.news.previewImage || undefined,
       tags: i.news.tags ? i.news.tags.map(t => ({ id: t.id, name: t.name })) : [],

@@ -140,6 +140,7 @@ ${siteUrl}
 
   private formatNewsItemHtml(newsItem: {
     id: string | number;
+    slug?: string;
     title: string;
     excerpt?: string;
     publishedAt?: Date | string;
@@ -147,7 +148,11 @@ ${siteUrl}
     tags?: Array<{ id?: number; name?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
-    const newsUrl = `${siteUrl}/news/${newsItem.id}`;
+    const rawPath = (newsItem.slug && String(newsItem.slug).trim())
+      ? String(newsItem.slug).trim()
+      : String(newsItem.id).trim();
+    const normalizedPath = rawPath.replace(/^\/+/, '').replace(/^news\//, '');
+    const newsUrl = `${siteUrl}/news/${normalizedPath}`;
     const publishedDate = newsItem.publishedAt
       ? new Date(newsItem.publishedAt).toLocaleDateString('ru-RU', {
         year: 'numeric',
@@ -156,11 +161,13 @@ ${siteUrl}
       })
       : '';
 
-    const fileBase = process.env.FILE_BASE_URL || process.env.API_URL || 'http://localhost:3002';
+    const fileBase = process.env.FILE_BASE_URL || process.env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
     const makeImageUrl = (p?: string) => {
       if (!p) return null;
       if (p.startsWith('http') || p.startsWith('//')) return p;
       if (p.startsWith('/')) return `${fileBase}${p}`;
+      if (p.startsWith('uploads/')) return `${fileBase}/${p}`;
+      if (p.startsWith('news/')) return `${fileBase}/uploads/${p}`;
       return `${fileBase}/${p}`;
     };
 
@@ -193,6 +200,7 @@ ${siteUrl}
   generateDigestEmail(
     newsItems: Array<{
       title: string;
+      slug?: string;
       excerpt?: string;
       publishedAt?: Date;
       id: string | number;
@@ -233,6 +241,7 @@ ${siteUrl}
   generateDigestText(
     newsItems: Array<{
       title: string;
+      slug?: string;
       excerpt?: string;
       publishedAt?: Date;
       id: string | number;
@@ -249,15 +258,18 @@ ${siteUrl}
             day: 'numeric',
           })
           : '';
+        const rawPath = (item.slug && String(item.slug).trim())
+          ? String(item.slug).trim()
+          : String(item.id).trim();
+        const normalizedPath = rawPath.replace(/^\/+/, '').replace(/^news\//, '');
+
         return `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${publishedDate}
 
 ${item.title}
 
-${item.excerpt || ''}
-
-Читать: ${siteUrl}/news/${item.id}
+      Читать: ${siteUrl}/news/${normalizedPath}
         `;
       })
       .join('\n');
