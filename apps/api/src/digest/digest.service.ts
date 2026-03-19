@@ -47,13 +47,19 @@ export class DigestService {
       .orderBy('page.publishedAt', 'DESC')
       .getMany();
 
-    return news.map((n) => ({
-      id: n.id,
-      title: n.page.title,
-      slug: n.page.slug,
-      previewImage: n.previewImage,
-      publishedAt: n.page.publishedAt?.toISOString(),
-    }));
+    return news.map((n) => {
+      const digestNews = {
+        id: n.id,
+        title: n.page.title,
+        slug: n.page.slug,
+        previewImage: n.previewImage,
+        publishedAt: n.page.publishedAt?.toISOString(),
+      };
+      this.logger.log(
+        `Collected news: id=${digestNews.id}, slug=${digestNews.slug}, title=${digestNews.title}, previewImage=${digestNews.previewImage}`,
+      );
+      return digestNews;
+    });
   }
 
   async getActiveSubscribers(): Promise<NewsSubscription[]> {

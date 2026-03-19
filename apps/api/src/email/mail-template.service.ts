@@ -192,6 +192,10 @@ ${siteUrl}
     // Clean up the path (remove leading slashes and potential news/ prefix)
     const normalizedPath = pathForUrl.replace(/^\/+/, '').replace(/^news\//, '');
     const newsUrl = `${siteUrl}/news/${normalizedPath}`;
+    
+    this.logger.log(
+      `formatNewsItemHtml: slug="${newsItem.slug}", normalized="${normalizedPath}", url="${newsUrl}"`,
+    );
     const publishedDate = newsItem.publishedAt
       ? new Date(newsItem.publishedAt).toLocaleDateString('ru-RU', {
         year: 'numeric',
