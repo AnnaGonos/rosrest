@@ -19,6 +19,12 @@ export class NewsService {
     private readonly blockRepository: Repository<Block>,
   ) { }
 
+  private normalizeNewsSlug(slug?: string): string {
+    const raw = (slug || '').trim();
+    if (!raw) return '';
+    return raw.replace(/^\/+/, '').replace(/^news\//, '');
+  }
+
   async findAll(opts?: { isDraft?: boolean; tagId?: number }): Promise<any[]> {
     const query = this.newsRepository
       .createQueryBuilder('news')
@@ -56,11 +62,21 @@ export class NewsService {
   }
 
   async findBySlug(slug: string): Promise<any> {
-    const normalized = slug.startsWith('news/') ? slug : `news/${slug}`;
-    const news = await this.newsRepository.findOne({
-      where: { page: { slug: normalized } },
-      relations: ['page', 'page.blocks', 'page.blocks.children', 'tags'],
-    });
+    const cleanSlug = this.normalizeNewsSlug(slug);
+    const prefixedSlug = `news/${cleanSlug}`;
+
+    const news = await this.newsRepository
+      .createQueryBuilder('news')
+      .leftJoinAndSelect('news.page', 'page')
+      .leftJoinAndSelect('page.blocks', 'block')
+      .leftJoinAndSelect('block.children', 'children')
+      .leftJoinAndSelect('news.tags', 'tags')
+      .where('page.slug = :cleanSlug OR page.slug = :prefixedSlug', {
+        cleanSlug,
+        prefixedSlug,
+      })
+      .getOne();
+
     if (!news) throw new NotFoundException('News not found');
     return toPlainNews(news);
   }
@@ -121,10 +137,7 @@ export class NewsService {
     tagIds?: number[];
     blocks?: any[];
   }): Promise<any> {
-    let slug = data.slug ? data.slug : `news-${Date.now()}`;
-    if (!slug.startsWith('news/')) {
-      slug = `news/${slug}`;
-    }
+    let slug = data.slug ? this.normalizeNewsSlug(data.slug) : `news-${Date.now()}`;
 
     let blocks: Block[] = [];
     if (Array.isArray(data.blocks)) {
@@ -213,9 +226,7 @@ export class NewsService {
     }
 
     if (update.slug !== undefined) {
-      news.page.slug = update.slug.startsWith('news/')
-        ? update.slug
-        : `news/${update.slug}`;
+      news.page.slug = this.normalizeNewsSlug(update.slug);
       pageModified = true;
     }
 

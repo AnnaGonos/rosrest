@@ -18,6 +18,78 @@ interface DigestNews {
 export class DigestService {
   private readonly logger = new Logger(DigestService.name);
 
+  private extractImageFromHtml(html?: string): string | undefined {
+    if (!html) return undefined;
+    const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return match?.[1]?.trim() || undefined;
+  }
+
+  private findImageInValue(value: any): string | undefined {
+    if (value == null) return undefined;
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return undefined;
+
+      const fromHtml = this.extractImageFromHtml(trimmed);
+      if (fromHtml) return fromHtml;
+
+      if (
+        /^https?:\/\//i.test(trimmed) ||
+        trimmed.startsWith('/uploads') ||
+        trimmed.startsWith('uploads/')
+      ) {
+        return trimmed;
+      }
+
+      if (/\.(jpg|jpeg|png|webp|gif|svg)(\?.*)?$/i.test(trimmed)) {
+        return trimmed;
+      }
+
+      return undefined;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = this.findImageInValue(item);
+        if (found) return found;
+      }
+      return undefined;
+    }
+
+    if (typeof value === 'object') {
+      const preferredKeys = ['image', 'imageUrl', 'previewImage', 'src', 'url', 'path', 'file'];
+      for (const key of preferredKeys) {
+        if (key in value) {
+          const found = this.findImageInValue(value[key]);
+          if (found) return found;
+        }
+      }
+
+      for (const nested of Object.values(value)) {
+        const found = this.findImageInValue(nested);
+        if (found) return found;
+      }
+    }
+
+    return undefined;
+  }
+
+  private extractPreviewImageFromPage(page: any): string | undefined {
+    if (!page?.blocks || !Array.isArray(page.blocks)) return undefined;
+    for (const block of page.blocks) {
+      const found = this.findImageInValue(block?.content);
+      if (found) return found;
+      if (Array.isArray(block?.children)) {
+        for (const child of block.children) {
+          const childFound = this.findImageInValue(child?.content);
+          if (childFound) return childFound;
+        }
+      }
+    }
+    return undefined;
+  }
+
   constructor(
     @InjectRepository(News)
     private newsRepository: Repository<News>,
@@ -42,17 +114,20 @@ export class DigestService {
     const news = await this.newsRepository
       .createQueryBuilder('news')
       .leftJoinAndSelect('news.page', 'page')
+      .leftJoinAndSelect('page.blocks', 'block')
+      .leftJoinAndSelect('block.children', 'children')
       .where('page.isDraft = :isDraft', { isDraft: false })
       .andWhere('page.publishedAt > :sinceTime', { sinceTime })
       .orderBy('page.publishedAt', 'DESC')
       .getMany();
 
     return news.map((n) => {
+      const previewImage = n.previewImage || this.extractPreviewImageFromPage(n.page);
       const digestNews = {
         id: n.id,
         title: n.page.title,
         slug: n.page.slug,
-        previewImage: n.previewImage,
+        previewImage,
         publishedAt: n.page.publishedAt?.toISOString(),
       };
       this.logger.log(
