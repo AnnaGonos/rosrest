@@ -64,9 +64,11 @@ export class DigestService {
 
   generateDigestHtml(newsItems: DigestNews[]): string {
     const formattedNews = newsItems.map((news) => ({
-      id: parseInt(news.id),
+      id: news.id,
+      slug: news.slug,
       title: news.title,
-      excerpt: news.slug,
+      excerpt: '',
+      previewImage: news.previewImage,
       publishedAt: news.publishedAt ? new Date(news.publishedAt) : undefined,
     }));
 
@@ -85,9 +87,10 @@ export class DigestService {
     const html = this.generateDigestHtml(newsItems);
     const text = this.mailTemplateService.generateDigestText(
       newsItems.map((n) => ({
-        id: parseInt(n.id),
+        id: n.id,
+        slug: n.slug,
         title: n.title,
-        excerpt: n.slug,
+        excerpt: '',
         publishedAt: n.publishedAt ? new Date(n.publishedAt) : undefined,
       })),
     );
