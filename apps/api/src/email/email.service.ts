@@ -98,7 +98,6 @@ export class EmailService {
       const from = process.env.MAIL_FROM || 'noreply@rosrest.com';
       const authUser = process.env.MAIL_USER || process.env.SMTP_USER || '';
 
-      // Nodemailer options: keep readable From header, but set envelope.from to authenticated user
       const mailOptions: any = {
         from: `Российская ассоциация реставраторов <${from}>`,
         to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
@@ -111,10 +110,8 @@ export class EmailService {
         },
       };
 
-      // If we have an authenticated SMTP user (e.g. Beget), ensure MAIL FROM equals authenticated user
       if (authUser) {
         mailOptions.envelope = { from: authUser, to: mailOptions.to };
-        // also include Sender header for servers that check it
         mailOptions.sender = authUser;
         mailOptions.headers = {
           ...mailOptions.headers,

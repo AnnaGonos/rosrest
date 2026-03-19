@@ -148,9 +148,12 @@ ${siteUrl}
     tags?: Array<{ id?: number; name?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const excerptAsSlug = (newsItem.excerpt && /^news\//.test(String(newsItem.excerpt).trim()))
+      ? String(newsItem.excerpt).trim()
+      : '';
     const rawPath = (newsItem.slug && String(newsItem.slug).trim())
       ? String(newsItem.slug).trim()
-      : String(newsItem.id).trim();
+      : (excerptAsSlug || String(newsItem.id).trim());
     const normalizedPath = rawPath.replace(/^\/+/, '').replace(/^news\//, '');
     const newsUrl = `${siteUrl}/news/${normalizedPath}`;
     const publishedDate = newsItem.publishedAt
@@ -164,11 +167,16 @@ ${siteUrl}
     const fileBase = process.env.FILE_BASE_URL || process.env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
     const makeImageUrl = (p?: string) => {
       if (!p) return null;
-      if (p.startsWith('http') || p.startsWith('//')) return p;
-      if (p.startsWith('/')) return `${fileBase}${p}`;
-      if (p.startsWith('uploads/')) return `${fileBase}/${p}`;
-      if (p.startsWith('news/')) return `${fileBase}/uploads/${p}`;
-      return `${fileBase}/${p}`;
+      const raw = String(p).trim();
+      if (!raw) return null;
+      if (raw.startsWith('http') || raw.startsWith('//')) return raw;
+      if (raw.startsWith('/uploads/')) return `${fileBase}${raw}`;
+      if (raw.startsWith('/')) return `${fileBase}${raw}`;
+      if (raw.startsWith('uploads/')) return `${fileBase}/${raw}`;
+      if (raw.startsWith('news/')) return `${fileBase}/uploads/${raw}`;
+      if (raw.startsWith('blocks/')) return `${fileBase}/uploads/${raw}`;
+      if (raw.includes('/')) return `${fileBase}/${raw}`;
+      return `${fileBase}/uploads/news/${raw}`;
     };
 
     const imageUrl = makeImageUrl(newsItem.previewImage || undefined);
