@@ -713,7 +713,7 @@ small {
   margin: 0;
 }
 
-.article-text a {
+.article-text a, .article-text-link {
   color: var(--primary-strong);
   text-decoration: none;
 }
