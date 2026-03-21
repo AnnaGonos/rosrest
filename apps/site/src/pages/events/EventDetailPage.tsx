@@ -8,6 +8,7 @@ import ShareModal from '../../components/ShareModal'
 import FAQSection from '../../components/FAQSection/FAQSection'
 import ScheduleSection from '../../components/ScheduleSection/ScheduleSection'
 import { getFileUrl } from '../../utils/getFileUrl'
+import { isCookieConsentAccepted, saveCookieConsent } from '../../utils/cookieConsent'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -26,6 +27,19 @@ export default function EventDetailPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+    const [isMapAllowed, setIsMapAllowed] = useState<boolean>(isCookieConsentAccepted())
+
+    useEffect(() => {
+        const handleConsentChanged = () => {
+            setIsMapAllowed(isCookieConsentAccepted())
+        }
+
+        window.addEventListener('rosrest:cookie-consent-changed', handleConsentChanged)
+
+        return () => {
+            window.removeEventListener('rosrest:cookie-consent-changed', handleConsentChanged)
+        }
+    }, [])
 
     useEffect(() => {
         if (!id) return
@@ -119,7 +133,7 @@ export default function EventDetailPage() {
                                         <p className="body-text">{event.detailedAddress}</p>
                                     </div>
                                 )}
-                                {event.mapCoordinates && (
+                                {event.mapCoordinates && isMapAllowed && (
                                     <div className="event-detail__map-container">
                                         <iframe
                                             title="Карта мероприятия"
@@ -131,6 +145,21 @@ export default function EventDetailPage() {
                                             allowFullScreen
                                             loading="lazy"
                                         ></iframe>
+                                    </div>
+                                )}
+                                {event.mapCoordinates && !isMapAllowed && (
+                                    <div className="event-detail__map-container" style={{ padding: '16px', border: '1px solid #d9e2f1', borderRadius: '8px' }}>
+                                        <p className="body-text" style={{ marginBottom: '12px' }}>
+                                            Для отображения Яндекс.Карты требуется согласие на использование cookie и аналогичных технологий.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            className="share__button-link"
+                                            onClick={() => saveCookieConsent('accepted')}
+                                            title="Разрешить карту"
+                                        >
+                                            Разрешить и показать карту
+                                        </button>
                                     </div>
                                 )}
 

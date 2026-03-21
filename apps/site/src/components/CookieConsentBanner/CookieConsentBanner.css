@@ -61,6 +61,20 @@
     color: var(--primary-bg);
 }
 
+.cookie-consent__btn--primary {
+    background-color: var(--primary-strong);
+    color: var(--primary-bg);
+}
+
+.cookie-consent__btn--primary:hover {
+    opacity: 0.9;
+}
+
+.cookie-consent__btn--secondary {
+    background-color: transparent;
+    color: var(--primary-strong);
+}
+
 
 @media (max-width: 768px) {
     .cookie-consent__content {

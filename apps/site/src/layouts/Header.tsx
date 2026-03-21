@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import './Layout.css'
 import { OutlineButtonLink } from '../components/LinkButtons'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import { isCookieConsentAccepted } from '../utils/cookieConsent'
 
 interface Project {
     id: string
@@ -55,13 +56,16 @@ export default function Header() {
     const fetchMenu = async () => {
         try {
             const cacheKey = 'mainMenuCache';
-            const cacheTtl = 60 * 60 * 1000; // 1 час
-            const cached = sessionStorage.getItem(cacheKey);
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                if (parsed.timestamp && Date.now() - parsed.timestamp < cacheTtl && parsed.items) {
-                    setMenuItems(parsed.items);
-                    return;
+            const cacheTtl = 60 * 60 * 1000; 
+            const canUseOptionalStorage = isCookieConsentAccepted();
+            if (canUseOptionalStorage) {
+                const cached = sessionStorage.getItem(cacheKey);
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (parsed.timestamp && Date.now() - parsed.timestamp < cacheTtl && parsed.items) {
+                        setMenuItems(parsed.items);
+                        return;
+                    }
                 }
             }
             const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002';
@@ -70,7 +74,9 @@ export default function Header() {
                 const data = await res.json();
                 const items = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : null);
                 setMenuItems(items);
-                sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), items }));
+                if (canUseOptionalStorage) {
+                    sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), items }));
+                }
             }
         } catch (e) {
         }
