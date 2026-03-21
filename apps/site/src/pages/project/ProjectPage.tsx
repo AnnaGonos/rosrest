@@ -60,7 +60,7 @@ export default function ProjectPage() {
                 />
             </div>
 
-            <div className="page__container">
+            <div className="page__container page__container--27">
                 <div className='page__header-title'>
                     <h1 className="page-title">Проекты</h1>
                 </div>

@@ -152,6 +152,41 @@
   cursor: not-allowed;
 }
 
+.comment-form__agreement {
+  margin-top: 14px;
+}
+
+.comment-form__agreement-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.comment-form__agreement-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--primary-strong);
+}
+
+.comment-form__agreement-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #444;
+}
+
+.comment-form__agreement-text a {
+  color: var(--primary-strong);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.comment-form__agreement-text a:hover {
+  border-bottom-color: var(--primary-strong);
+}
+
 .comment-form-loading {
   padding: 20px;
   text-align: center;

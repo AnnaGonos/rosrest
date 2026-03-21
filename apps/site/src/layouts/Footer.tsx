@@ -1,43 +1,8 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
 import './Layout.css'
 
-interface Service {
-    id: string
-    page: {
-        id: string
-        slug: string
-        title: string
-        publishedAt?: string
-        isDraft: boolean
-    }
-}
 
 export default function Footer() {
-    const [services, setServices] = useState<Service[]>([])
-
-    useEffect(() => {
-        fetchServices()
-    }, [])
-
-    const fetchServices = async () => {
-        try {
-            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
-            const response = await fetch(`${API_BASE}/services?isDraft=false`)
-            if (!response.ok) return
-            const data = await response.json()
-
-            const sorted = data.sort((a: Service, b: Service) => {
-                const dateA = new Date(a.page.publishedAt || 0).getTime()
-                const dateB = new Date(b.page.publishedAt || 0).getTime()
-                return dateA - dateB
-            })
-            setServices(sorted)
-        } catch (err) {
-            console.error('Error fetching services:', err)
-        }
-    }
-
     return (
         <footer className="footer">
             <div className="footer-top">
@@ -85,7 +50,7 @@ export default function Footer() {
                     <Link to="/news" className="footer-nav__link">Новости РАР</Link>
                     <Link to="/for-journalist" className="footer-nav__link">Журналистам</Link>
                 </div>
-                <div className="footer-nav__section">
+                {/* <div className="footer-nav__section">
                     <Link to="/events" className="footer-nav__title" style={{ marginBottom: '10px' }}>Календарь мероприятий</Link>
                     <Link to="/services" className="footer-nav__title">Услуги</Link>
                     {services.map(service => (
@@ -97,8 +62,8 @@ export default function Footer() {
                             {service.page.title}
                         </Link>
                     ))}
-                </div>
-                <div className="footer-nav__section">
+                </div> */}
+                <div className="footer-nav__section footer-nav__section--right">
                     <Link to="/documents/istoricheskie-poselenija" className="footer-nav__title">Исторические поселения</Link>
                     <Link to="/monitoring-zakon" className="footer-nav__title">Мониторинг законодательства</Link>
                     <Link to="https://www.culture.ru/" target="_blank" rel="noopener noreferrer" className="footer-nav__title">КУЛЬТУРА.РФ</Link>
@@ -108,7 +73,7 @@ export default function Footer() {
 
             <div className="footer-bottom">
                 <small className='footer-bottom__quoting'>© {new Date().getFullYear()} «Российская Ассоциация Реставраторов». При цитировании и ином использовании материалов портала ссылка на www.rosrest.com обязательна в формате гиперссылки.</small>
-                {/* <small className='footer-bottom__privacy'><Link to="/privacy">Политика обработки персональных данных</Link></small> */}
+                <small className='footer-bottom__privacy'><Link to="/privacy">Политика обработки персональных данных</Link></small>
                 <small className='footer-bottom__development'><Link to="https://t.me/gonosanna" target="_blank" rel="noopener noreferrer">Разработка сайта</Link></small>
             </div>
         </footer>

@@ -16,6 +16,10 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    if (!token) {
+      setError('Некорректная ссылка для сброса пароля');
+      return;
+    }
     if (newPassword.length < 8) {
       setError('Минимум 8 символов');
       return;
@@ -29,14 +33,19 @@ export default function ResetPasswordPage() {
       const response = await fetch(API_ENDPOINTS.ADMIN_RESET_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: newPassword }),
+        body: JSON.stringify({ token, newPassword }),
       });
       if (!response.ok) {
-        setError('Ошибка сброса пароля');
+        try {
+          const data = await response.json();
+          setError(data.message || 'Ошибка сброса пароля');
+        } catch {
+          setError('Ошибка сброса пароля');
+        }
         return;
       }
       setSuccess('Пароль успешно сброшен!');
-      setTimeout(() => navigate('/'), 2000);
+      setTimeout(() => navigate('/login'), 1800);
     } catch {
       setError('Ошибка сервера');
     } finally {

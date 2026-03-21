@@ -25,6 +25,11 @@ export class AdminService {
 	private readonly saltRounds = 12;
 	private readonly jwtSecret = process.env.ADMIN_JWT_SECRET || 'dev-admin-secret';
 	private readonly resetTokenTtlMs = 60 * 60 * 1000;
+	private readonly adminAppUrl = (
+		process.env.ADMIN_APP_URL ||
+		process.env.ADMIN_FRONTEND_URL ||
+		'http://localhost:3001'
+	).replace(/\/$/, '');
 
 	constructor(
 		@InjectRepository(AdminAccount)
@@ -111,25 +116,26 @@ export class AdminService {
 			return { sent: true };
 		}
 		const token = crypto.randomBytes(32).toString('hex');
+		const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 		const expires = new Date(Date.now() + this.resetTokenTtlMs);
-		admin.resetToken = token;
+		admin.resetToken = tokenHash;
 		admin.resetTokenExpires = expires;
 		await this.adminRepo.save(admin);
 
-		// Формируем ссылку для сброса пароля
-		const resetUrl = `http://localhost:3001/reset-password/${token}`;
+		const resetUrl = `${this.adminAppUrl}/reset-password/${token}`;
 		const subject = 'Сброс пароля RosRest';
 		const text = `Для сброса пароля перейдите по ссылке: ${resetUrl}`;
-		const html = `<p>Для сброса пароля перейдите по <a href="${resetUrl}">этой ссылке</a>.</p>`;
+		const html = this.mailService.getResetPasswordHtml(admin.email, resetUrl);
 		await this.mailService.sendMail(admin.email, subject, text, html);
 
 		return process.env.NODE_ENV === 'development'
-			? { sent: true, token }
+			? { sent: true, token, resetUrl }
 			: { sent: true };
 	}
 
 	async resetPassword(dto: ResetPasswordDto) {
-		const admin = await this.adminRepo.findOne({ where: { resetToken: dto.token } });
+		const tokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+		const admin = await this.adminRepo.findOne({ where: { resetToken: tokenHash } });
 		if (!admin || !admin.resetTokenExpires) {
 			throw new BadRequestException('Invalid reset token');
 		}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import './NewsSubscribeForm.css'
 
 interface NewsSubscribeFormProps {
@@ -8,6 +9,7 @@ interface NewsSubscribeFormProps {
 export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps) {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [agreementAccepted, setAgreementAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | false>(false)
@@ -17,6 +19,12 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!agreementAccepted) {
+      setError('Вы должны согласиться на обработку персональных данных')
+      return
+    }
+
     setLoading(true)
     setError(null)
     setSuccess(false)
@@ -42,6 +50,7 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
         setSuccess(data.message || `Ваша заявка принята. Мы отправили письмо на почту ${email} для подтверждения вашей эл. почты`)
         setEmail('')
         setName('')
+        setAgreementAccepted(false)
 
         if (onSuccess) {
           onSuccess()
@@ -72,8 +81,6 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
 
           <div className="news-subscribe-form__input-group">
             <div className='news-subscribe-form__input-container'>
-
-
               <input
                 type="text"
                 value={name}
@@ -93,10 +100,27 @@ export default function NewsSubscribeForm({ onSuccess }: NewsSubscribeFormProps)
                 disabled={loading}
               />
             </div>
+
+            <div className="news-subscribe-form__agreement">
+              <label className="news-subscribe-form__agreement-label">
+                <input
+                  type="checkbox"
+                  checked={agreementAccepted}
+                  onChange={(e) => setAgreementAccepted(e.target.checked)}
+                  disabled={loading}
+                  className="news-subscribe-form__agreement-checkbox"
+                />
+                <span className="news-subscribe-form__agreement-text">
+                  Нажимая «Подписаться», соглашаюсь на обработку персональных данных. 
+                  Подробнее в <Link to="/privacy">политике конфиденциальности</Link>
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
               className="news-subscribe-form__button"
-              disabled={loading}
+              disabled={loading || !agreementAccepted}
             >
               {loading ? 'Подписываем...' : 'Подписаться'}
             </button>

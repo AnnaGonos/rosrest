@@ -147,7 +147,7 @@ export class DigestService {
     });
   }
 
-  generateDigestHtml(newsItems: DigestNews[]): string {
+  generateDigestHtml(newsItems: DigestNews[], subscriberEmail?: string): string {
     const formattedNews = newsItems.map((news) => ({
       id: news.id,
       slug: news.slug,
@@ -157,7 +157,7 @@ export class DigestService {
       publishedAt: news.publishedAt ? new Date(news.publishedAt) : undefined,
     }));
 
-    return this.mailTemplateService.generateDigestEmail(formattedNews);
+    return this.mailTemplateService.generateDigestEmail(formattedNews, subscriberEmail);
   }
 
   async sendDigestEmails(
@@ -169,7 +169,6 @@ export class DigestService {
       return { sent: 0, failed: 0 };
     }
 
-    const html = this.generateDigestHtml(newsItems);
     const text = this.mailTemplateService.generateDigestText(
       newsItems.map((n) => ({
         id: n.id,
@@ -189,15 +188,32 @@ export class DigestService {
       };
     }
 
+    // Generate individual HTML for each subscriber with their email in unsubscribe URL
     const recipientEmails = subscribers.map((s) => s.email);
-    const result = await this.emailService.sendBulkEmail(
-      recipientEmails,
-      subject,
-      html,
-      text,
-    );
+    let sent = 0;
+    let failed = 0;
 
-    return { sent: result.sent, failed: result.failed };
+    for (const subscriber of subscribers) {
+      const html = this.generateDigestHtml(newsItems, subscriber.email);
+      const result = await this.emailService.sendBulkEmail(
+        [subscriber.email],
+        subject,
+        html,
+        text,
+      );
+      sent += result.sent;
+      failed += result.failed;
+
+      if (result.sent > 0) {
+        // Update lastDigestSentAt for this subscriber
+        await this.subscriptionRepository.update(
+          { id: subscriber.id },
+          { lastDigestSentAt: new Date() }
+        );
+      }
+    }
+
+    return { sent, failed };
   }
 
 

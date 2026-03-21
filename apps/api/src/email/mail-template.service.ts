@@ -98,7 +98,6 @@ export class MailTemplateService {
 
   generateWelcomeEmail(email: string, name?: string): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
-    const apiUrl = process.env.API_URL || 'http://localhost:3002';
 
     const useSimple = process.env.USE_SIMPLE_EMAIL === 'true';
     const templateName = useSimple ? 'welcome-simple' : 'welcome';
@@ -107,7 +106,7 @@ export class MailTemplateService {
       email,
       name: name || '',
       siteUrl,
-      unsubscribeUrl: `${apiUrl}/subscriptions/news/unsubscribe?email=${encodeURIComponent(email)}`,
+      unsubscribeUrl: `${siteUrl}/unsubscribe?email=${encodeURIComponent(email)}`,
     });
   }
 
@@ -131,6 +130,8 @@ export class MailTemplateService {
 ${siteUrl}
 
 Если у вас есть вопросы, свяжитесь с нами на сайте.
+
+Чтобы отписаться от рассылки, перейдите по ссылке: ${siteUrl}/unsubscribe?email=${email}
 
 ---
 Это письмо было отправлено автоматически. 
@@ -253,7 +254,7 @@ ${siteUrl}
 
     let unsubscribeUrl: string;
     if (subscriberEmail) {
-      unsubscribeUrl = `${apiUrl}/subscriptions/news/unsubscribe?email=${encodeURIComponent(subscriberEmail)}`;
+      unsubscribeUrl = `${siteUrl}/unsubscribe?email=${encodeURIComponent(subscriberEmail)}`;
     } else {
       unsubscribeUrl = `${siteUrl}/unsubscribe`;
     }

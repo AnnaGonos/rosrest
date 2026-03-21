@@ -31,6 +31,9 @@ import RarMemberPortfolioPage from './pages/rar/RarMemberPortfolioPage'
 import NewsPage from './pages/news/NewsPage'
 import NewsDetailPage from './pages/news/NewsDetailPage'
 import ForJournalistPage from './pages/for-journalist/ForJournalistPage'
+import SubscribePage from './pages/SubscribePage'
+import UnsubscribePage from './pages/UnsubscribePage'
+import PrivacyPage from './pages/PrivacyPage'
 import ScrollToTop from './ScrollToTop'
 
 function App() {
@@ -75,6 +78,9 @@ function App() {
           <Route path="portfolio/:slug" element={<RarMemberPortfolioPage />} />
 
           <Route path="for-journalist" element={<ForJournalistPage />} />
+          <Route path="subscribe" element={<SubscribePage />} />
+          <Route path="unsubscribe" element={<UnsubscribePage />} />
+          <Route path="privacy" element={<PrivacyPage />} />
           
           <Route path="*" element={<NotFoundPage />} />
         </Route>

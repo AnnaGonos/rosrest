@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './CommentForm.css'
 
 interface CommentFormProps {
@@ -24,6 +25,7 @@ export default function CommentForm({ commentableType, commentableId, onCommentA
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [consentAccepted, setConsentAccepted] = useState(false)
 
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
@@ -54,6 +56,11 @@ export default function CommentForm({ commentableType, commentableId, onCommentA
 
     if (!formToken) {
       setError('Форма не готова. Обновите страницу.')
+      return
+    }
+
+    if (!consentAccepted) {
+      setError('Подтвердите согласие на обработку персональных данных')
       return
     }
 
@@ -88,6 +95,7 @@ export default function CommentForm({ commentableType, commentableId, onCommentA
       setAuthorName('')
       setAuthorEmail('')
       setContent('')
+      setConsentAccepted(false)
 
       await fetchFormToken()
 
@@ -195,10 +203,25 @@ export default function CommentForm({ commentableType, commentableId, onCommentA
         <button
           type="submit"
           className="comment-form__submit"
-          disabled={loading}
+          disabled={loading || !consentAccepted}
         >
           {loading ? 'Отправка...' : 'Отправить комментарий'}
         </button>
+
+        <div className="comment-form__agreement">
+          <label className="comment-form__agreement-label">
+            <input
+              type="checkbox"
+              checked={consentAccepted}
+              onChange={(e) => setConsentAccepted(e.target.checked)}
+              className="comment-form__agreement-checkbox"
+            />
+            <span className="comment-form__agreement-text">
+              Я соглашаюсь на обработку персональных данных и принимаю условия{' '}
+              <Link to="/privacy">политики конфиденциальности</Link>.
+            </span>
+          </label>
+        </div>
       </form>
     </div>
   )

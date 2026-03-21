@@ -52,12 +52,14 @@ export class AdminController {
 	}
 
 	@Post('forgot-password')
+	@Throttle({ default: { limit: 5, ttl: 60000 } })
 	@ApiOperation({ summary: 'Send reset token to email' })
 	forgotPassword(@Body() dto: ForgotPasswordDto) {
 		return this.adminService.forgotPassword(dto);
 	}
 
 	@Post('reset-password')
+	@Throttle({ default: { limit: 10, ttl: 60000 } })
 	@ApiOperation({ summary: 'Reset password with token' })
 	resetPassword(@Body() dto: ResetPasswordDto) {
 		return this.adminService.resetPassword(dto);
