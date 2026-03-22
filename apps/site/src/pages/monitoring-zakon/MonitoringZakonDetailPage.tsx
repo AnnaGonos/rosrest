@@ -6,6 +6,7 @@ import { BlocksRenderer } from '../../components/BlocksRenderer'
 import MonitoringZakonCard from '../../components/MonitoringZakonCard/MonitoringZakonCard'
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface Block {
     id: string
@@ -129,8 +130,9 @@ export default function MonitoringZakonDetailPage() {
         }
     }, [API_BASE, slug])
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка страницы..." />
+    }
     if (!item) return null
 
     return (

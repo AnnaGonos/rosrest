@@ -4,6 +4,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './ProjectPage.css'
 import { useEffect, useState } from 'react'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface Project {
     id: string
@@ -33,9 +34,13 @@ export default function ProjectPage() {
         setError(null)
         try {
             const response = await fetch(`${API_BASE}/projects?isDraft=false`)
-            if (!response.ok) throw new Error('Ошибка загрузки проектов')
+            if (response.status === 404) {
+                setProjects([])
+                return
+            }
+            if (!response.ok) throw new Error(`Ошибка загрузки проектов (HTTP ${response.status})`)
             const data = await response.json()
-            setProjects(data)
+            setProjects(Array.isArray(data) ? data : [])
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
         } finally {
@@ -46,8 +51,9 @@ export default function ProjectPage() {
 
 
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка проектов..." />
+    }
 
     return (
         <div className="page-main">

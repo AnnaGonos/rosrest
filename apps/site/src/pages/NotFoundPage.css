@@ -6,14 +6,13 @@
     background: var(--primary-bg);
 }
 
-.not-found-page__container {}
-
 .not-found-page__content {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 20px;
+    position: relative;
 }
 
 .not-found-page__code {
@@ -22,6 +21,8 @@
     line-height: 1;
     color: var(--dark-bg);
     margin: 0;
+    pointer-events: none;
+    user-select: none;
 }
 
 .not-found-page__title {
@@ -47,6 +48,8 @@
     display: flex;
     gap: 15px;
     margin-top: 20px;
+    position: relative;
+    z-index: 2;
 }
 
 .not-found-page__btn {

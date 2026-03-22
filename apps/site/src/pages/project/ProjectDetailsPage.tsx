@@ -4,6 +4,8 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import { BlocksRenderer } from '../../components/BlocksRenderer'
+import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
 
 interface Block {
     id: string
@@ -31,6 +33,7 @@ export default function ProjectDetailsPage() {
     const [project, setProject] = useState<Project | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [notFound, setNotFound] = useState(false)
 
     useEffect(() => {
         fetchProject()
@@ -41,12 +44,20 @@ export default function ProjectDetailsPage() {
     const fetchProject = async () => {
         setLoading(true)
         setError(null)
+        setNotFound(false)
         try {
             const response = await fetch(`${API_BASE}/projects`)
-            if (!response.ok) throw new Error('Ошибка загрузки проекта')
+            if (response.status === 404) {
+                setNotFound(true)
+                return
+            }
+            if (!response.ok) throw new Error(`Ошибка загрузки проекта (HTTP ${response.status})`)
             const data: Project[] = await response.json()
             const found = data.find(p => p.page.slug.replace(/^projects\//, '') === slug)
-            if (!found) throw new Error('Проект не найден')
+            if (!found) {
+                setNotFound(true)
+                return
+            }
 
             setProject(found)
         } catch (err) {
@@ -56,8 +67,13 @@ export default function ProjectDetailsPage() {
         }
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка проекта..." />
+    }
     if (!project) return null
 
     return (

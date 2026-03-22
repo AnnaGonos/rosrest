@@ -6,6 +6,8 @@ import { BackToSectionButton } from '../../components/LinkButtons'
 import { getFileUrl } from '../../utils/getFileUrl';
 import { BlocksRenderer } from '../../components/BlocksRenderer'
 import './ServiceDetailPage.css'
+import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
 
 interface Block {
     id: string
@@ -43,6 +45,7 @@ export default function ServiceDetailPage() {
     const [service, setService] = useState<Service | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [notFound, setNotFound] = useState(false)
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
@@ -53,12 +56,20 @@ export default function ServiceDetailPage() {
     const fetchService = async () => {
         setLoading(true)
         setError(null)
+        setNotFound(false)
         try {
             const response = await fetch(`${API_BASE}/services`)
-            if (!response.ok) throw new Error('Ошибка загрузки услуги')
+            if (response.status === 404) {
+                setNotFound(true)
+                return
+            }
+            if (!response.ok) throw new Error(`Ошибка загрузки услуги (HTTP ${response.status})`)
             const data: Service[] = await response.json()
             const found = data.find(s => s.page.slug.replace(/^services\//, '') === slug)
-            if (!found) throw new Error('Услуга не найдена')
+            if (!found) {
+                setNotFound(true)
+                return
+            }
             setService(found)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
@@ -67,8 +78,13 @@ export default function ServiceDetailPage() {
         }
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка услуги..." />
+    }
     if (!service) return null
 
     return (

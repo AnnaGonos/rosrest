@@ -81,6 +81,7 @@ function App() {
           <Route path="subscribe" element={<SubscribePage />} />
           <Route path="unsubscribe" element={<UnsubscribePage />} />
           <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="404" element={<NotFoundPage />} />
           
           <Route path="*" element={<NotFoundPage />} />
         </Route>

@@ -2,6 +2,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { useEffect, useState } from 'react'
 import LinkList from '../../components/LinkList/LinkList'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface Service {
     id: string
@@ -31,9 +32,13 @@ export default function ServicesPage() {
         try {
             const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002';
             const response = await fetch(`${API_BASE}/services?isDraft=false`)
-            if (!response.ok) throw new Error('Ошибка загрузки услуг')
+            if (response.status === 404) {
+                setServices([])
+                return
+            }
+            if (!response.ok) throw new Error(`Ошибка загрузки услуг (HTTP ${response.status})`)
             const data = await response.json()
-            setServices(data)
+            setServices(Array.isArray(data) ? data : [])
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
         } finally {
@@ -41,8 +46,9 @@ export default function ServicesPage() {
         }
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка услуг..." />
+    }
 
     return (
         <div className="page-main">
@@ -60,15 +66,17 @@ export default function ServicesPage() {
                     <h1 className="page-title">Услуги</h1>
                 </div>
 
-                <ContentSection columns={1}>
-                    <LinkList
-                        items={services.map(service => ({
-                            label: service.page.title,
-                            href: `${service.page.slug.replace(/^services\//, '')}`,
-                        }))}
-                        variant="primary-icon"
-                    />
-                </ContentSection>
+                {services.length > 0 && (
+                    <ContentSection columns={1}>
+                        <LinkList
+                            items={services.map(service => ({
+                                label: service.page.title,
+                                href: `${service.page.slug.replace(/^services\//, '')}`,
+                            }))}
+                            variant="primary-icon"
+                        />
+                    </ContentSection>
+                )}
             </div>
         </div>
     )

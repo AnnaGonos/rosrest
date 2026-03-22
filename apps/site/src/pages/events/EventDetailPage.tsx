@@ -9,6 +9,8 @@ import FAQSection from '../../components/FAQSection/FAQSection'
 import ScheduleSection from '../../components/ScheduleSection/ScheduleSection'
 import { getFileUrl } from '../../utils/getFileUrl'
 import { isCookieConsentAccepted, saveCookieConsent } from '../../utils/cookieConsent'
+import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -26,6 +28,7 @@ export default function EventDetailPage() {
     const [event, setEvent] = useState<EventCardItem | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [notFound, setNotFound] = useState(false)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
     const [isMapAllowed, setIsMapAllowed] = useState<boolean>(isCookieConsentAccepted())
 
@@ -46,14 +49,19 @@ export default function EventDetailPage() {
         let active = true
         setLoading(true)
         setError(null)
+        setNotFound(false)
 
         fetch(`${API_BASE}/events/${id}`)
             .then((res) => {
+                if (res.status === 404) {
+                    if (active) setNotFound(true)
+                    return null
+                }
                 if (!res.ok) throw new Error(`Не удалось загрузить событие (HTTP ${res.status})`)
                 return res.json()
             })
-            .then((data: EventCardItem) => {
-                if (!active) return
+            .then((data) => {
+                if (!active || !data) return
                 setEvent(data)
             })
             .catch((err) => {
@@ -72,14 +80,27 @@ export default function EventDetailPage() {
     const coverUrl = getFileUrl(event?.previewImageUrl )
     const hasCover = Boolean(coverUrl)
 
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
     return (
         <div className="page-main">
             <div className="page__header">
                 <BackToSectionButton to="/events" label="К разделу События" title='Назад' />
             </div>
 
-            {loading && <div className="page__container"><div className="events-status">Загрузка события...</div></div>}
-            {error && !loading && <div className="page__container"><div className="events-status events-status--error">{error}</div></div>}
+            {(loading || error) && (
+                <div className="page__container">
+                    <RequestState
+                        loading={loading}
+                        error={error}
+                        loadingText="Загрузка события..."
+                        variant="inline"
+                        className="events-status"
+                    />
+                </div>
+            )}
 
             {!loading && !error && event && (
                 <>

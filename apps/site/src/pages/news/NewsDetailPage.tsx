@@ -9,6 +9,8 @@ import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
 import './NewsDetailPage.css'
+import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
 
 interface Block {
     id: string
@@ -45,6 +47,7 @@ const MONTH_NAMES = [
 
 export default function NewsDetailPage() {
     const { slug } = useParams<{ slug: string }>()
+    const [notFound, setNotFound] = useState(false)
     const [item, setItem] = useState<NewsItem | null>(null)
     const [recommendations, setRecommendations] = useState<NewsCardItem[]>([])
     const [_, setAllTags] = useState<NewsTag[]>([])
@@ -130,6 +133,7 @@ export default function NewsDetailPage() {
         const fetchItem = async () => {
             setLoading(true)
             setError(null)
+            setNotFound(false)
             try {
                 const rawSlug = slug || ''
                 let data = await fetchBySlug(rawSlug)
@@ -137,10 +141,15 @@ export default function NewsDetailPage() {
                 if (!data && /^[a-f0-9\-]{36}$/.test(rawSlug)) {
                     data = await fetchById(rawSlug)
                 }
-                if (!data) throw new Error('Ошибка загрузки новости')
+                if (!data) throw new Error('Новость не найдена')
                 setItem(data)
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
+                const errorMsg = err instanceof Error ? err.message : 'Неизвестная ошибка'
+                if (errorMsg.includes('не найдена')) {
+                    setNotFound(true)
+                } else {
+                    setError(errorMsg)
+                }
             } finally {
                 setLoading(false)
             }
@@ -151,8 +160,13 @@ export default function NewsDetailPage() {
         }
     }, [API_BASE, slug])
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка новости..." />
+    }
     if (!item) return null
 
     return (

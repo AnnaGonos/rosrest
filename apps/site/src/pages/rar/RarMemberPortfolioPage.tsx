@@ -9,6 +9,7 @@ import './RarMemberPortfolioPage.css'
 import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface Block {
     id: string
@@ -81,8 +82,9 @@ export default function RarMemberPortfolioPage() {
         }
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка портфолио..." />
+    }
     if (!member) return null
 
     return (

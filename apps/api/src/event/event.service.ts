@@ -52,11 +52,17 @@ export class EventService {
     offset?: number,
     sortOrder?: 'ASC' | 'DESC', 
   ): Promise<{ events: Event[]; totalCount: number }> {
+    // Time-based filters depend on current date and can become stale across days,
+    // so cache only non-time-sensitive selections.
+    const shouldUseCache = !(isPublished === true && (filter === 'past' || filter === 'upcoming'));
     const cacheKey = this.getCacheKey(isPublished, filter);
-    const cached = await this.cacheManager.get<{ events: Event[]; totalCount: number }>(cacheKey);
-    if (cached) {
-      const paginatedEvents = cached.events.slice(offset || 0, (offset || 0) + (limit || cached.events.length));
-      return { events: paginatedEvents, totalCount: cached.totalCount };
+
+    if (shouldUseCache) {
+      const cached = await this.cacheManager.get<{ events: Event[]; totalCount: number }>(cacheKey);
+      if (cached) {
+        const paginatedEvents = cached.events.slice(offset || 0, (offset || 0) + (limit || cached.events.length));
+        return { events: paginatedEvents, totalCount: cached.totalCount };
+      }
     }
 
     const query = this.eventRepository.createQueryBuilder('event');
@@ -120,7 +126,9 @@ export class EventService {
     const [allEvents, totalCount] = await query.getManyAndCount();
     const result = { events: allEvents, totalCount };
 
-    await this.cacheManager.set(cacheKey, result);
+    if (shouldUseCache) {
+      await this.cacheManager.set(cacheKey, result);
+    }
 
     const paginatedEvents = allEvents.slice(offset || 0, (offset || 0) + (limit || allEvents.length));
     return { events: paginatedEvents, totalCount };

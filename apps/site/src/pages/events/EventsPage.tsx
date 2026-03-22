@@ -6,6 +6,7 @@ import './EventsPage.css'
 import './../../index.css'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -95,6 +96,9 @@ export default function EventsPage() {
         
         fetch(`${API_BASE}/events?isPublished=true&filter=upcoming&sortOrder=ASC`)
             .then((res) => {
+                if (res.status === 404) {
+                    return { events: [], totalCount: 0 }
+                }
                 if (!res.ok) throw new Error(`Не удалось загрузить актуальные события (HTTP ${res.status})`)
                 return res.json()
             })
@@ -135,6 +139,9 @@ export default function EventsPage() {
         
         fetch(`${API_BASE}/events?isPublished=true&filter=past&sortOrder=DESC&limit=${PAST_LIMIT}&offset=${pastPage * PAST_LIMIT}`)
             .then((res) => {
+                if (res.status === 404) {
+                    return { events: [], totalCount: 0 }
+                }
                 if (!res.ok) throw new Error(`Не удалось загрузить прошедшие события (HTTP ${res.status})`)
                 return res.json()
             })
@@ -196,21 +203,26 @@ export default function EventsPage() {
                     Чтобы добавить ваше мероприятие в календарь, направьте информацию о нем на info.rosrest@mail.ru, press.rosrest@mail.ru
                 </p>
 
-                {loading && <div className="events-status">Загрузка событий...</div>}
-                {error && !loading && <div className="events-status events-status--error">{error}</div>}
+                <RequestState
+                    loading={loading}
+                    error={error}
+                    loadingText="Загрузка событий..."
+                    variant="inline"
+                    className="events-status"
+                />
 
                 {!loading && !error && (
                     <div className="events-page__sections">
                         <EventsSection
-                            title="Ближайшие мероприятия"
+                            title="Предстоящие"
                             events={upcomingEvents}
-                            emptyText="Ближайших мероприятий пока нет"
+                            emptyText="Пока нет мероприятий"
                         />
 
                         <EventsSection
                             title="Прошедшие"
                             events={pastEvents}
-                            emptyText="Пока нет прошедших мероприятий"
+                            emptyText="Пока нет мероприятий"
                         />
                         
                         {(pastTotalCount === null || pastEvents.length < pastTotalCount) && pastEvents.length > 0 && (

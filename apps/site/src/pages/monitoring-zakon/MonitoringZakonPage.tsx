@@ -5,6 +5,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import Pagination from '../../components/Pagination/Pagination'
 import './MonitoringZakonPage.css'
 import MonitoringZakonCard from '../../components/MonitoringZakonCard/MonitoringZakonCard'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface MonitoringItem {
     id: string
@@ -65,8 +66,9 @@ export default function MonitoringZakonPage() {
         setSearchParams({ page: String(page) })
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка мониторинга..." />
+    }
 
     return (
         <div className="page-main">

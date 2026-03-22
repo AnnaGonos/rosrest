@@ -8,6 +8,7 @@ import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import './NewsPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import NewsSubscribeForm from '../../components/Subscribe/NewsSubscribeForm'
+import RequestState from '../../components/RequestState/RequestState'
 
 const PAGE_SIZE = 21
 
@@ -98,8 +99,9 @@ export default function NewsPage() {
         setSearchParams(newParams)
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка новостей..." />
+    }
 
     return (
         <div className="page-main news-page">
