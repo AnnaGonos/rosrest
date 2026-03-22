@@ -52,9 +52,10 @@ export class EventService {
     offset?: number,
     sortOrder?: 'ASC' | 'DESC', 
   ): Promise<{ events: Event[]; totalCount: number }> {
-    // Time-based filters depend on current date and can become stale across days,
-    // so cache only non-time-sensitive selections.
-    const shouldUseCache = !(isPublished === true && (filter === 'past' || filter === 'upcoming'));
+    // Time-based filters depend on current date and may use different request scopes
+    // (e.g. admin without isPublished). Skip cache for all past/upcoming requests
+    // to avoid stale or mismatched data.
+    const shouldUseCache = !(filter === 'past' || filter === 'upcoming');
     const cacheKey = this.getCacheKey(isPublished, filter);
 
     if (shouldUseCache) {
