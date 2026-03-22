@@ -248,7 +248,7 @@ export default function CharterPage() {
           <div className="mb-4">
             <h1>Устав и ежегодные отчеты</h1>
             <p className="text-muted">Для того, чтобы опубликовать документ, достаточно указать название документа и загрузить основной PDF файл.</p>
-            <a href="https://disk.yandex.ru/d/FcxUqjwhXeHsog"
+            <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.9tz90gcw1hmy"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-dark  d-flex align-items-center"

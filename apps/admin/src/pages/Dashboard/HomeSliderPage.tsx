@@ -232,7 +232,7 @@ export default function HomeSliderPage() {
           <div className="mb-4">
             <h1>Слайдер на главной странице</h1>
             <p className="text-muted mb-1">При добавлении изображений они будут отображаться в слайдере в порядке убывания даты загрузки (сначала новые, затем старые).</p>
-            <a href="https://disk.yandex.ru/d/L_HSqLrVc7tc_Q"
+            <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.cfu5omcem4no"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-dark  d-flex align-items-center"
