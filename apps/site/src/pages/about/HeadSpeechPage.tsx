@@ -3,25 +3,17 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import './AboutPage.css'
 import '../services/ServiceDetailPage.css'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 
 export default function HeadSpeechPage() {
     return (
         <div className="page-main page__container">
-            <Helmet>
-                <title>Обращение председателя - Российская ассоциация реставраторов</title>
-                <meta
-                    name="description"
-                    content="Обращение председателя Российской ассоциации реставраторов о целях, ценностях и развитии профессионального сообщества."
-                />
-                <meta property="og:title" content="Обращение председателя - Российская ассоциация реставраторов" />
-                <meta
-                    property="og:description"
-                    content="Текст обращения председателя Российской ассоциации реставраторов."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://rosrest.com/about/head-speech" />
-            </Helmet>
+            <Seo
+                title="Обращение председателя - Российская ассоциация реставраторов"
+                description="Обращение председателя Российской ассоциации реставраторов о целях, ценностях и развитии профессионального сообщества."
+                canonical="https://rosrest.com/about/head-speech"
+                url="https://rosrest.com/about/head-speech"
+            />
 
             <div className="page__header">
                 <Breadcrumbs

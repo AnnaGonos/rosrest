@@ -4,7 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import DocumentList from '../../components/DocumentList/DocumentList'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -55,20 +55,12 @@ export default function CharterPage() {
 
     return (
         <div className="page-main">
-            <Helmet>
-                <title>Устав и ежегодные отчеты - Российская ассоциация реставраторов</title>
-                <meta
-                    name="description"
-                    content="Устав и ежегодные отчеты Российской ассоциации реставраторов: официальные документы и материалы."
-                />
-                <meta property="og:title" content="Устав и ежегодные отчеты - Российская ассоциация реставраторов" />
-                <meta
-                    property="og:description"
-                    content="Официальные документы: устав и ежегодные отчеты Российской ассоциации реставраторов."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://rosrest.com/charter" />
-            </Helmet>
+            <Seo
+                title="Устав и ежегодные отчеты - Российская ассоциация реставраторов"
+                description="Устав и ежегодные отчеты Российской ассоциации реставраторов: официальные документы и материалы."
+                canonical="https://rosrest.com/charter"
+                url="https://rosrest.com/charter"
+            />
 
             <div className="page__header">
                 <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Об Ассоциации', to: '/about' }, { label: 'Устав и отчёты', isCurrent: true }]} />

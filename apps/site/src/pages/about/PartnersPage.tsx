@@ -5,7 +5,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import './AboutPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 import RequestState from '../../components/RequestState/RequestState'
 
 type Partner = {
@@ -48,20 +48,12 @@ export default function PartnersPage() {
 
     return (
         <div className="page-main">
-            <Helmet>
-                <title>Партнеры - Российская ассоциация реставраторов</title>
-                <meta
-                    name="description"
-                    content="Партнеры Российской ассоциации реставраторов: профильные организации и компании, сотрудничающие с Ассоциацией."
-                />
-                <meta property="og:title" content="Партнеры - Российская ассоциация реставраторов" />
-                <meta
-                    property="og:description"
-                    content="Список партнеров Российской ассоциации реставраторов."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://rosrest.com/about/partners" />
-            </Helmet>
+            <Seo
+                title="Партнеры - Российская ассоциация реставраторов"
+                description="Партнеры Российской ассоциации реставраторов: профильные организации и компании, сотрудничающие с Ассоциацией."
+                canonical="https://rosrest.com/about/partners"
+                url="https://rosrest.com/about/partners"
+            />
 
             <div className="page__header">
                 <Breadcrumbs

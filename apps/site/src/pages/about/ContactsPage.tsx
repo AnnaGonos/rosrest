@@ -5,7 +5,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import EmployeeCard from '../../components/EmployeeCard/EmployeeCard'
 import './AboutPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -57,20 +57,12 @@ export default function ContactsPage() {
 
   return (
     <div className="page-main about-page contacts-page">
-      <Helmet>
-        <title>Контакты Ассоциации - Российская ассоциация реставраторов</title>
-        <meta
-          name="description"
-          content="Контакты Российской ассоциации реставраторов: адрес, телефон, почта и руководство Ассоциации."
-        />
-        <meta property="og:title" content="Контакты - Российская ассоциация реставраторов" />
-        <meta
-          property="og:description"
-          content="Актуальные контакты и руководство Российской ассоциации реставраторов."
-        />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://rosrest.com/contacts" />
-      </Helmet>
+      <Seo
+        title="Контакты Ассоциации - Российская ассоциация реставраторов"
+        description="Контакты Российской ассоциации реставраторов: адрес, телефон, почта и руководство Ассоциации."
+        canonical="https://rosrest.com/contacts"
+        url="https://rosrest.com/contacts"
+      />
 
       <div className="page__header">
         <Breadcrumbs items={[{ label: 'Главная', to: '/' },

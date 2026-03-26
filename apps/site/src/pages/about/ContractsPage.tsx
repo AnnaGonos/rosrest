@@ -4,7 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import DocumentList from '../../components/DocumentList/DocumentList'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -43,20 +43,12 @@ export default function ContractsPage() {
 
   return (
     <div className="page-main about-page contracts-page">
-      <Helmet>
-        <title>Соглашения РАР - Российская ассоциация реставраторов</title>
-        <meta
-          name="description"
-          content="Соглашения Российской ассоциации реставраторов: документы и материалы о партнерском взаимодействии."
-        />
-        <meta property="og:title" content="Соглашения РАР - Российская ассоциация реставраторов" />
-        <meta
-          property="og:description"
-          content="Официальные соглашения Российской ассоциации реставраторов."
-        />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://rosrest.com/contracts" />
-      </Helmet>
+      <Seo
+        title="Соглашения РАР - Российская ассоциация реставраторов"
+        description="Соглашения Российской ассоциации реставраторов: документы и материалы о партнерском взаимодействии."
+        canonical="https://rosrest.com/contracts"
+        url="https://rosrest.com/contracts"
+      />
 
       <div className="page__header">
         <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Об Ассоциации', to: '/about' }, { label: 'Соглашения РАР', isCurrent: true }]} />

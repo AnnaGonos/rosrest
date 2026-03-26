@@ -4,7 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import Gallery from '../../components/Gallery/Gallery'
 import { BackToSectionButton } from '../../components/LinkButtons'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -58,20 +58,12 @@ export default function AwardsPage() {
 
     return (
         <div className="page-main">
-            <Helmet>
-                <title>Награды и дипломы - Российская ассоциация реставраторов</title>
-                <meta
-                    name="description"
-                    content="Награды, дипломы и благодарности Российской ассоциации реставраторов и ее руководства."
-                />
-                <meta property="og:title" content="Награды и дипломы - Российская ассоциация реставраторов" />
-                <meta
-                    property="og:description"
-                    content="Информация о наградах и дипломах Российской ассоциации реставраторов."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://rosrest.com/about/awards" />
-            </Helmet>
+            <Seo
+                title="Награды и дипломы - Российская ассоциация реставраторов"
+                description="Награды, дипломы и благодарности Российской ассоциации реставраторов и ее руководства."
+                canonical="https://rosrest.com/about/awards"
+                url="https://rosrest.com/about/awards"
+            />
 
             <div className="page__header">
                 <Breadcrumbs items={[

@@ -4,25 +4,18 @@ import ImageViewer from '../../components/ImageViewer/ImageViewer'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import './AboutPage.css'
 import { PresentationButton } from '../../components/LinkButtons'
-import { Helmet } from 'react-helmet-async'
+import Seo from '../../components/Seo/Seo'
 
 export default function AboutPage() {
     return (
         <div className="page-main">
-            <Helmet>
-                <title>Об Ассоциации - Российская ассоциация реставраторов</title>
-                <meta
-                    name="description"
-                    content="О Российской ассоциации реставраторов: цели, задачи, участники и деятельность профессионального объединения реставрационного сообщества России."
-                />
-                <meta property="og:title" content="Об Ассоциации - Российская ассоциация реставраторов" />
-                <meta
-                    property="og:description"
-                    content="Информация о деятельности Российской ассоциации реставраторов, ее задачах и направлениях работы."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://rosrest.com/about" />
-            </Helmet>
+            <Seo
+                title="Об Ассоциации - Российская ассоциация реставраторов"
+                description="О Российской ассоциации реставраторов: цели, задачи, участники и деятельность профессионального объединения реставрационного сообщества России."
+                canonical="https://rosrest.com/about"
+                url="https://rosrest.com/about"
+                image="https://sun9-1.userapi.com/s/v1/ig2/KFaveUghQIAUAPnOy7w6yEMnRKrwZ5XNYkn3NVg0vQy-24YJX39mC_b3rQxv9wRLqJBk3XAUmNTlBN9K3YkCFc8E.jpg?quality=96&as=32x21,48x32,72x48,108x72,160x107,240x160,360x240,480x320,540x360,640x427,720x480,1080x720,1280x853,1440x960,2268x1512&from=bu&cs=2268x0"
+            />
 
             <div className="page__header">
                 <Breadcrumbs
