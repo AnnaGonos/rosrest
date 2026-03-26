@@ -4,6 +4,7 @@ import { getFileUrl } from '../../utils/getFileUrl';
 import './EducationPage.css'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
@@ -42,6 +43,12 @@ export default function EducationPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Образование - Российская ассоциация реставраторов"
+                description="Программы повышения квалификации, образовательные проекты и реестр выпускников Российской ассоциации реставраторов."
+                canonical="https://rosrest.com/education"
+                url="https://rosrest.com/education"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

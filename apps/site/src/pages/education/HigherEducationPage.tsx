@@ -4,6 +4,7 @@ import './EducationPage.css'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
@@ -42,6 +43,12 @@ export default function HigherEducationPage() {
 
   return (
     <div className="page-main">
+      <Seo
+        title="Высшее профессиональное образование - Российская ассоциация реставраторов"
+        description="Высшее профессиональное образование: образовательные программы и партнерские вузы, рекомендованные Российской ассоциацией реставраторов."
+        canonical="https://rosrest.com/education/vysshee-professionalnoe-obrazovanie"
+        url="https://rosrest.com/education/vysshee-professionalnoe-obrazovanie"
+      />
       <div className="page__header">
         <Breadcrumbs
           items={[

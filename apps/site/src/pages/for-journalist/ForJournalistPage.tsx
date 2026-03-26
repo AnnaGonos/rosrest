@@ -4,6 +4,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BlocksRenderer } from '../../components/BlocksRenderer'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import './ForJournalistPage.css'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -69,6 +70,12 @@ export default function ForJournalistPage() {
     if (loading) {
         return (
             <div className="page-main">
+                <Seo
+                    title="Для журналистов - Российская ассоциация реставраторов"
+                    description="Материалы и контакты для журналистов — Российская ассоциация реставраторов."
+                    canonical="https://rosrest.com/press-center/for-journalist"
+                    url="https://rosrest.com/press-center/for-journalist"
+                />
                 <div className="page__container">
                     <div className="text-center py-5">Загрузка...</div>
                 </div>
@@ -88,6 +95,12 @@ export default function ForJournalistPage() {
                     />
                 </div>
                 <div className="page__container">
+                    <Seo
+                        title="Для журналистов - Российская ассоциация реставраторов"
+                        description="Материалы и контакты для журналистов — Российская ассоциация реставраторов."
+                        canonical="https://rosrest.com/press-center/for-journalist"
+                        url="https://rosrest.com/press-center/for-journalist"
+                    />
                     <h1 className="page-title">Для журналистов</h1>
                     <div className="alert alert-warning">
                         {error || 'Страница не найдена'}
@@ -100,6 +113,12 @@ export default function ForJournalistPage() {
 
     return (
         <div className="page-main for-journalist-page">
+            <Seo
+                title={`${forJournalist.page.title} - Российская ассоциация реставраторов`}
+                description={`${forJournalist.page.title} — материалы для журналистов.`}
+                canonical={`https://rosrest.com/press-center/${forJournalist.page.slug}`}
+                url={`https://rosrest.com/press-center/${forJournalist.page.slug}`}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

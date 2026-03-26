@@ -7,6 +7,7 @@ import './../../index.css'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -183,6 +184,12 @@ export default function EventsPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Календарь мероприятий - Российская ассоциация реставраторов"
+                description="Афиша и календарь мероприятий Российской ассоциации реставраторов: конференции, семинары и профильные встречи."
+                canonical="https://rosrest.com/events"
+                url="https://rosrest.com/events"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

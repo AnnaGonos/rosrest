@@ -11,6 +11,7 @@ import { getFileUrl } from '../../utils/getFileUrl'
 import { isCookieConsentAccepted, saveCookieConsent } from '../../utils/cookieConsent'
 import RequestState from '../../components/RequestState/RequestState'
 import NotFoundPage from '../NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -104,6 +105,13 @@ export default function EventDetailPage() {
 
             {!loading && !error && event && (
                 <>
+                    <Seo
+                        title={`${event.title} - Российская ассоциация реставраторов`}
+                        description={event.description ? event.description.replace(/<[^>]*>/g, '').slice(0, 160) : `Событие ${event.title} в календаре мероприятий РАР.`}
+                        canonical={window.location.origin + '/events/' + (event.id ?? id)}
+                        url={window.location.origin + '/events/' + (event.id ?? id)}
+                        image={coverUrl ?? undefined}
+                    />
                     <div className="page__container">
                         <div className={`event-detail__preview ${hasCover ? 'has-cover' : 'no-cover'}`}>
                             <div className="event-detail__preview-info">
