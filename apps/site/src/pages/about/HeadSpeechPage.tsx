@@ -2,10 +2,27 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import './AboutPage.css'
+import '../services/ServiceDetailPage.css'
+import { Helmet } from 'react-helmet-async'
 
 export default function HeadSpeechPage() {
     return (
         <div className="page-main page__container">
+            <Helmet>
+                <title>Обращение председателя - Российская ассоциация реставраторов</title>
+                <meta
+                    name="description"
+                    content="Обращение председателя Российской ассоциации реставраторов о целях, ценностях и развитии профессионального сообщества."
+                />
+                <meta property="og:title" content="Обращение председателя - Российская ассоциация реставраторов" />
+                <meta
+                    property="og:description"
+                    content="Текст обращения председателя Российской ассоциации реставраторов."
+                />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://rosrest.com/about/head-speech" />
+            </Helmet>
+
             <div className="page__header">
                 <Breadcrumbs
                     items={[
@@ -21,7 +38,29 @@ export default function HeadSpeechPage() {
                     <BackToSectionButton to="/about" label="К разделу Об Ассоциации" />
                     <h1 className="page-title">Обращение председателя</h1>
                 </div>
+
                 <ContentSection columns={1}>
+                    <div className="service-contacts" style={{ marginBottom: '50px' }}>
+                        <div className="service-contacts__grid" style={{ gridTemplateColumns: '1fr' }}>
+                            <a href="https://test.rosrest.com/portfolio/acting-chairman" className="service-contact-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+                                <div  className="service-contact-card__photo">
+                                    <img
+                                        src="/photo_5362041132193352721_y-e1766964863262-600x600.jpg"
+                                        alt="Татьяна Черняева"
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div className="service-contact-card__info">
+                                    <h3 className="service-contact-card__name">Татьяна Черняева</h3>
+                                    <p className="service-contact-card__position">Председатель Российской ассоциации реставраторов</p>                               
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </ContentSection>
+
+                <ContentSection columns={1}>
+                    
                     <p className="body-text">
                         <b>Уважаемые коллеги!</b>
                     </p>

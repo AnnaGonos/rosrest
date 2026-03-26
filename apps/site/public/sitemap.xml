@@ -7,6 +7,21 @@
     <loc>https://rosrest.com/about</loc>
   </url>
   <url>
+    <loc>https://rosrest.com/about/head-speech</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/charter</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/contracts</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/about/awards</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/about/partners</loc>
+  </url>
+  <url>
     <loc>https://rosrest.com/contacts</loc>
   </url>
   <url>
@@ -29,6 +44,12 @@
   </url>
   <url>
     <loc>https://rosrest.com/education</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/education/srednee-professionalnoe-obrazovanie</loc>
+  </url>
+  <url>
+    <loc>https://rosrest.com/education/vysshee-professionalnoe-obrazovanie</loc>
   </url>
   <url>
     <loc>https://rosrest.com/press-center</loc>

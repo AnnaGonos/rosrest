@@ -7,6 +7,19 @@
     width: 100%;
 }
 
+.about-empty {
+    border: 1px dashed var(--dark-bg-strong);
+    background: #f6faff;
+    padding: 20px 30px;
+    border-radius: 14px;
+    color: var(--dark-default);
+    text-align: center;
+}
+
+.about-status {
+    margin-bottom: 20px;
+}
+
 .team-grid {
     display: grid;
     gap: 20px;

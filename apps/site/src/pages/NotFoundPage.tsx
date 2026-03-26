@@ -1,12 +1,17 @@
 import './NotFoundPage.css'
 import { PrimaryButtonLink, BackButton } from '../components/LinkButtons'
+import { Helmet } from 'react-helmet-async'
 
 export default function NotFoundPage() {
     return (
         <div className="page-main">
+            <Helmet>
+                <title>404 — Страница не найдена</title>
+                <meta name="robots" content="noindex,follow" />
+            </Helmet>
             <div className="page__container privacy-page__container">
                 <div className="not-found-page__content">
-                    <img src="/public/search-loupe.jpg" className="not-found-page__illustration" alt="Страница не найдена" />
+                    <img src="/search-loupe.jpg" className="not-found-page__illustration" alt="Страница не найдена" />
 
                     <h2 className="not-found-page__title">Страница не найдена</h2>
                     <p className="not-found-page__description body-text article-text">

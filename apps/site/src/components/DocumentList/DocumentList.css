@@ -3,6 +3,16 @@
    font-family: var(--rar-font-raleway);
 }
 
+.documents-empty {
+    border: 1px dashed var(--dark-bg-strong);
+    background: #f6faff;
+    padding: 20px 30px;
+    border-radius: 14px;
+    color: var(--dark-default);
+    text-align: center;
+    margin-bottom: 16px;
+}
+
 .documents-list ul {
     list-style: none !important;
     padding: 0;

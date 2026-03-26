@@ -5,6 +5,8 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import EmployeeCard from '../../components/EmployeeCard/EmployeeCard'
 import './AboutPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import { Helmet } from 'react-helmet-async'
+import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -28,8 +30,10 @@ export default function ContactsPage() {
   useEffect(() => {
     let mounted = true
     setLoading(true)
+    setError(null)
     fetch(`${API_BASE}/employees`)
       .then((r) => {
+        if (r.status === 404) return []
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json()
       })
@@ -53,6 +57,21 @@ export default function ContactsPage() {
 
   return (
     <div className="page-main about-page contacts-page">
+      <Helmet>
+        <title>Контакты Ассоциации - Российская ассоциация реставраторов</title>
+        <meta
+          name="description"
+          content="Контакты Российской ассоциации реставраторов: адрес, телефон, почта и руководство Ассоциации."
+        />
+        <meta property="og:title" content="Контакты - Российская ассоциация реставраторов" />
+        <meta
+          property="og:description"
+          content="Актуальные контакты и руководство Российской ассоциации реставраторов."
+        />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://rosrest.com/contacts" />
+      </Helmet>
+
       <div className="page__header">
         <Breadcrumbs items={[{ label: 'Главная', to: '/' },
         { label: 'Об Ассоциации', to: '/about' }, { label: 'Аппарат Ассоциации и Контакты', isCurrent: true }]} />
@@ -95,10 +114,19 @@ export default function ContactsPage() {
         </ContentSection>
 
         <ContentSection columns={1}>
-          {loading && <div>Загрузка...</div>}
-          {error && <div className="body-text">Ошибка: {error}</div>}
+          <RequestState
+            loading={loading}
+            error={error}
+            loadingText="Загрузка контактов..."
+            variant="inline"
+            className="about-status"
+          />
 
-          {!loading && !error && (
+          {!loading && !error && sorted.length === 0 && (
+            <div className="about-empty body-text">Пока нет контактов</div>
+          )}
+
+          {!loading && !error && sorted.length > 0 && (
             <div className="team-grid columns-4">
               {sorted.map((e) => (
                 <EmployeeCard key={e.id} employee={e} resolveImage={resolveImage} type="square" />

@@ -5,6 +5,10 @@
     margin-top: 32px;
 }
 
+.rar-status {
+    margin-bottom: 20px;
+}
+
 .rar-section-card {
     display: flex;
     align-items: center;

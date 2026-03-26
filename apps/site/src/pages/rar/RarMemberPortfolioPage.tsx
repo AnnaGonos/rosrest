@@ -10,6 +10,8 @@ import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
 import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
+import { Helmet } from 'react-helmet-async'
 
 interface Block {
     id: string
@@ -46,6 +48,7 @@ export default function RarMemberPortfolioPage() {
     const [member, setMember] = useState<RarMember | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [notFound, setNotFound] = useState(false)
     const [isShareModalOpen, setIsShareModalOpen] = useState(false)
     const [commentsCount, setCommentsCount] = useState(0)
     const commentsRef = useRef<HTMLDivElement>(null)
@@ -66,14 +69,22 @@ export default function RarMemberPortfolioPage() {
     const fetchMember = async () => {
         setLoading(true)
         setError(null)
+        setNotFound(false)
         try {
             const response = await fetch(`${API_BASE}/rar-members`)
+            if (response.status === 404) {
+                setNotFound(true)
+                return
+            }
             if (!response.ok) throw new Error('Ошибка загрузки портфолио')
             const data: RarMember[] = await response.json()
             const found = data.find(m =>
                 m.page.slug.replace(/^portfolio\//, '') === slug && !m.page.isDraft
             )
-            if (!found) throw new Error('Портфолио не найдено')
+            if (!found) {
+                setNotFound(true)
+                return
+            }
             setMember(found)
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
@@ -82,13 +93,29 @@ export default function RarMemberPortfolioPage() {
         }
     }
 
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
     if (loading || error) {
         return <RequestState loading={loading} error={error} loadingText="Загрузка портфолио..." />
     }
     if (!member) return null
 
+    const pageUrl = `${window.location.origin}/${member.page.slug.replace(/^\//, '')}`
+    const metaTitle = `${member.page.title} — Портфолио — Российская ассоциация реставраторов`
+    const metaDescription = `Портфолио ${member.page.title}. Информация о члене РАР и выполненных проектах.`
+  
     return (
         <div className="page-main page-main--portfolio">
+            <Helmet>
+                <title>{metaTitle}</title>
+                <meta name="description" content={metaDescription} />
+                <meta property="og:title" content={metaTitle} />
+                <meta property="og:description" content={metaDescription} />
+                <meta property="og:type" content="article" />
+                <link rel="canonical" href={pageUrl} />
+            </Helmet>
             <div className="page__header">
                 <Breadcrumbs
                     items={[

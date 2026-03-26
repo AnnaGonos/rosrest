@@ -3,6 +3,7 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './RarMembersPage.css'
+import RequestState from '../../components/RequestState/RequestState'
 
 interface RarSection {
     id: string
@@ -60,8 +61,13 @@ export default function RarMembersPage() {
                 </div>
 
                 <ContentSection columns={1}>
-                    {loading && <div>Загрузка...</div>}
-                    {error && <div className="body-text">Ошибка: {error}</div>}
+                    <RequestState
+                        loading={loading}
+                        error={error}
+                        loadingText="Загрузка секций..."
+                        variant="inline"
+                        className="rar-status"
+                    />
                     {!loading && !error && (
                         <LinkCardList items={items} columns={4} variant="categories" />
                     )}

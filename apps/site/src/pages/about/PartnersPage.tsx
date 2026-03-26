@@ -5,6 +5,8 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import './AboutPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import { Helmet } from 'react-helmet-async'
+import RequestState from '../../components/RequestState/RequestState'
 
 type Partner = {
     id: string
@@ -23,8 +25,10 @@ export default function PartnersPage() {
     useEffect(() => {
         let mounted = true
         setLoading(true)
+        setError(null)
         fetch(`${API_BASE}/partners`)
             .then((r) => {
+                if (r.status === 404) return []
                 if (!r.ok) throw new Error(`HTTP ${r.status}`)
                 return r.json()
             })
@@ -44,6 +48,21 @@ export default function PartnersPage() {
 
     return (
         <div className="page-main">
+            <Helmet>
+                <title>Партнеры - Российская ассоциация реставраторов</title>
+                <meta
+                    name="description"
+                    content="Партнеры Российской ассоциации реставраторов: профильные организации и компании, сотрудничающие с Ассоциацией."
+                />
+                <meta property="og:title" content="Партнеры - Российская ассоциация реставраторов" />
+                <meta
+                    property="og:description"
+                    content="Список партнеров Российской ассоциации реставраторов."
+                />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://rosrest.com/about/partners" />
+            </Helmet>
+
             <div className="page__header">
                 <Breadcrumbs
                     items={[
@@ -60,9 +79,19 @@ export default function PartnersPage() {
                 </div>
 
                 <ContentSection columns={1}>
-                    {loading && <div>Загрузка...</div>}
-                    {error && <div className="body-text">Ошибка: {error}</div>}
-                    {!loading && !error && (
+                    <RequestState
+                        loading={loading}
+                        error={error}
+                        loadingText="Загрузка партнеров..."
+                        variant="inline"
+                        className="about-status"
+                    />
+
+                    {!loading && !error && items.length === 0 && (
+                        <div className="about-empty body-text">Пока нет партнеров</div>
+                    )}
+
+                    {!loading && !error && items.length > 0 && (
                         <LinkCardList
                             columns={4}
                             variant="featured"

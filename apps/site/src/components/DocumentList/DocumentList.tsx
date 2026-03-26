@@ -16,10 +16,18 @@ type Props = {
     loading: boolean
     error: string | null
     emptyMessage?: string
+    emptyClassName?: string
     variant?: 'list' | 'gallery'
 }
 
-export default function DocumentList({ items, loading, error, emptyMessage = 'Документы не найдены.', variant = 'list' }: Props) {
+export default function DocumentList({
+    items,
+    loading,
+    error,
+    emptyMessage = 'Документы не найдены.',
+    emptyClassName = 'body-text',
+    variant = 'list',
+}: Props) {
     const resolveFile = (raw?: string | null) => getFileUrl(raw) || ''
     const resolvePreview = (raw?: string | null) => getFileUrl(raw) || undefined
 
@@ -30,7 +38,7 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
     if (variant === 'list') {
         return (
             <div className="documents-list">
-                {items.length === 0 && <div className="body-text">{emptyMessage}</div>}
+                {items.length === 0 && <div className={emptyClassName}>{emptyMessage}</div>}
                 <ul>
                     {items.map((d) => {
                         const fileUrl = resolveFile(d.fileUrl);
@@ -53,7 +61,7 @@ export default function DocumentList({ items, loading, error, emptyMessage = 'Д
     } else {
         return (
             <div className="documents-list documents-grid">
-                {items.length === 0 && <div className="body-text">{emptyMessage}</div>}
+                {items.length === 0 && <div className={emptyClassName}>{emptyMessage}</div>}
                 <div className="documents-grid__items">
                     {items.map((d) => {
                         const preview = resolvePreview(d.previewUrl);

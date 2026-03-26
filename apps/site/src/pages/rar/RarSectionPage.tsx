@@ -5,6 +5,9 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './RarSectionPage.css'
+import RequestState from '../../components/RequestState/RequestState'
+import NotFoundPage from '../NotFoundPage'
+import { Helmet } from 'react-helmet-async'
 
 interface Page {
     id: string
@@ -34,6 +37,7 @@ export default function RarSectionPage() {
     const [members, setMembers] = useState<RarMember[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [notFound, setNotFound] = useState(false)
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
 
@@ -51,15 +55,27 @@ export default function RarSectionPage() {
     const fetchSectionAndMembers = async () => {
         setLoading(true)
         setError(null)
+        setNotFound(false)
         try {
             const sectionsResponse = await fetch(`${API_BASE}/rar-sections`)
+            if (sectionsResponse.status === 404) {
+                setNotFound(true)
+                return
+            }
             if (!sectionsResponse.ok) throw new Error('Ошибка загрузки секции')
             const sectionsData: RarSection[] = await sectionsResponse.json()
             const foundSection = sectionsData.find(s => s.slug === slug)
-            if (!foundSection) throw new Error('Секция не найдена')
+            if (!foundSection) {
+                setNotFound(true)
+                return
+            }
             setSection(foundSection)
 
             const membersResponse = await fetch(`${API_BASE}/rar-members`)
+            if (membersResponse.status === 404) {
+                setNotFound(true)
+                return
+            }
             if (!membersResponse.ok) throw new Error('Ошибка загрузки членов')
             const membersData: RarMember[] = await membersResponse.json()
             
@@ -76,9 +92,18 @@ export default function RarSectionPage() {
         }
     }
 
-    if (loading) return <div className="page-main"><div className="page__container">Загрузка...</div></div>
-    if (error) return <div className="page-main"><div className="page__container">Ошибка: {error}</div></div>
+    if (notFound) {
+        return <NotFoundPage />
+    }
+
+    if (loading || error) {
+        return <RequestState loading={loading} error={error} loadingText="Загрузка секции..." />
+    }
     if (!section) return null
+
+    const pageUrl = `${window.location.origin}/members/${section.slug}`
+    const metaTitle = `${section.title} — Члены РАР — Российская ассоциация реставраторов`
+    const metaDescription = `Список членов РАР в разделе «${section.title}». Ознакомьтесь с портфолио и информацией о членах.`
 
     const items = members.map(member => ({
         title: member.page.title,
@@ -89,6 +114,14 @@ export default function RarSectionPage() {
 
     return (
         <div className="page-main">
+            <Helmet>
+                <title>{metaTitle}</title>
+                <meta name="description" content={metaDescription} />
+                <meta property="og:title" content={metaTitle} />
+                <meta property="og:description" content={metaDescription} />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href={pageUrl} />
+            </Helmet>
             <div className="page__header">
                 <Breadcrumbs
                     items={[
@@ -106,12 +139,10 @@ export default function RarSectionPage() {
                 </div>
 
                 <ContentSection columns={1}>
-                    {loading && <div>Загрузка...</div>}
-                    {error && <div className="body-text">Ошибка: {error}</div>}
-                    {!loading && !error && items.length === 0 && (
+                    {items.length === 0 && (
                         <p className="body-text">В этой секции пока никого нет</p>
                     )}
-                    {!loading && !error && items.length > 0 && (
+                    {items.length > 0 && (
                         <LinkCardList items={items} columns={4} variant="categories" />
                     )}
                 </ContentSection>

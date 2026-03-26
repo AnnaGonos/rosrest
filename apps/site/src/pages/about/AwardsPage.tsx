@@ -4,6 +4,8 @@ import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import Gallery from '../../components/Gallery/Gallery'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import { Helmet } from 'react-helmet-async'
+import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -22,8 +24,10 @@ export default function AwardsPage() {
     useEffect(() => {
         let mounted = true
         setLoading(true)
+        setError(null)
         fetch(`${API_BASE}/awards`)
             .then((r) => {
+                if (r.status === 404) return []
                 if (!r.ok) throw new Error(`HTTP ${r.status}`)
                 return r.json()
             })
@@ -54,6 +58,21 @@ export default function AwardsPage() {
 
     return (
         <div className="page-main">
+            <Helmet>
+                <title>Награды и дипломы - Российская ассоциация реставраторов</title>
+                <meta
+                    name="description"
+                    content="Награды, дипломы и благодарности Российской ассоциации реставраторов и ее руководства."
+                />
+                <meta property="og:title" content="Награды и дипломы - Российская ассоциация реставраторов" />
+                <meta
+                    property="og:description"
+                    content="Информация о наградах и дипломах Российской ассоциации реставраторов."
+                />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://rosrest.com/about/awards" />
+            </Helmet>
+
             <div className="page__header">
                 <Breadcrumbs items={[
                     { label: 'Главная', to: '/' },
@@ -74,9 +93,19 @@ export default function AwardsPage() {
                 </ContentSection>
 
                 <ContentSection columns={1}>
-                    {loading && <div>Загрузка...</div>}
-                    {error && <div className="body-text">Ошибка: {error}</div>}
-                    {!loading && !error && (
+                    <RequestState
+                        loading={loading}
+                        error={error}
+                        loadingText="Загрузка наград и дипломов..."
+                        variant="inline"
+                        className="about-status"
+                    />
+
+                    {!loading && !error && images.length === 0 && (
+                        <div className="about-empty body-text">Пока нет наград и дипломов</div>
+                    )}
+
+                    {!loading && !error && images.length > 0 && (
                         <Gallery images={images} mode="grid" columns={5} thumbnailHeight={350} />
                     )}
                 </ContentSection>
