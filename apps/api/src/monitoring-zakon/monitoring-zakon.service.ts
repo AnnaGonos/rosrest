@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
@@ -98,7 +98,7 @@ export class MonitoringZakonService {
       where: { id },
       relations: ['page', 'page.blocks', 'page.blocks.children'],
     });
-    if (!item) throw new Error('Monitoring item not found');
+    if (!item) throw new NotFoundException('Monitoring item not found');
 
     const result = toPlainMonitoring(item);
 
@@ -108,19 +108,24 @@ export class MonitoringZakonService {
   }
 
   async findBySlug(slug: string): Promise<any> {
-    const normalized = slug.startsWith('monitoring-zakon/') ? slug : `monitoring-zakon/${slug}`;
+    const cleanSlug = (slug || '').trim().replace(/^\/+/, '').replace(/^monitoring-zakon\//, '');
+    const prefixedSlug = `monitoring-zakon/${cleanSlug}`;
 
-    const cacheKey = this.CACHE_SLUG_KEY(normalized);
+    const cacheKey = this.CACHE_SLUG_KEY(prefixedSlug);
     const cached = await this.cacheManager.get<any>(cacheKey);
     if (cached) {
       return cached;
     }
 
-    const item = await this.monitoringRepository.findOne({
-      where: { page: { slug: normalized } },
-      relations: ['page', 'page.blocks', 'page.blocks.children'],
-    });
-    if (!item) throw new Error('Monitoring item not found');
+    const item = await this.monitoringRepository
+      .createQueryBuilder('monitoring')
+      .leftJoinAndSelect('monitoring.page', 'page')
+      .leftJoinAndSelect('page.blocks', 'block')
+      .leftJoinAndSelect('block.children', 'children')
+      .where('page.slug = :cleanSlug OR page.slug = :prefixedSlug', { cleanSlug, prefixedSlug })
+      .getOne();
+
+    if (!item) throw new NotFoundException('Monitoring item not found');
 
     const result = toPlainMonitoring(item);
 

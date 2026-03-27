@@ -43,15 +43,22 @@ export class MonitoringZakonController {
   }
 
   @Get('slug/:slug')
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Получить элемент по id' })
-  @ApiParam({ name: 'id', description: 'ID элемента' })
+  @ApiOperation({ summary: 'Получить элемент по slug' })
+  @ApiParam({ name: 'slug', description: 'Slug элемента' })
   @ApiResponse({ status: 200, description: 'Элемент', type: MonitoringZakon })
   @ApiResponse({ status: 404, description: 'Item not found' })
-  findOne(@Param('id') id: string): Promise<MonitoringZakon> {
-    return this.monitoringService.findOne(id);
+  async findBySlug(@Param('slug') slug: string): Promise<any> {
+    return this.monitoringService.findBySlug(slug);
   }
+
+  // @Get(':id')
+  // @ApiOperation({ summary: 'Получить элемент по id' })
+  // @ApiParam({ name: 'id', description: 'ID элемента' })
+  // @ApiResponse({ status: 200, description: 'Элемент', type: MonitoringZakon })
+  // @ApiResponse({ status: 404, description: 'Item not found' })
+  // findOne(@Param('id') id: string): Promise<any> {
+  //   return this.monitoringService.findOne(id);
+  // }
 
   @Post()
   @UseGuards(JwtAuthGuard)
