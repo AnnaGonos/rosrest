@@ -1541,10 +1541,9 @@ small {
     gap: 20px;
   }
 
-  .image-block--im04.image-block--reverse .image-block__image {
-    grid-column: 1 / 3;
-  }
-
+  .image-block--im04 .image-block__image,
+  .image-block--im04 .image-block__description,
+  .image-block--im04.image-block--reverse .image-block__image,
   .image-block--im04.image-block--reverse .image-block__description {
     grid-column: 1 / 3;
   }
