@@ -293,15 +293,16 @@ export default function LibraryPage() {
                                                 key={item.id}
                                                 className="library-card library-card--clickable"
                                                 onClick={() => {
-                                                    if (item.type === 'article' && item.page?.slug) {
-                                                        const slug = item.page.slug.replace(/^library\//, '')
-                                                        navigate(`/articles/${slug}`)
-                                                        return
-                                                    }
+                                                        if (item.type === 'article' && item.page?.slug) {
+                                                            const slug = item.page.slug.replace(/^library\//, '')
+                                                            navigate(`/articles/${slug}`)
+                                                            return
+                                                        }
 
-                                                    // books open in modal
-                                                    navigate(`/library/${item.id}`)
-                                                }}
+                                                        const prevScroll = window.scrollY || 0
+                                                        navigate(`/library/${item.id}`)
+                                                        requestAnimationFrame(() => window.scrollTo(0, prevScroll))
+                                                    }}
                                                 role="button"
                                                 tabIndex={0}
                                             >
