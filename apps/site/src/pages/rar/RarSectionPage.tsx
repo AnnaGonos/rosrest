@@ -101,10 +101,6 @@ export default function RarSectionPage() {
     }
     if (!section) return null
 
-    const pageUrl = window.location.origin + '/members/' + (section.slug || section.id)
-    const metaTitle = `${section.title} - Члены Российской ассоциации реставраторов`
-    const metaDescription = `${section.title} — список членов Российской ассоциации реставраторов, их портфолио и контактная информация.`
-
     const items = members.map(member => ({
         title: member.page.title,
         href: `/portfolio/${member.page.slug.replace(/^portfolio\//, '')}`,
