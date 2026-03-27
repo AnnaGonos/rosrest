@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getFileUrl } from '../../utils/getFileUrl'
 import { useParams, useNavigate } from 'react-router-dom'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
@@ -63,6 +63,7 @@ export default function LibraryPage() {
     const navigate = useNavigate()
     const [columns, setColumns] = useState<number>(5)
     const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set())
+    const prevScrollRef = useRef<number | null>(null)
 
     const toggleCategoryExpanded = (categoryId: number) => {
         const newExpanded = new Set(expandedCategories)
@@ -293,16 +294,18 @@ export default function LibraryPage() {
                                                 key={item.id}
                                                 className="library-card library-card--clickable"
                                                 onClick={() => {
-                                                        if (item.type === 'article' && item.page?.slug) {
-                                                            const slug = item.page.slug.replace(/^library\//, '')
-                                                            navigate(`/articles/${slug}`)
-                                                            return
-                                                        }
+                                                    if (item.type === 'article' && item.page?.slug) {
+                                                        const slug = item.page.slug.replace(/^library\//, '')
+                                                        navigate(`/articles/${slug}`)
+                                                        return
+                                                    }
 
-                                                        const prevScroll = window.scrollY || 0
-                                                        navigate(`/library/${item.id}`)
-                                                        requestAnimationFrame(() => window.scrollTo(0, prevScroll))
-                                                    }}
+                                                    prevScrollRef.current = window.scrollY || 0
+                                                    navigate(`/library/${item.id}`)
+                                                    requestAnimationFrame(() => {
+                                                        if (prevScrollRef.current !== null) window.scrollTo(0, prevScrollRef.current)
+                                                    })
+                                                }}
                                                 role="button"
                                                 tabIndex={0}
                                             >
@@ -361,9 +364,14 @@ export default function LibraryPage() {
                 item={selectedItem}
                 isOpen={isModalOpen}
                 onClose={() => {
+                    const prev = prevScrollRef.current ?? (window.scrollY || 0)
                     navigate('/library')
                     setIsModalOpen(false)
                     setSelectedItem(null)
+                    requestAnimationFrame(() => {
+                        if (prev !== null) window.scrollTo(0, prev)
+                        prevScrollRef.current = null
+                    })
                 }}
             />
         </div>
