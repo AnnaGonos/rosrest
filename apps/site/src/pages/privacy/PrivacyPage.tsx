@@ -1,10 +1,17 @@
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import './PrivacyPage.css'
-import ContentSection from '../components/ContentSection/ContentSection'
+import ContentSection from '../../components/ContentSection/ContentSection'
+import Seo from '../../components/Seo/Seo'
 
 export default function PrivacyPage() {
     return (
         <div className="page-main">
+            <Seo
+                title={`Политика в отношении обработки персональных данных - Российская ассоциация реставраторов`}
+                description={`Политика обработки персональных данных Некоммерческого партнёрства «Российская Ассоциация Реставраторов».`}
+                canonical={window.location.origin + '/privacy'}
+                url={window.location.origin + '/privacy'}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

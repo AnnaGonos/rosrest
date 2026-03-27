@@ -1,11 +1,18 @@
-import NewsSubscribeForm from '../components/Subscribe/NewsSubscribeForm'
-import '../components/Subscribe/NewsSubscribeForm.css'
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
-import ContentSection from '../components/ContentSection/ContentSection'
+import NewsSubscribeForm from '../../components/Subscribe/NewsSubscribeForm'
+import '../../components/Subscribe/NewsSubscribeForm.css'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import ContentSection from '../../components/ContentSection/ContentSection'
+import Seo from '../../components/Seo/Seo'
 
 export default function SubscribePage() {
     return (
         <div className="page-main documents-page">
+            <Seo
+                title={`Подписка на рассылку Российской ассоциации реставраторов`}
+                description={`Подписаться на новости и обновления Российской ассоциации реставраторов.`}
+                canonical={window.location.origin + '/subscribe'}
+                url={window.location.origin + '/subscribe'}
+            />
             <div className="page__header">
                 <Breadcrumbs items={[
                     { label: 'Главная', to: '/' },

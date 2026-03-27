@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
-import ContentSection from '../components/ContentSection/ContentSection'
-import { BackToSectionButton } from '../components/LinkButtons'
-import { BlocksRenderer, type Block } from '../components/BlocksRenderer'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import ContentSection from '../../components/ContentSection/ContentSection'
+import { BackToSectionButton } from '../../components/LinkButtons'
+import { BlocksRenderer, type Block } from '../../components/BlocksRenderer'
 import './LibraryPage.css'
-import ScrollToTopButton from '../components/ScrollToTop/ScrollToTopButton'
-import ShareModal from '../components/ShareModal'
-import { getFileUrl } from '../utils/getFileUrl'
+import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
+import Seo from '../../components/Seo/Seo'
+import ShareModal from '../../components/ShareModal'
+import { getFileUrl } from '../../utils/getFileUrl'
 
 interface PageData {
     id: string
@@ -100,9 +101,18 @@ export default function LibraryArticlePage() {
     }
 
     if (!page) return null
+    const imageUrl = previewImage ? (getFileUrl(previewImage) ?? undefined) : undefined
 
     return (
         <div className="page-main">
+            <Seo
+                title={`${page.title} - Библиотека Российской ассоциации реставраторов`}
+                description={page.title + ' — статья в библиотеке Российской ассоциации реставраторов.'}
+                canonical={window.location.origin + '/articles/' + slug}
+                url={window.location.origin + '/articles/' + slug}
+                image={imageUrl}
+                imageAlt={page.title}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

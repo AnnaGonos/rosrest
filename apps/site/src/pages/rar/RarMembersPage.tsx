@@ -4,6 +4,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './RarMembersPage.css'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 interface RarSection {
     id: string
@@ -46,6 +47,12 @@ export default function RarMembersPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Члены Российской ассоциации реставраторов"
+                description="Каталог членов Российской ассоциации реставраторов по секциям и направлениям."
+                canonical="https://rosrest.com/members"
+                url="https://rosrest.com/members"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

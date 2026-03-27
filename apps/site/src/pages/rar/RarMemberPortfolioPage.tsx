@@ -10,8 +10,8 @@ import ScrollToTopButton from '../../components/ScrollToTop/ScrollToTopButton'
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
 import RequestState from '../../components/RequestState/RequestState'
-import NotFoundPage from '../NotFoundPage'
-import { Helmet } from 'react-helmet-async'
+import NotFoundPage from '../not-found/NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -102,20 +102,14 @@ export default function RarMemberPortfolioPage() {
     }
     if (!member) return null
 
-    const pageUrl = `${window.location.origin}/${member.page.slug.replace(/^\//, '')}`
-    const metaTitle = `${member.page.title} — Портфолио — Российская ассоциация реставраторов`
-    const metaDescription = `Портфолио ${member.page.title}. Информация о члене РАР и выполненных проектах.`
-  
     return (
         <div className="page-main page-main--portfolio">
-            <Helmet>
-                <title>{metaTitle}</title>
-                <meta name="description" content={metaDescription} />
-                <meta property="og:title" content={metaTitle} />
-                <meta property="og:description" content={metaDescription} />
-                <meta property="og:type" content="article" />
-                <link rel="canonical" href={pageUrl} />
-            </Helmet>
+            <Seo
+                title={`${member.page.title} - Портфолио Российской ассоциации реставраторов`}
+                description={member.page.title + ' — портфолио, информация о члене Российской ассоциации реставраторов.'}
+                canonical={window.location.origin + '/portfolio/' + (member.page.slug || member.page.id)}
+                url={window.location.origin + '/portfolio/' + (member.page.slug || member.page.id)}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

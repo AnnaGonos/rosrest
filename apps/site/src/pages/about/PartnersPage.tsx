@@ -49,7 +49,7 @@ export default function PartnersPage() {
     return (
         <div className="page-main">
             <Seo
-                title="Партнеры - Российская ассоциация реставраторов"
+                title="Партнеры Российской ассоциации реставраторов"
                 description="Партнеры Российской ассоциации реставраторов: профильные организации и компании, сотрудничающие с Ассоциацией."
                 canonical="https://rosrest.com/about/partners"
                 url="https://rosrest.com/about/partners"

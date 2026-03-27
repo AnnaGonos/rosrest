@@ -3,6 +3,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { useEffect, useState } from 'react'
 import LinkList from '../../components/LinkList/LinkList'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 interface Service {
     id: string
@@ -52,6 +53,12 @@ export default function ServicesPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Услуги Российской ассоциации реставраторов"
+                description="Услуги Российской ассоциации реставраторов: консультации, экспертиза и профессиональные сервисы для реставрационных организаций."
+                canonical="https://rosrest.com/services"
+                url="https://rosrest.com/services"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

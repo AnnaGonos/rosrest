@@ -6,8 +6,8 @@ import { BackToSectionButton } from '../../components/LinkButtons'
 import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './RarSectionPage.css'
 import RequestState from '../../components/RequestState/RequestState'
-import NotFoundPage from '../NotFoundPage'
-import { Helmet } from 'react-helmet-async'
+import NotFoundPage from '../not-found/NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 interface Page {
     id: string
@@ -101,9 +101,9 @@ export default function RarSectionPage() {
     }
     if (!section) return null
 
-    const pageUrl = `${window.location.origin}/members/${section.slug}`
-    const metaTitle = `${section.title} — Члены РАР — Российская ассоциация реставраторов`
-    const metaDescription = `Список членов РАР в разделе «${section.title}». Ознакомьтесь с портфолио и информацией о членах.`
+    const pageUrl = window.location.origin + '/members/' + (section.slug || section.id)
+    const metaTitle = `${section.title} - Члены Российской ассоциации реставраторов`
+    const metaDescription = `${section.title} — список членов Российской ассоциации реставраторов, их портфолио и контактная информация.`
 
     const items = members.map(member => ({
         title: member.page.title,
@@ -114,14 +114,12 @@ export default function RarSectionPage() {
 
     return (
         <div className="page-main">
-            <Helmet>
-                <title>{metaTitle}</title>
-                <meta name="description" content={metaDescription} />
-                <meta property="og:title" content={metaTitle} />
-                <meta property="og:description" content={metaDescription} />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href={pageUrl} />
-            </Helmet>
+            <Seo
+                title={`${section.title} - Члены Российской ассоциации реставраторов`}
+                description={section.title + ' — список членов Российской ассоциации реставраторов, их портфолио и контактная информация.'}
+                canonical={window.location.origin + '/members/' + (section.slug || section.id)}
+                url={window.location.origin + '/members/' + (section.slug || section.id)}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

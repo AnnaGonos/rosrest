@@ -56,7 +56,7 @@ export default function CharterPage() {
     return (
         <div className="page-main">
             <Seo
-                title="Устав и ежегодные отчеты - Российская ассоциация реставраторов"
+                title="Устав и ежегодные отчеты Российской ассоциации реставраторов"
                 description="Устав и ежегодные отчеты Российской ассоциации реставраторов: официальные документы и материалы."
                 canonical="https://rosrest.com/charter"
                 url="https://rosrest.com/charter"

@@ -10,7 +10,7 @@ export default function AboutPage() {
     return (
         <div className="page-main">
             <Seo
-                title="Об Ассоциации - Российская ассоциация реставраторов"
+                title="Об Ассоциации"
                 description="О Российской ассоциации реставраторов: цели, задачи, участники и деятельность профессионального объединения реставрационного сообщества России."
                 canonical="https://rosrest.com/about"
                 url="https://rosrest.com/about"

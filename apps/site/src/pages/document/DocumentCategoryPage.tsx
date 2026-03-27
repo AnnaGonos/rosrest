@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { BlocksRenderer } from '../components/BlocksRenderer'
+import { BlocksRenderer } from '../../components/BlocksRenderer'
 import { useParams } from 'react-router-dom'
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
-import ContentSection from '../components/ContentSection/ContentSection'
-import DocumentList from '../components/DocumentList/DocumentList'
-import CategoryAccordion from '../components/CategoryAccordion/CategoryAccordion'
-import { BackToSectionButton } from '../components/LinkButtons'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import ContentSection from '../../components/ContentSection/ContentSection'
+import DocumentList from '../../components/DocumentList/DocumentList'
+import CategoryAccordion from '../../components/CategoryAccordion/CategoryAccordion'
+import { BackToSectionButton } from '../../components/LinkButtons'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -101,6 +102,12 @@ export default function DocumentCategoryPage() {
 
   return (
     <div className="page-main documents-page">
+      <Seo
+        title={`${category.name} - Документы Российской ассоциации реставраторов`}
+        description={`Документы в категории «${category.name}» Российской ассоциации реставраторов.`}
+        canonical={`https://rosrest.com/documents/${category.slug || category.id}`}
+        url={`https://rosrest.com/documents/${category.slug || category.id}`}
+      />
       <div className="page__header">
         <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Документы', to: '/documents' }, { label: category.name, isCurrent: true }]} />
       </div>

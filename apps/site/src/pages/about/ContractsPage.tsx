@@ -44,7 +44,7 @@ export default function ContractsPage() {
   return (
     <div className="page-main about-page contracts-page">
       <Seo
-        title="Соглашения РАР - Российская ассоциация реставраторов"
+        title="Соглашения Российской ассоциации реставраторов"
         description="Соглашения Российской ассоциации реставраторов: документы и материалы о партнерском взаимодействии."
         canonical="https://rosrest.com/contracts"
         url="https://rosrest.com/contracts"

@@ -9,6 +9,7 @@ import './NewsPage.css'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import NewsSubscribeForm from '../../components/Subscribe/NewsSubscribeForm'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 const PAGE_SIZE = 21
 
@@ -105,6 +106,12 @@ export default function NewsPage() {
 
     return (
         <div className="page-main news-page">
+            <Seo
+                title="Новости Российской ассоциации реставраторов"
+                description="Актуальные новости Российской ассоциации реставраторов: события, объявления и публикации профессионального сообщества."
+                canonical="https://rosrest.com/news"
+                url="https://rosrest.com/news"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

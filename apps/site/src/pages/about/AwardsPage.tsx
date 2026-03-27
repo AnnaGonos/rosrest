@@ -59,7 +59,7 @@ export default function AwardsPage() {
     return (
         <div className="page-main">
             <Seo
-                title="Награды и дипломы - Российская ассоциация реставраторов"
+                title="Награды и дипломы Российской ассоциации реставраторов"
                 description="Награды, дипломы и благодарности Российской ассоциации реставраторов и ее руководства."
                 canonical="https://rosrest.com/about/awards"
                 url="https://rosrest.com/about/awards"

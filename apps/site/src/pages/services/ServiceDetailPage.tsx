@@ -7,7 +7,8 @@ import { getFileUrl } from '../../utils/getFileUrl';
 import { BlocksRenderer } from '../../components/BlocksRenderer'
 import './ServiceDetailPage.css'
 import RequestState from '../../components/RequestState/RequestState'
-import NotFoundPage from '../NotFoundPage'
+import NotFoundPage from '../not-found/NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -89,6 +90,12 @@ export default function ServiceDetailPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title={`${service.page.title} - Услуга Российской ассоциации реставраторов`}
+                description={service.page.title + ' — услуга, предлагаемая Российской ассоциацией реставраторов.'}
+                canonical={window.location.origin + '/services/' + (service.page.slug || service.page.id)}
+                url={window.location.origin + '/services/' + (service.page.slug || service.page.id)}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

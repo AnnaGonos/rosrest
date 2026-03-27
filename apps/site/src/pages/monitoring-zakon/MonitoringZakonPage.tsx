@@ -6,6 +6,7 @@ import Pagination from '../../components/Pagination/Pagination'
 import './MonitoringZakonPage.css'
 import MonitoringZakonCard from '../../components/MonitoringZakonCard/MonitoringZakonCard'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 interface MonitoringItem {
     id: string
@@ -72,6 +73,12 @@ export default function MonitoringZakonPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Мониторинг законодательства Российской ассоциации реставраторов"
+                description="Мониторинг законодательства Российской ассоциации реставраторов: аналитика, обзоры и изменения в нормативной базе."
+                canonical="https://rosrest.com/monitoring-zakon"
+                url="https://rosrest.com/monitoring-zakon"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

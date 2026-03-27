@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import LinkCardList from '../components/LinkCardList/LinkCardList'
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
-import ContentSection from '../components/ContentSection/ContentSection'
+import LinkCardList from '../../components/LinkCardList/LinkCardList'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import ContentSection from '../../components/ContentSection/ContentSection'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import Seo from '../../components/Seo/Seo'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -15,7 +16,7 @@ type Category = {
   children?: Category[]
 }
 
-export default function DocumentsIndexPage() {
+export default function DocumentsPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -49,6 +50,12 @@ export default function DocumentsIndexPage() {
 
   return (
     <div className="page-main documents-page">
+      <Seo
+        title="Документы Российской ассоциации реставраторов"
+        description="Официальные документы, регламенты и материалы Российской ассоциации реставраторов по направлениям деятельности и профессиональным темам."
+        canonical="https://rosrest.com/documents"
+        url="https://rosrest.com/documents"
+      />
       <div className="page__header">
         <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Документы', isCurrent: true }]} />
       </div>

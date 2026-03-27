@@ -5,7 +5,8 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import { BlocksRenderer } from '../../components/BlocksRenderer'
 import RequestState from '../../components/RequestState/RequestState'
-import NotFoundPage from '../NotFoundPage'
+import NotFoundPage from '../not-found/NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -78,6 +79,12 @@ export default function ProjectDetailsPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title={`${project.page.title} - Российская ассоциация реставраторов`}
+                description={project.page.title + ' — проект Российской ассоциации реставраторов.'}
+                canonical={window.location.origin + '/projects/' + (project.page.slug || project.page.id)}
+                url={window.location.origin + '/projects/' + (project.page.slug || project.page.id)}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

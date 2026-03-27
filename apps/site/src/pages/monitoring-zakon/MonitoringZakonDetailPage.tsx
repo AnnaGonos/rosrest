@@ -7,6 +7,7 @@ import MonitoringZakonCard from '../../components/MonitoringZakonCard/Monitoring
 import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -137,6 +138,12 @@ export default function MonitoringZakonDetailPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title={`${item.page.title} - Мониторинг законодательства Российской ассоциации реставраторов`}
+                description={`${item.page.title} — Мониторинг законодательства Российской ассоциации реставраторов.`}
+                canonical={window.location.origin + '/monitoring-zakon/' + (item.page.slug || item.page.id)}
+                url={window.location.origin + '/monitoring-zakon/' + (item.page.slug || item.page.id)}
+            />
             <div className="page__header">
                 <BackToSectionButton to="/monitoring-zakon?page=1" label="К разделу Мониторинг" title="Назад" />
             </div>

@@ -58,7 +58,7 @@ export default function ContactsPage() {
   return (
     <div className="page-main about-page contacts-page">
       <Seo
-        title="Контакты Ассоциации - Российская ассоциация реставраторов"
+        title="Контакты Российской ассоциации реставраторов"
         description="Контакты Российской ассоциации реставраторов: адрес, телефон, почта и руководство Ассоциации."
         canonical="https://rosrest.com/contacts"
         url="https://rosrest.com/contacts"

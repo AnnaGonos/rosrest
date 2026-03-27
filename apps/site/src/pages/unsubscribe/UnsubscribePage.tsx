@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import './UnsubscribePage.css'
+import Seo from '../../components/Seo/Seo'
 
 export default function UnsubscribePage() {
   const [searchParams] = useSearchParams()
@@ -42,6 +43,12 @@ export default function UnsubscribePage() {
 
   return (
     <div className="unsubscribe-page">
+      <Seo
+        title={`Отписка от рассылки Российской ассоциации реставраторов`}
+        description={`Страница подтверждения отписки от рассылки Российской ассоциации реставраторов.`}
+        canonical={window.location.origin + '/unsubscribe'}
+        url={window.location.origin + '/unsubscribe'}
+      />
       <div className="unsubscribe-page__container">
         <div className="unsubscribe-page__content">
           {isLoading ? (

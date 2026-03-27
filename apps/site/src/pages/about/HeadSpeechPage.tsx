@@ -9,7 +9,7 @@ export default function HeadSpeechPage() {
     return (
         <div className="page-main page__container">
             <Seo
-                title="Обращение председателя - Российская ассоциация реставраторов"
+                title="Обращение председателя Российской ассоциации реставраторов"
                 description="Обращение председателя Российской ассоциации реставраторов о целях, ценностях и развитии профессионального сообщества."
                 canonical="https://rosrest.com/about/head-speech"
                 url="https://rosrest.com/about/head-speech"

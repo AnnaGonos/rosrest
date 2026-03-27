@@ -6,6 +6,7 @@ import NewsCard, { NewsCardItem } from "../../components/News/NewsCard"
 import EventCard, { EventCardItem } from "../../components/Event/EventCard"
 import { OutlineButtonLink } from "../../components/LinkButtons"
 import './PressCenter.css'
+import Seo from '../../components/Seo/Seo'
 
 export default function PressCenterPage() {
     const [latestNews, setLatestNews] = useState<NewsCardItem[]>([])
@@ -60,6 +61,12 @@ export default function PressCenterPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Пресс-центр Российской ассоциации реставраторов"
+                description="Пресс-центр Российской ассоциации реставраторов: новости, мероприятия и материалы для СМИ."
+                canonical="https://rosrest.com/press-center"
+                url="https://rosrest.com/press-center"
+            />
             <div className="page__header">
                 <Breadcrumbs items={[{
                     label: 'Главная', to: '/'

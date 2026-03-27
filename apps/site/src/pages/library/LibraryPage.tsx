@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { getFileUrl } from '../utils/getFileUrl'
+import { getFileUrl } from '../../utils/getFileUrl'
 import { useParams, useNavigate } from 'react-router-dom'
-import Breadcrumbs from '../components/Breadcrumbs/Breadcrumbs'
-import ContentSection from '../components/ContentSection/ContentSection'
-import { BackToSectionButton, PrimaryButtonLink, OutlineButtonLink } from '../components/LinkButtons'
-import LibraryItemModal from '../components/LibraryItemModal'
-import { BlocksRenderer, type Block } from '../components/BlocksRenderer'
+import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
+import ContentSection from '../../components/ContentSection/ContentSection'
+import { BackToSectionButton, PrimaryButtonLink, OutlineButtonLink } from '../../components/LinkButtons'
+import LibraryItemModal from '../../components/LibraryItemModal'
+import { BlocksRenderer, type Block } from '../../components/BlocksRenderer'
 import './LibraryPage.css'
+import Seo from '../../components/Seo/Seo'
 
 interface LibraryItem {
     id: number
@@ -77,7 +78,7 @@ export default function LibraryPage() {
         fetchLibraryItems()
     }, [])
 
-   
+
     useEffect(() => {
         const slugParam = params.slug as string | undefined
 
@@ -131,34 +132,34 @@ export default function LibraryPage() {
         setIsModalOpen(false)
         setSelectedItem(null)
 
-        ; (async () => {
-            try {
-                setArticleLoading(true)
-                setArticleError(null)
-                const response = await fetch(`${API_BASE_URL}/library?type=article&limit=1000`)
-                if (!response.ok) throw new Error('Статья не найдена')
-                const items: LibraryItem[] = await response.json()
-                const targetSlug = `library/${slugParam}`
-                const item = items.find((entry) => entry.page?.slug === targetSlug)
+            ; (async () => {
+                try {
+                    setArticleLoading(true)
+                    setArticleError(null)
+                    const response = await fetch(`${API_BASE_URL}/library?type=article&limit=1000`)
+                    if (!response.ok) throw new Error('Статья не найдена')
+                    const items: LibraryItem[] = await response.json()
+                    const targetSlug = `library/${slugParam}`
+                    const item = items.find((entry) => entry.page?.slug === targetSlug)
 
-                if (!item?.page) {
-                    throw new Error('Статья не найдена')
+                    if (!item?.page) {
+                        throw new Error('Статья не найдена')
+                    }
+
+                    setArticlePage({
+                        id: item.page.id,
+                        slug: item.page.slug,
+                        title: item.page.title,
+                        publishedAt: item.page.publishedAt,
+                        isDraft: item.page.isDraft ?? false,
+                        blocks: (item as any).page.blocks || [],
+                    })
+                } catch (err) {
+                    setArticleError(err instanceof Error ? err.message : 'Неизвестная ошибка')
+                } finally {
+                    setArticleLoading(false)
                 }
-
-                setArticlePage({
-                    id: item.page.id,
-                    slug: item.page.slug,
-                    title: item.page.title,
-                    publishedAt: item.page.publishedAt,
-                    isDraft: item.page.isDraft ?? false,
-                    blocks: (item as any).page.blocks || [],
-                })
-            } catch (err) {
-                setArticleError(err instanceof Error ? err.message : 'Неизвестная ошибка')
-            } finally {
-                setArticleLoading(false)
-            }
-        })()
+            })()
     }, [params.slug, groupedItems])
 
     useEffect(() => {
@@ -228,6 +229,12 @@ export default function LibraryPage() {
 
     return (
         <div className="library-page">
+            <Seo
+                title={`Библиотека Российской ассоциации реставраторов`}
+                description={`Журналы, книги и научные работы по реставрации и сохранению культурного наследия.`}
+                canonical={window.location.origin + '/library'}
+                url={window.location.origin + '/library'}
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

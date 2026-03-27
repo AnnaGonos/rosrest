@@ -185,7 +185,7 @@ export default function EventsPage() {
     return (
         <div className="page-main">
             <Seo
-                title="Календарь мероприятий - Российская ассоциация реставраторов"
+                title="Календарь мероприятий Российской ассоциации реставраторов"
                 description="Афиша и календарь мероприятий Российской ассоциации реставраторов: конференции, семинары и профильные встречи."
                 canonical="https://rosrest.com/events"
                 url="https://rosrest.com/events"

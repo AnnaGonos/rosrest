@@ -6,11 +6,11 @@ import PartnersPage from './pages/about/PartnersPage'
 import AwardsPage from './pages/about/AwardsPage'
 import CharterPage from './pages/about/CharterPage'
 import ContractsPage from './pages/about/ContractsPage'
-import LibraryPage from './pages/LibraryPage'
-import DocumentsIndexPage from './pages/DocumentsIndexPage'
-import DocumentCategoryPage from './pages/DocumentCategoryPage'
+import LibraryPage from './pages/library/LibraryPage'
+import DocumentsPage from './pages/document/DocumentsPage'
+import DocumentCategoryPage from './pages/document/DocumentCategoryPage'
 import ContactsPage from './pages/about/ContactsPage'
-import NotFoundPage from './pages/NotFoundPage'
+import NotFoundPage from './pages/not-found/NotFoundPage'
 import Layout from './layouts/Layout'
 import EducationPage from './pages/education/EducationPage'
 import SecondaryEducationPage from './pages/education/SecondaryEducationPage'
@@ -24,16 +24,16 @@ import ServicesPage from './pages/services/ServicesPage'
 import ServiceDetailPage from './pages/services/ServiceDetailPage'
 import MonitoringZakonPage from './pages/monitoring-zakon/MonitoringZakonPage'
 import MonitoringZakonDetailPage from './pages/monitoring-zakon/MonitoringZakonDetailPage'
-import LibraryArticlePage from './pages/LibraryArticlePage'
+import LibraryArticlePage from './pages/library/LibraryArticlePage'
 import RarMembersPage from './pages/rar/RarMembersPage'
 import RarSectionPage from './pages/rar/RarSectionPage'
 import RarMemberPortfolioPage from './pages/rar/RarMemberPortfolioPage'
 import NewsPage from './pages/news/NewsPage'
 import NewsDetailPage from './pages/news/NewsDetailPage'
 import ForJournalistPage from './pages/for-journalist/ForJournalistPage'
-import SubscribePage from './pages/SubscribePage'
-import UnsubscribePage from './pages/UnsubscribePage'
-import PrivacyPage from './pages/PrivacyPage'
+import SubscribePage from './pages/subscribe/SubscribePage'
+import UnsubscribePage from './pages/unsubscribe/UnsubscribePage'
+import PrivacyPage from './pages/privacy/PrivacyPage'
 import ScrollToTop from './ScrollToTop'
 
 function App() {
@@ -49,40 +49,44 @@ function App() {
           <Route path="about/awards" element={<AwardsPage />} />
           <Route path="charter" element={<CharterPage />} />
           <Route path="contracts" element={<ContractsPage />} />
-          <Route path="documents" element={<DocumentsIndexPage />} />
-          <Route path="documents/:slug" element={<DocumentCategoryPage />} />
           <Route path="contacts" element={<ContactsPage />} />
-          <Route path="library" element={<LibraryPage />} />
-          <Route path="library/:slug" element={<LibraryPage />} />
-          <Route path="articles/:slug" element={<LibraryArticlePage />} />
-          <Route path="education" element={<EducationPage />} />
-          <Route path="education/srednee-professionalnoe-obrazovanie" element={<SecondaryEducationPage />} />
-          <Route path="education/vysshee-professionalnoe-obrazovanie" element={<HigherEducationPage />} />
-          <Route path="events" element={<EventsPage />} />
-          <Route path="events/:id" element={<EventDetailPage />} />
-          <Route path="press-center" element={<PressCenterPage />} />
-          <Route path="news" element={<NewsPage />} />
-          <Route path="news/:slug" element={<NewsDetailPage />} />
-
-          <Route path="projects" element={<ProjectPage />} />
-          <Route path="projects/:slug" element={<ProjectDetailsPage />} />
-
-          <Route path="services" element={<ServicesPage />} />
-          <Route path="services/:slug" element={<ServiceDetailPage />} />
-
-          <Route path="monitoring-zakon" element={<MonitoringZakonPage />} />
-          <Route path="monitoring-zakon/:slug" element={<MonitoringZakonDetailPage />} />
-
           <Route path="members" element={<RarMembersPage />} />
           <Route path="members/:slug" element={<RarSectionPage />} />
           <Route path="portfolio/:slug" element={<RarMemberPortfolioPage />} />
 
+          <Route path="documents" element={<DocumentsPage />} />
+          <Route path="documents/:slug" element={<DocumentCategoryPage />} />
+
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="services/:slug" element={<ServiceDetailPage />} />
+
+          <Route path="press-center" element={<PressCenterPage />} />
+          <Route path="news" element={<NewsPage />} />
+          <Route path="news/:slug" element={<NewsDetailPage />} />
           <Route path="for-journalist" element={<ForJournalistPage />} />
+
+          <Route path="projects" element={<ProjectPage />} />
+          <Route path="projects/:slug" element={<ProjectDetailsPage />} />
+
+          <Route path="events" element={<EventsPage />} />
+          <Route path="events/:id" element={<EventDetailPage />} />
+
+          <Route path="education" element={<EducationPage />} />
+          <Route path="education/srednee-professionalnoe-obrazovanie" element={<SecondaryEducationPage />} />
+          <Route path="education/vysshee-professionalnoe-obrazovanie" element={<HigherEducationPage />} />
+
+          <Route path="library" element={<LibraryPage />} />
+          <Route path="library/:slug" element={<LibraryPage />} />
+          <Route path="articles/:slug" element={<LibraryArticlePage />} />
+
+          <Route path="monitoring-zakon" element={<MonitoringZakonPage />} />
+          <Route path="monitoring-zakon/:slug" element={<MonitoringZakonDetailPage />} />
+
           <Route path="subscribe" element={<SubscribePage />} />
           <Route path="unsubscribe" element={<UnsubscribePage />} />
           <Route path="privacy" element={<PrivacyPage />} />
+
           <Route path="404" element={<NotFoundPage />} />
-          
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

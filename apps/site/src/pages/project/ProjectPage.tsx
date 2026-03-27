@@ -5,6 +5,7 @@ import LinkCardList from '../../components/LinkCardList/LinkCardList'
 import './ProjectPage.css'
 import { useEffect, useState } from 'react'
 import RequestState from '../../components/RequestState/RequestState'
+import Seo from '../../components/Seo/Seo'
 
 interface Project {
     id: string
@@ -57,6 +58,12 @@ export default function ProjectPage() {
 
     return (
         <div className="page-main">
+            <Seo
+                title="Проекты Российской ассоциации реставраторов"
+                description="Проекты Российской ассоциации реставраторов: образовательные, выставочные и исследовательские инициативы в сфере реставрации."
+                canonical="https://rosrest.com/projects"
+                url="https://rosrest.com/projects"
+            />
             <div className="page__header">
                 <Breadcrumbs
                     items={[

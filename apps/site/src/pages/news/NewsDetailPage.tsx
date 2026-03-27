@@ -10,7 +10,8 @@ import ShareModal from '../../components/ShareModal'
 import CommentsSection from '../../components/Comments/CommentsSection'
 import './NewsDetailPage.css'
 import RequestState from '../../components/RequestState/RequestState'
-import NotFoundPage from '../NotFoundPage'
+import NotFoundPage from '../not-found/NotFoundPage'
+import Seo from '../../components/Seo/Seo'
 
 interface Block {
     id: string
@@ -137,7 +138,7 @@ export default function NewsDetailPage() {
             try {
                 const rawSlug = slug || ''
                 let data = await fetchBySlug(rawSlug)
-                
+
                 if (!data && /^[a-f0-9\-]{36}$/.test(rawSlug)) {
                     data = await fetchById(rawSlug)
                 }
@@ -171,6 +172,13 @@ export default function NewsDetailPage() {
 
     return (
         <div className="page-main news-detail-page">
+            <Seo
+                title={`${item.page.title} - Новости Российской ассоциации реставраторов`}
+                description={item.page.title + ' — новость Российской ассоциации реставраторов.'}
+                canonical={window.location.origin + '/news/' + (item.page.slug || item.page.id)}
+                url={window.location.origin + '/news/' + (item.page.slug || item.page.id)}
+                image={getFileUrl(item.previewImage) || undefined}
+            />
             <div className="page__header">
                 <BackToSectionButton to="/news?page=1" label="К разделу Новости" title="Назад" />
             </div>
@@ -219,7 +227,7 @@ export default function NewsDetailPage() {
                         Поделиться
                     </button>
 
-                    <div 
+                    <div
                         className="news-detail__comments-counter"
                         onClick={scrollToComments}
                         title="Перейти к комментариям"
@@ -261,7 +269,7 @@ export default function NewsDetailPage() {
                 )}
 
                 <div ref={commentsRef}>
-                    <CommentsSection 
+                    <CommentsSection
                         commentableType="news"
                         commentableId={item.id}
                         onCommentCountChange={setCommentsCount}

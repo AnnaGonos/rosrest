@@ -6,10 +6,18 @@ import ServicesSection from '../components/Services/ServicesSection'
 import MonitoringZakonSection from '../components/MonitoringZakonSection/MonitoringZakonSection'
 import HomeNewsSection from '../components/News/HomeNewsSection'
 import '../components/News/HomeNewsSection.css'
+import Seo from '../components/Seo/Seo'
 
 export default function HomePage() {
   return (
     <div>
+      <Seo
+        title={`Российская ассоциация реставраторов — восстановление и сохранение наследия`}
+        description={`Новости, мероприятия и ресурсы Российской ассоциации реставраторов.`}
+        canonical={window.location.origin + '/'}
+        url={window.location.origin + '/'}
+      />
+      
       <Slider />
       <AboutSection />
       <HomeNewsSection />
