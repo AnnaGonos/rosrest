@@ -221,17 +221,11 @@ small {
 
     --margin-top-f: 180px;
 
-
-
     --grid-gutter-sm: 15px;
     --grid-gutter-md: 30px;
     --grid-gutter-lg: 40px;
     --grid-gutter-xl: 60px;
   }
-
-
-
-
 }
 
 .iconicon {
@@ -317,28 +311,23 @@ small {
 
 .monitoring-section {
   display: grid;
-  grid-template-columns: 3fr 4fr;
+  grid-template-columns: var(--grid-columns-sm);
   gap: 40px;
   padding: var(--padding-h);
-  /* margin-top: var(--margin-top-s); */
   padding-top: 40px;
   background-color: color-mix(in srgb, var(--primary-bg-strong) 30%, transparent);
   align-items: start;
 }
 
-/* Левая колонка - заголовок (фиксируется) */
 .monitoring-section__sidebar {
   position: sticky;
   top: 150px;
   align-self: start;
 }
-
-/* Правая колонка - контент */
 .monitoring-section__content {
   min-height: 500px;
 }
 
-/* Устаревший .monitoring-section__header - для обратной совместимости */
 .monitoring-section__header {
   display: flex;
   justify-content: space-between;
@@ -353,7 +342,6 @@ small {
   backdrop-filter: blur(4px);
 }
 
-/* Стили для фиксации (если понадобится JS решение) */
 .sticky {
   position: fixed;
   z-index: 101;
@@ -377,7 +365,6 @@ small {
   /* color: #b42318; */
 }
 
-/* Адаптивность для секции мониторинга */
 @media (max-width: 1199px) {}
 
 @media (max-width: 980px) {
@@ -396,9 +383,6 @@ small {
     min-height: fit-content;
   }
 }
-
-/* Local fonts (Inter and Raleway) — files are in ./Raleway/ and ./Inter/ under src */
-
 
 .visually-hidden {
   position: absolute !important;
@@ -421,7 +405,6 @@ small {
 
 
 @media (max-width: 900px) {
-
   .person,
   .person img {
     height: 350px !important;
@@ -433,7 +416,6 @@ small {
 
 
 @media (max-width: 700px) {
-
   .person,
   .person img {
     height: 200px !important;
@@ -464,11 +446,6 @@ small {
   }
 }
 
-/* 
-   Typography classes
- */
-
-/*  Заголовки страниц */
 .hero-title {
   font-family: var(--rar-body-font-family);
   font-weight: 500;
@@ -1180,8 +1157,27 @@ small {
 
 .image-block--im04 {
   display: grid;
-  grid-template: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 40px;
+  align-items: start;
+}
+
+.image-block--im04 .image-block__image {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.image-block--im04 .image-block__description {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.image-block--im04.image-block--reverse .image-block__image {
+  grid-column: 2;
+}
+
+.image-block--im04.image-block--reverse .image-block__description {
+  grid-column: 1;
 }
 
 .image-block__image {
@@ -1539,8 +1535,29 @@ small {
 
   .image-block--im04 {
     display: grid;
-    grid-template: repeat(1, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
+  }
+
+  .image-block--im04 .image-block__image,
+  .image-block--im04 .image-block__description {
+    grid-column: 1;
+  }
+
+  .image-block--im04 .image-block__image {
+    grid-row: 1;
+  }
+
+  .image-block--im04 .image-block__description {
+    grid-row: 2;
+  }
+
+  .image-block--im04.image-block--reverse .image-block__image {
+    grid-row: 2;
+  }
+
+  .image-block--im04.image-block--reverse .image-block__description {
+    grid-row: 1;
   }
 
   .image-block__image {
