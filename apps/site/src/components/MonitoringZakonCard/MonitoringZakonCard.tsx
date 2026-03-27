@@ -1,5 +1,6 @@
 import './MonitoringZakonCard.css'
 import { ArrowButton } from '../LinkButtons'
+import { Link } from 'react-router-dom'
 
 export interface MonitoringZakonCardItem {
     id: string
@@ -23,7 +24,7 @@ export default function MonitoringZakonCard({ item, type }: { item: MonitoringZa
     const safeSlug = encodeURIComponent(item.slug.replace(/^monitoring-zakon\//, ''))
 
     return (
-        <a className={`monitoring-card ${type === 'recommendation' ? 'monitoring-card--recommendation' : type === 'main-page' ? 'monitoring-card--main-page' : ''}`} href={`/monitoring-zakon/${safeSlug}`}>
+        <Link className={`monitoring-card ${type === 'recommendation' ? 'monitoring-card--recommendation' : type === 'main-page' ? 'monitoring-card--main-page' : ''}`} to={`/monitoring-zakon/${safeSlug}`}>
             <h3 className="monitoring-card__title" >{item.title}</h3>
             <div className="monitoring-card__meta">
                 <div className="monitoring-card__date">
@@ -34,6 +35,6 @@ export default function MonitoringZakonCard({ item, type }: { item: MonitoringZa
                     <ArrowButton asButton aria-label="Перейти" />
                 )}
             </div>
-        </a>
+        </Link>
     )
 }

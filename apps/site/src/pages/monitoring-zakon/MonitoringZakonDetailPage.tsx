@@ -111,13 +111,32 @@ export default function MonitoringZakonDetailPage() {
     }, [shouldLoadRecs])
 
     useEffect(() => {
+        const fetchBySlug = async (value: string) => {
+            const cleanSlug = value.replace(/^monitoring-zakon\//, '')
+            const encoded = encodeURIComponent(cleanSlug)
+            const response = await fetch(`${API_BASE}/monitoring-zakon/slug/${encoded}`)
+            if (!response.ok) return null
+            return response.json()
+        }
+
+        const fetchById = async (id: string) => {
+            const response = await fetch(`${API_BASE}/monitoring-zakon/${id}`)
+            if (!response.ok) return null
+            return response.json()
+        }
+
         const fetchItem = async () => {
             setLoading(true)
             setError(null)
             try {
-                const response = await fetch(`${API_BASE}/monitoring-zakon/slug/${encodeURIComponent(slug || '')}`)
-                if (!response.ok) throw new Error('Ошибка загрузки страницы')
-                const data = await response.json()
+                const rawSlug = slug || ''
+                let data = await fetchBySlug(rawSlug)
+
+                if (!data && /^[a-f0-9\-]{8,}$/.test(rawSlug)) {
+                    data = await fetchById(rawSlug)
+                }
+
+                if (!data) throw new Error('Страница мониторинга не найдена')
                 setItem(data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
