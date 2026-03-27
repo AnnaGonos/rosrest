@@ -115,7 +115,7 @@ export default function MonitoringZakonDetailPage() {
             setLoading(true)
             setError(null)
             try {
-                const response = await fetch(`${API_BASE}/monitoring-zakon/slug/${slug}`)
+                const response = await fetch(`${API_BASE}/monitoring-zakon/slug/${encodeURIComponent(slug || '')}`)
                 if (!response.ok) throw new Error('Ошибка загрузки страницы')
                 const data = await response.json()
                 setItem(data)

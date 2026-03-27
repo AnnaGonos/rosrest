@@ -20,8 +20,10 @@ const formatDate = (value?: string) => {
 }
 
 export default function MonitoringZakonCard({ item, type }: { item: MonitoringZakonCardItem, type?: 'recommendation' | 'main-page' | 'default' }) {
+    const safeSlug = encodeURIComponent(item.slug.replace(/^monitoring-zakon\//, ''))
+
     return (
-        <a className={`monitoring-card ${type === 'recommendation' ? 'monitoring-card--recommendation' : type === 'main-page' ? 'monitoring-card--main-page' : ''}`} href={`/monitoring-zakon/${item.slug.replace(/^monitoring-zakon\//, '')}`}>
+        <a className={`monitoring-card ${type === 'recommendation' ? 'monitoring-card--recommendation' : type === 'main-page' ? 'monitoring-card--main-page' : ''}`} href={`/monitoring-zakon/${safeSlug}`}>
             <h3 className="monitoring-card__title" >{item.title}</h3>
             <div className="monitoring-card__meta">
                 <div className="monitoring-card__date">
