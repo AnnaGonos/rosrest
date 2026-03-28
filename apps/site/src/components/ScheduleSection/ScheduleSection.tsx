@@ -11,11 +11,13 @@ export type ScheduleBlock = {
         name: string
         position?: string
         photoUrl?: string
+        comment?: string
     }>
     speakers?: Array<{
         name: string
         position?: string
         photoUrl?: string
+        comment?: string
     }>
 }
 
@@ -103,6 +105,9 @@ export default function ScheduleSection({ schedule, title = 'Расписани�
                                                             {moderator.position && (
                                                                 <div className="schedule-block__person-position">{moderator.position}</div>
                                                             )}
+                                                            {moderator.comment && (
+                                                                <div className="schedule-block__person-comment body-text--light">{moderator.comment}</div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -129,6 +134,9 @@ export default function ScheduleSection({ schedule, title = 'Расписани�
                                                             <div className="schedule-block__person-name">{speaker.name}</div>
                                                             {speaker.position && (
                                                                 <div className="schedule-block__person-position">{speaker.position}</div>
+                                                            )}
+                                                            {speaker.comment && (
+                                                                <div className="schedule-block__person-comment body-text--light">{speaker.comment}</div>
                                                             )}
                                                         </div>
                                                     </div>

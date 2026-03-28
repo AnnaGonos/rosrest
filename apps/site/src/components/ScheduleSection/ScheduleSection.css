@@ -160,6 +160,12 @@
     margin-top: 2px;
 }
 
+.schedule-block__person-comment {
+    color: var(--dark-medium);
+    font-size: 14px;
+    margin-top: 6px;
+}
+
 /* Адаптив */
 @media (max-width: 768px) {
     .schedule-section {

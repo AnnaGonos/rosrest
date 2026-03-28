@@ -81,11 +81,13 @@ export class CreateEventDto {
         name: string;
         position?: string;
         photoUrl?: string;
+        comment?: string;
       }>;
       speakers?: Array<{
         name: string;
         position?: string;
         photoUrl?: string;
+        comment?: string;
       }>;
     }>;
   }>;

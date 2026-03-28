@@ -49,11 +49,13 @@ export class Event {
         name: string;
         position?: string;
         photoUrl?: string;
+        comment?: string;
       }>;
       speakers?: Array<{
         name: string;
         position?: string;
         photoUrl?: string;
+        comment?: string;
       }>;
     }>;
   }>;

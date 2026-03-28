@@ -37,6 +37,7 @@ type Moderator = {
   photoUrl?: string;
   originalPhotoUrl?: string;
   imageUploadValue?: ImageUploadValue;
+  comment?: string;
 }
 
 type Speaker = {
@@ -45,6 +46,7 @@ type Speaker = {
   photoUrl?: string;
   originalPhotoUrl?: string;
   imageUploadValue?: ImageUploadValue;
+  comment?: string;
 }
 
 type ScheduleBlock = {
@@ -330,6 +332,7 @@ export default function EventsPage() {
               name: mod.name,
               position: mod.position,
               photoUrl,
+              comment: mod.comment || undefined,
             };
           }) || [],
           speakers: block.speakers?.map((sp, speakerIndex) => {
@@ -346,6 +349,7 @@ export default function EventsPage() {
               name: sp.name,
               position: sp.position,
               photoUrl,
+              comment: sp.comment || undefined,
             };
           }) || [],
         })),
@@ -490,6 +494,7 @@ export default function EventsPage() {
               name: mod.name,
               position: mod.position,
               photoUrl,
+              comment: mod.comment || undefined,
             };
           }) || [],
           speakers: block.speakers?.map((sp, speakerIndex) => {
@@ -511,6 +516,7 @@ export default function EventsPage() {
               name: sp.name,
               position: sp.position,
               photoUrl,
+              comment: sp.comment || undefined,
             };
           }) || []
         }))
@@ -1149,6 +1155,32 @@ export default function EventsPage() {
                               }}
                             />
                           </Form.Group>
+                          <Form.Group controlId={`createModeratorComment${dayIndex}-${blockIndex}-${moderatorIndex}`} className="mb-2">
+                            <Form.Label>Комментарий / Описание выступления</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="О чем будет выступать модератор (необязательно)"
+                              value={moderator.comment || ''}
+                              onChange={e => {
+                                const newSchedule = [...schedule];
+                                newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].comment = e.currentTarget.value;
+                                setSchedule(newSchedule);
+                              }}
+                            />
+                          </Form.Group>
+                          <Form.Group controlId={`createModeratorComment${dayIndex}-${blockIndex}-${moderatorIndex}`} className="mb-2">
+                            <Form.Label>Комментарий / Описание выступления</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="О чем будет выступать модератор (необязательно)"
+                              value={moderator.comment || ''}
+                              onChange={e => {
+                                const newSchedule = [...schedule];
+                                newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].comment = e.currentTarget.value;
+                                setSchedule(newSchedule);
+                              }}
+                            />
+                          </Form.Group>
                           <ImageUploadInput
                             id={`createModeratorPhotoFile${dayIndex}-${blockIndex}-${moderatorIndex}`}
                             label={<>Фото модератора</>}
@@ -1171,6 +1203,19 @@ export default function EventsPage() {
                               setSchedule(newSchedule);
                             }}
                           />
+                          <Form.Group controlId={`editModeratorComment${dayIndex}-${blockIndex}-${moderatorIndex}`} className="mb-2">
+                            <Form.Label>Комментарий / Описание выступления</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="О чем будет выступать модератор (необязательно)"
+                              value={moderator.comment || ''}
+                              onChange={e => {
+                                const newSchedule = [...editSchedule];
+                                newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].comment = e.currentTarget.value;
+                                setEditSchedule(newSchedule);
+                              }}
+                            />
+                          </Form.Group>
                         </div>
                       ))}
                       <Button
@@ -1236,6 +1281,21 @@ export default function EventsPage() {
                                 if (newSchedule[dayIndex].blocks[blockIndex].speakers) {
                                   newSchedule[dayIndex].blocks[blockIndex].speakers![speakerIndex].position = e.currentTarget.value;
                                   setSchedule(newSchedule);
+                                }
+                              }}
+                            />
+                          </Form.Group>
+                          <Form.Group controlId={`createSpeakerComment${dayIndex}-${blockIndex}-${speakerIndex}`} className="mb-2">
+                            <Form.Label>Комментарий / Описание выступления</Form.Label>
+                            <Form.Control
+                              type="text"
+                              placeholder="О чем будет выступать спикер (необязательно)"
+                              value={speaker.comment || ''}
+                              onChange={(e) => {
+                                const newSchedule = [...schedule]
+                                if (newSchedule[dayIndex].blocks[blockIndex].speakers) {
+                                  newSchedule[dayIndex].blocks[blockIndex].speakers![speakerIndex].comment = e.currentTarget.value
+                                  setSchedule(newSchedule)
                                 }
                               }}
                             />
