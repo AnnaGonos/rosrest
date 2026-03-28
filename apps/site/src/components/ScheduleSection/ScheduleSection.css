@@ -42,7 +42,6 @@
     gap: 60px;
 }
 
-/* День расписания */
 .schedule-day {
     border-left: 3px solid var(--primary-strong);
     padding-left: 30px;
@@ -61,7 +60,6 @@
     gap: 30px;
 }
 
-/* Блок расписания */
 .schedule-block {
     display: flex;
     gap: 30px;
@@ -162,11 +160,10 @@
 
 .schedule-block__person-comment {
     color: var(--dark-medium);
-    font-size: 14px;
-    margin-top: 6px;
+    font-size: 15px;
+    margin-top: 10px;
 }
 
-/* Адаптив */
 @media (max-width: 768px) {
     .schedule-section {
         margin-top: 60px;
@@ -196,5 +193,9 @@
     .schedule-block__person-photo {
         width: 80px;
         height: 80px;
+    }
+
+    .schedule-block__person-comment {
+        font-size: 14px;
     }
 }
