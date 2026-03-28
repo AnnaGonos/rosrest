@@ -1021,18 +1021,47 @@ export default function EventsPage() {
                             style={{ width: '100px' }}
                           />
                         </Form.Group>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          className="ms-auto align-self-start"
-                          onClick={() => {
-                            const newSchedule = [...schedule];
-                            newSchedule[dayIndex].blocks.splice(blockIndex, 1);
-                            setSchedule(newSchedule);
-                          }}
-                        >
-                          <i className="bi bi-trash" /> Удалить блок
-                        </Button>
+                        <div className="ms-auto d-flex gap-2 align-self-start">
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            title="Переместить вверх"
+                            onClick={() => {
+                              if (blockIndex <= 0) return
+                              const newSchedule = [...schedule]
+                              const blocks = newSchedule[dayIndex].blocks
+                              ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
+                              setSchedule(newSchedule)
+                            }}
+                          >
+                            <i className="bi bi-caret-up-fill" />
+                          </Button>
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            title="Переместить вниз"
+                            onClick={() => {
+                              const newSchedule = [...schedule]
+                              const blocks = newSchedule[dayIndex].blocks
+                              if (blockIndex >= blocks.length - 1) return
+                              ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
+                              setSchedule(newSchedule)
+                            }}
+                          >
+                            <i className="bi bi-caret-down-fill" />
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => {
+                              const newSchedule = [...schedule];
+                              newSchedule[dayIndex].blocks.splice(blockIndex, 1);
+                              setSchedule(newSchedule);
+                            }}
+                          >
+                            <i className="bi bi-trash" />
+                          </Button>
+                        </div>
                       </div>
 
                       <Form.Group controlId={`createScheduleBlockTitle${dayIndex}-${blockIndex}`} className="mb-2">
@@ -1578,6 +1607,47 @@ export default function EventsPage() {
                             style={{ width: '100px' }}
                           />
                         </Form.Group>
+                        <div className="ms-auto d-flex gap-2 align-self-start">
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            title="Переместить вверх"
+                            onClick={() => {
+                              if (blockIndex <= 0) return
+                              const newSchedule = [...editSchedule]
+                              const blocks = newSchedule[dayIndex].blocks
+                              ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
+                              setEditSchedule(newSchedule)
+                            }}
+                          >
+                            <i className="bi bi-caret-up-fill" />
+                          </Button>
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            title="Переместить вниз"
+                            onClick={() => {
+                              const newSchedule = [...editSchedule]
+                              const blocks = newSchedule[dayIndex].blocks
+                              if (blockIndex >= blocks.length - 1) return
+                              ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
+                              setEditSchedule(newSchedule)
+                            }}
+                          >
+                            <i className="bi bi-caret-down-fill" />
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => {
+                              const newSchedule = [...editSchedule]
+                              newSchedule[dayIndex].blocks.splice(blockIndex, 1)
+                              setEditSchedule(newSchedule)
+                            }}
+                          >
+                            <i className="bi bi-trash" />
+                          </Button>
+                        </div>
                       </div>
                       <Form.Group controlId={`editScheduleBlockTitle${dayIndex}-${blockIndex}`} className="mb-2">
                         <Form.Label>Заголовок блока</Form.Label>
