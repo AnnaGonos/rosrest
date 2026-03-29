@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-const API_BASE = process.env.VITE_API_URL || process.env.API_BASE || 'http://localhost:3002'
+const API_BASE = 'https://api.rosrest.com/api'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const publicPath = path.resolve(__dirname, '..', 'public')
 const outFile = path.join(publicPath, 'sitemap.xml')
