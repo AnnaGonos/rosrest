@@ -53,6 +53,7 @@ async function build() {
 
     const staticPaths = [
         '/',
+        '/documents',
         '/about',
         '/about/head-speech',
         '/charter',
@@ -214,25 +215,9 @@ async function build() {
                     xml += formatUrl(`${origin}/documents/${slugOrId}`, lm)
                 }
 
-                try {
-                    if (typeof node.id !== 'undefined') {
-                        const docs = await fetchJson(`/documents?type=documents&categoryId=${node.id}&isPublished=true`)
-                        const docsArr = Array.isArray(docs) ? docs : (docs?.items || [])
-                        for (const d of docsArr) {
-                            if (!d) continue
-                            const fileUrl = d.fileUrl || d.pdfUrl || d.contentUrl || null
-                            if (!fileUrl) continue
-                            
-                            let loc = fileUrl
-                            if (!/^https?:\/\//.test(loc)) {
-                                loc = origin.replace(/\/$/, '') + '/' + String(loc).replace(/^\//, '')
-                            }
-                            const lmDoc = toIsoDate(d.updatedAt || d.publishedAt || d.createdAt)
-                            xml += formatUrl(loc, lmDoc)
-                        }
-                    }
-                } catch (err) {
-                }
+                // Intentionally do NOT include direct file URLs or external redirects for documents.
+                // SEO should list only the category pages (already added above). Individual documents
+                // may point to file downloads or external sites and should not be part of sitemap.
 
                 if (node.children && node.children.length) {
                     await walk(node.children)
