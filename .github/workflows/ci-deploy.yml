@@ -45,6 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: site-dist
+          path: dist
 
       - name: Start ssh-agent and add key
         # pinned to a supported release; if this version errors, try v0.7.0 or remove the tag
