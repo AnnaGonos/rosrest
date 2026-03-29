@@ -4,6 +4,9 @@ on:
   push:
     branches: [ main ]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,7 +47,8 @@ jobs:
           name: site-dist
 
       - name: Start ssh-agent and add key
-        uses: webfactory/ssh-agent@v0.8.1
+        # pinned to a supported release; if this version errors, try v0.7.0 or remove the tag
+        uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
