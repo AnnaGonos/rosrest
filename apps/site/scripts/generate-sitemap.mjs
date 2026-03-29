@@ -215,10 +215,6 @@ async function build() {
                     xml += formatUrl(`${origin}/documents/${slugOrId}`, lm)
                 }
 
-                // Intentionally do NOT include direct file URLs or external redirects for documents.
-                // SEO should list only the category pages (already added above). Individual documents
-                // may point to file downloads or external sites and should not be part of sitemap.
-
                 if (node.children && node.children.length) {
                     await walk(node.children)
                 }
