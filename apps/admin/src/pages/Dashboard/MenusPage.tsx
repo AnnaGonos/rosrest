@@ -43,9 +43,9 @@ export default function MenusPage() {
         fetchMenu()
     }, [])
 
-    const fetchMenu = async () => {
+    const fetchMenu = async (showLoader = true) => {
         try {
-            setLoading(true)
+            if (showLoader) setLoading(true)
             setError(null)
             const res = await fetch(API.API_ENDPOINTS.MENUS.list)
             if (!res.ok) throw new Error(`Ошибка загрузки меню: ${res.status}`)
@@ -72,7 +72,7 @@ export default function MenusPage() {
             console.error('Fetch menu error:', e)
             setError(e.message || 'Ошибка загрузки меню')
         } finally {
-            setLoading(false)
+            if (showLoader) setLoading(false)
         }
     }
 
@@ -183,7 +183,7 @@ export default function MenusPage() {
             await fetch(API.API_ENDPOINTS.MENUS.saveMain, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             setMessage('Обновлено')
             setTimeout(() => setMessage(null), 2000)
-            fetchMenu()
+            await fetchMenu(false)
         } catch (e) {
             console.error(e)
             setMessage('Ошибка сохранения')

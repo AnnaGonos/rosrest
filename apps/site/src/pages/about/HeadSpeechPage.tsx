@@ -34,7 +34,7 @@ export default function HeadSpeechPage() {
                 <ContentSection columns={1}>
                     <div className="service-contacts" style={{ marginBottom: '50px' }}>
                         <div className="service-contacts__grid" style={{ gridTemplateColumns: '1fr' }}>
-                            <a href="https://test.rosrest.com/portfolio/acting-chairman" className="service-contact-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+                            <a href="/portfolio/acting-chairman" className="service-contact-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
                                 <div  className="service-contact-card__photo">
                                     <img
                                         src="/photo_5362041132193352721_y-e1766964863262-600x600.jpg"
