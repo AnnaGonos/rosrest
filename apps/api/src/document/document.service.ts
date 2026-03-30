@@ -97,7 +97,7 @@ export class DocumentService {
 		let fileUrl: string | undefined = undefined;
 		if (file) {
 			if (!fileUploadService) throw new BadRequestException('FileUploadService is required');
-			
+
 			let type: 'pdf' | 'doc' = 'pdf';
 			if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
 				type = 'doc';
@@ -186,64 +186,61 @@ export class DocumentService {
 		return document
 	}
 
-	       async updateDocument(
-		       id: string,
-		       dto: UpdateDocumentDto,
-		       file?: UploadFile,
-		       fileUploadService?: FileUploadService,
-		       previewFile?: UploadFile,
-	       ) {
-		       const document = await this.documentRepo.findOne({ where: { id } })
-		       if (!document) {
-			       throw new NotFoundException(`Document with ID ${id} not found`)
-		       }
+	async updateDocument(
+		id: string,
+		dto: UpdateDocumentDto,
+		file?: UploadFile,
+		fileUploadService?: FileUploadService,
+		previewFile?: UploadFile,
+	) {
+		const document = await this.documentRepo.findOne({ where: { id } })
+		if (!document) {
+			throw new NotFoundException(`Document with ID ${id} not found`)
+		}
 
-		       if (dto.type) {
-			       document.type = dto.type
-		       }
+		if (dto.type) {
+			document.type = dto.type
+		}
 
-		       if (dto.subcategoryId !== undefined) {
-			       if (dto.subcategoryId === null) {
-				       document.category = null
-				       document.subcategory = null
-			       } else {
-				       const subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] })
-				       if (!subcategory) {
-					       throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`)
-				       }
-				       if (!subcategory.parent) {
-					       throw new BadRequestException('У подкатегории должен быть родитель (категория)')
-				       }
-				       document.subcategory = subcategory
-				       document.category = subcategory.parent
-			       }
-		       }
+		if (dto.subcategoryId !== undefined) {
+			if (dto.subcategoryId === null) {
+				document.category = null
+				document.subcategory = null
+			} else {
+				const subcategory = await this.categoryTreeRepo.findOne({ where: { id: dto.subcategoryId }, relations: ['parent'] })
+				if (!subcategory) {
+					throw new BadRequestException(`Subcategory with ID ${dto.subcategoryId} not found`)
+				}
+				if (!subcategory.parent) {
+					throw new BadRequestException('У подкатегории должен быть родитель (категория)')
+				}
+				document.subcategory = subcategory
+				document.category = subcategory.parent
+			}
+		}
 
-		       if (dto.title !== undefined) {
-			       document.title = dto.title
-		       }
+		if (dto.title !== undefined) {
+			document.title = dto.title
+		}
 
-		       if (dto.isPublished !== undefined) {
-			       document.isPublished = dto.isPublished
-		       }
+		if (dto.isPublished !== undefined) {
+			document.isPublished = dto.isPublished
+		}
 
-		       // Handle file upload or fileUrl update
-		       if (file && fileUploadService) {
-			       let type: 'pdf' | 'doc' = 'pdf';
-			       if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-				       type = 'doc';
-			       }
-			       document.fileUrl = await fileUploadService.upload(file, type, 'documents/files');
-		       } else if (dto.fileUrl !== undefined) {
-			       document.fileUrl = dto.fileUrl;
-		       }
+		if (file && fileUploadService) {
+			let type: 'pdf' | 'doc' = 'pdf';
+			if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+				type = 'doc';
+			}
+			document.fileUrl = await fileUploadService.upload(file, type, 'documents/files');
+		} else if (dto.fileUrl !== undefined) {
+			document.fileUrl = dto.fileUrl;
+		}
 
-		       // Optionally handle previewFile/previewUrl update if needed
-
-		       const saved = await this.documentRepo.save(document)
-		       await this.invalidateCache()
-		       return saved
-	       }
+		const saved = await this.documentRepo.save(document)
+		await this.invalidateCache()
+		return saved
+	}
 
 	async removeDocument(id: string) {
 		const document = await this.documentRepo.findOne({ where: { id } })
@@ -264,7 +261,6 @@ export class DocumentService {
 			}
 		}
 
-		// Only enforce unique name among siblings (same parent).
 		let existingByName: DocumentCategory | null = null
 		if (parent) {
 			existingByName = await this.categoryTreeRepo.findOne({ where: { name: dto.name, parent: { id: parent.id } }, relations: ['parent'] })
@@ -272,7 +268,7 @@ export class DocumentService {
 			existingByName = await this.categoryTreeRepo.findOne({ where: { name: dto.name, parent: IsNull() } })
 		}
 		if (existingByName) {
-			throw new BadRequestException(`Category with name "${dto.name}" already exists in the same parent`) 
+			throw new BadRequestException(`Category with name "${dto.name}" already exists in the same parent`)
 		}
 
 		let slug: string | null = null
@@ -291,11 +287,11 @@ export class DocumentService {
 
 		const category = this.categoryTreeRepo.create({ name: dto.name, parent, slug, icon })
 		if (dto.blocks) {
-            (category as any).blocks = dto.blocks;
-        }
-        const saved = await this.categoryTreeRepo.save(category)
-        await this.invalidateCache()
-        return saved
+			(category as any).blocks = dto.blocks;
+		}
+		const saved = await this.categoryTreeRepo.save(category)
+		await this.invalidateCache()
+		return saved
 	}
 
 	async getCategoryTree() {
@@ -350,9 +346,9 @@ export class DocumentService {
 			category.name = newName
 		}
 
-        if (dto.blocks !== undefined) {
-            (category as any).blocks = dto.blocks;
-        }
+		if (dto.blocks !== undefined) {
+			(category as any).blocks = dto.blocks;
+		}
 
 		if (dto.slug !== undefined) {
 			if (!dto.slug.trim()) {
