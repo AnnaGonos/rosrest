@@ -20,6 +20,7 @@ export default function MenusPage() {
     const [nodes, setNodes] = useState<MenuNode[]>([])
     const [message, setMessage] = useState<string | null>(null)
     const [orderChanged, setOrderChanged] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
     const idCounter = useRef(1)
     const lastSnapshotRef = useRef<MenuNode[] | null>(null)
 
@@ -91,6 +92,7 @@ export default function MenusPage() {
     }
 
     const createFromAddModal = async () => {
+        if (isSaving) return
         const temp = `t${idCounter.current++}`
         const node: MenuNode = { tempId: temp, title: addTitle || '', url: addUrl ?? null, ord: 0, children: [] }
         let updated: MenuNode[]
@@ -178,7 +180,9 @@ export default function MenusPage() {
     }
 
     const saveItems = async (nodesToSave?: MenuNode[]) => {
+        if (isSaving) return
         try {
+            setIsSaving(true)
             const payload = flatten(nodesToSave ?? lastSnapshotRef.current ?? nodes)
             await fetch(API.API_ENDPOINTS.MENUS.saveMain, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             setMessage('Обновлено')
@@ -187,6 +191,8 @@ export default function MenusPage() {
         } catch (e) {
             console.error(e)
             setMessage('Ошибка сохранения')
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -356,7 +362,7 @@ export default function MenusPage() {
                         )}
                         {orderChanged && (
                             <div className="mt-3">
-                                <Button variant="warning" onClick={() => { saveItems(nodes); setOrderChanged(false); }}>Обновить порядок</Button>
+                                <Button variant="warning" onClick={() => { saveItems(nodes); setOrderChanged(false); }} disabled={isSaving}>Обновить порядок</Button>
                             </div>
                         )}
                         {showAddModal && (
@@ -376,7 +382,7 @@ export default function MenusPage() {
                                 </Modal.Body>
                                 <Modal.Footer>
                                     <Button variant="secondary" onClick={cancelAddModal}>Отмена</Button>
-                                    <Button variant="primary" onClick={createFromAddModal} disabled={!addTitle}>Создать</Button>
+                                    <Button variant="primary" onClick={createFromAddModal} disabled={!addTitle || isSaving}>Создать</Button>
                                 </Modal.Footer>
                             </Modal>
                         )}
@@ -417,7 +423,7 @@ export default function MenusPage() {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={closeEdit}>Отмена</Button>
-                        <Button variant="primary" onClick={handleModalSave} disabled={!editingNode?.title}>Сохранить</Button>
+                        <Button variant="primary" onClick={handleModalSave} disabled={!editingNode?.title || isSaving}>Сохранить</Button>
                     </Modal.Footer>
                 </Modal>
             </Container>

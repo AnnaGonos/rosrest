@@ -41,34 +41,37 @@ export class MenuService {
   }
 
   async replaceMenu(menuName: string, items: any[]) {
-    await this.menuRepo.clear();
+    await this.menuRepo.manager.transaction(async (manager) => {
+      const txRepo = manager.getRepository(MenuItem);
+      await txRepo.clear();
 
-    const tempMap = new Map<string, any>();
-    const created: any[] = [];
-    for (const it of items) {
-      const entity = this.menuRepo.create({
-        title: it.title ?? it.label ?? '',
-        url: it.url ?? null,
-        ord: typeof it.ord === 'number' ? it.ord : 0,
-        parentId: null,
-      });
-      const saved = await this.menuRepo.save(entity);
-      created.push(saved);
-      if (it.tempId) tempMap.set(it.tempId, saved);
-      else tempMap.set(saved.id, saved);
-    }
+      const tempMap = new Map<string, any>();
+      const created: any[] = [];
+      for (const it of items) {
+        const entity = txRepo.create({
+          title: it.title ?? it.label ?? '',
+          url: it.url ?? null,
+          ord: typeof it.ord === 'number' ? it.ord : 0,
+          parentId: null,
+        });
+        const saved = await txRepo.save(entity);
+        created.push(saved);
+        if (it.tempId) tempMap.set(it.tempId, saved);
+        else tempMap.set(saved.id, saved);
+      }
 
-    for (let i = 0; i < items.length; i++) {
-      const it = items[i];
-      const saved = tempMap.get(it.tempId || created[i].id);
-      if (it.parentTempId) {
-        const parent = tempMap.get(it.parentTempId);
-        if (parent) {
-          saved.parentId = parent.id;
-          await this.menuRepo.save(saved);
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        const saved = tempMap.get(it.tempId || created[i].id);
+        if (it.parentTempId) {
+          const parent = tempMap.get(it.parentTempId);
+          if (parent) {
+            saved.parentId = parent.id;
+            await txRepo.save(saved);
+          }
         }
       }
-    }
+    });
 
     await this.cacheManager.del(`menu:header`);
     return this.getMenu('header');
