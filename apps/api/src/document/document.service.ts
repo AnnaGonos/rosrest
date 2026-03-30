@@ -50,12 +50,42 @@ export class DocumentService {
 	}
 
 	private async invalidateCache() {
-		for (const key of this.documentCacheKeys) {
-			await this.cacheManager.del(key)
+		try {
+			const store: any = (this.cacheManager as any).store
+			if (store && typeof store.getClient === 'function') {
+				const client = store.getClient()
+				if (typeof client.keys === 'function') {
+					const keys: string[] = await client.keys(`${this.DOCUMENT_CACHE_PREFIX}*`)
+					if (keys && keys.length) {
+						await Promise.all(keys.map((k: string) => this.cacheManager.del(k)))
+					}
+				} else if (typeof client.scan === 'function') {
+					let cursor = '0'
+					const foundKeys: string[] = []
+					do {
+						const res = await client.scan(cursor, 'MATCH', `${this.DOCUMENT_CACHE_PREFIX}*`, 'COUNT', 100)
+						cursor = res[0]
+						const batch: string[] = res[1] || []
+						foundKeys.push(...batch)
+					} while (cursor !== '0')
+					if (foundKeys.length) {
+						await Promise.all(foundKeys.map((k: string) => this.cacheManager.del(k)))
+					}
+				}
+			} else {
+				for (const key of this.documentCacheKeys) {
+					await this.cacheManager.del(key)
+				}
+			}
+			this.documentCacheKeys.clear()
+			await this.cacheManager.del(this.CATEGORY_TREE_CACHE_KEY)
+		} catch (e) {
+			for (const key of this.documentCacheKeys) {
+				try { await this.cacheManager.del(key) } catch (_) { }
+			}
+			this.documentCacheKeys.clear()
+			try { await this.cacheManager.del(this.CATEGORY_TREE_CACHE_KEY) } catch (_) { }
 		}
-		this.documentCacheKeys.clear()
-
-		await this.cacheManager.del(this.CATEGORY_TREE_CACHE_KEY)
 	}
 
 	async create(
@@ -67,7 +97,7 @@ export class DocumentService {
 		let fileUrl: string | undefined = undefined;
 		if (file) {
 			if (!fileUploadService) throw new BadRequestException('FileUploadService is required');
-			// Определяем тип файла по mime
+			
 			let type: 'pdf' | 'doc' = 'pdf';
 			if (file.mimetype === 'application/msword' || file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
 				type = 'doc';
