@@ -229,19 +229,33 @@ export default function HomeSliderPage() {
     <DashboardLayout title="Главная страница">
       <Container className="mt-3">
         <div className="d-flex flex-column gap-4">
-          <div className="mb-4">
-            <h1>Слайдер на главной странице</h1>
-            <p className="text-muted mb-1">При добавлении изображений они будут отображаться в слайдере в порядке убывания даты загрузки (сначала новые, затем старые).</p>
-            <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.cfu5omcem4no"
+          <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <h1>Слайдер на главной странице</h1>
+              <p className="text-muted mb-1">При добавлении изображений они будут отображаться в слайдере в порядке убывания даты загрузки (сначала новые, затем старые).</p>
+              <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.cfu5omcem4no"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline-dark d-flex align-items-center"
+                style={{ width: 'fit-content', margin: '20px 0' }}
+              >
+                <i className="bi bi-info-lg me-2"></i>
+                Советы по публикации
+              </a>
+              <small className="text-primary">Загружено изображений: {slides.length}</small>
+            </div>
+
+            <a
+              href="https://rosrest.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline-dark  d-flex align-items-center"
-              style={{ width: 'fit-content', margin: '20px 0' }}
+              className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+              style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+              title="Открыть слайдер на сайте"
+              aria-label="Открыть слайдер на сайте"
             >
-              <i className="bi bi-info-lg me-2"></i>
-              Советы по публикации
+              <i className="bi bi-box-arrow-up-right"></i>
             </a>
-            <small className="text-primary">Загружено изображений: {slides.length}</small>
           </div>
 
           {slides.length > 0 && (
