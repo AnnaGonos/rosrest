@@ -194,15 +194,27 @@ export class NewsletterService {
     });
 
     const subscribers = await this.subscriptionService.getActiveSubscriptions();
-    const recipientEmails = subscribers.map(s => s.email);
-
-    const html = this.mailTemplateService.generateDigestEmail(newsItems);
     const text = this.mailTemplateService.generateDigestText(newsItems);
     const subject = `Рассылка новостей — ${new Date().toLocaleDateString('ru-RU')}`;
 
-    const result = await this.emailService.sendBulkEmail(recipientEmails, subject, html, text);
+    let sent = 0;
+    let failed = 0;
+    const results: { email: string; success: boolean; error?: string | null }[] = [];
 
-    // mark queue items as sent regardless of per-recipient result; caller can inspect result
+    for (const subscriber of subscribers) {
+      const html = this.mailTemplateService.generateDigestEmail(newsItems, subscriber.email);
+      const sendResult = await this.emailService.sendBulkEmail(
+        [subscriber.email],
+        subject,
+        html,
+        text,
+      );
+
+      sent += sendResult.sent;
+      failed += sendResult.failed;
+      results.push(...sendResult.results);
+    }
+
     const sentAt = new Date();
     for (const it of items) {
       it.isSent = true;
@@ -215,6 +227,6 @@ export class NewsletterService {
       }
     }
 
-    return { sent: result.sent, failed: result.failed, details: result.results };
+    return { sent, failed, details: results };
   }
 }

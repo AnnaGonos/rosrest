@@ -97,7 +97,7 @@ export class MailTemplateService {
 
 
   generateWelcomeEmail(email: string, name?: string): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
 
     const useSimple = process.env.USE_SIMPLE_EMAIL === 'true';
     const templateName = useSimple ? 'welcome-simple' : 'welcome';
@@ -111,7 +111,7 @@ export class MailTemplateService {
   }
 
   generateWelcomeEmailText(email: string, name?: string): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
     return `
 Добро пожаловать${name ? ', ' + name : ''}!
 
@@ -131,7 +131,7 @@ ${siteUrl}
 
 Если у вас есть вопросы, свяжитесь с нами на сайте.
 
-Чтобы отписаться от рассылки, перейдите по ссылке: ${siteUrl}/unsubscribe?email=${email}
+Чтобы отписаться от рассылки, перейдите по ссылке: ${siteUrl}/unsubscribe?email=${encodeURIComponent(email)}
 
 ---
 Это письмо было отправлено автоматически. 
@@ -180,7 +180,7 @@ ${siteUrl}
     previewImage?: string;
     tags?: Array<{ id?: number; name?: string; title?: string; label?: string }>;
   }): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
     
     // Determine URL path: prefer slug, fallback to id
     let pathForUrl: string;
@@ -250,7 +250,7 @@ ${siteUrl}
     subscriberEmail?: string,
   ): string {
     const apiUrl = process.env.API_URL || 'http://localhost:3002';
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
 
     let unsubscribeUrl: string;
     if (subscriberEmail) {
@@ -289,7 +289,7 @@ ${siteUrl}
       id: string | number;
     }>,
   ): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.ru';
+    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
 
     const newsSection = newsItems
       .map((item) => {
