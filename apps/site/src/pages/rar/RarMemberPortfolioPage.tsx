@@ -43,6 +43,42 @@ interface RarMember {
     sections: RarSection[]
 }
 
+function collectStringsDeep(value: unknown, bucket: string[] = []): string[] {
+    if (value == null) return bucket
+    if (typeof value === 'string') {
+        const cleaned = value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+        if (cleaned) bucket.push(cleaned)
+        return bucket
+    }
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectStringsDeep(item, bucket))
+        return bucket
+    }
+    if (typeof value === 'object') {
+        Object.values(value as Record<string, unknown>).forEach((item) => collectStringsDeep(item, bucket))
+    }
+    return bucket
+}
+
+function collectBlockTexts(blocks: Block[] = []): string[] {
+    const result: string[] = []
+    const walk = (items: Block[]) => {
+        items.forEach((block) => {
+            collectStringsDeep(block.content, result)
+            if (block.children?.length) walk(block.children)
+        })
+    }
+    walk(blocks)
+    return result
+}
+
+function buildSeoDescription(page: Page): string {
+    const fallback = `${page.title} - портфолио члена Российской ассоциации реставраторов: профиль, направления деятельности и реализованные работы.`
+    const text = collectBlockTexts(page.blocks).join(' ').replace(/\s+/g, ' ').trim()
+    if (!text) return fallback
+    return text.length > 190 ? `${text.slice(0, 187).trim()}...` : text
+}
+
 export default function RarMemberPortfolioPage() {
     const { slug } = useParams<{ slug: string }>()
     const [member, setMember] = useState<RarMember | null>(null)
@@ -102,13 +138,17 @@ export default function RarMemberPortfolioPage() {
     }
     if (!member) return null
 
+    const portfolioSlug = member.page.slug.replace(/^portfolio\//, '')
+    const portfolioUrl = `${window.location.origin}/portfolio/${portfolioSlug}`
+    const seoDescription = buildSeoDescription(member.page)
+
     return (
         <div className="page-main page-main--portfolio">
             <Seo
                 title={`${member.page.title} - Портфолио Российской ассоциации реставраторов`}
-                description={member.page.title + ' — портфолио, информация о члене Российской ассоциации реставраторов.'}
-                canonical={window.location.origin + '/portfolio/' + (member.page.slug || member.page.id)}
-                url={window.location.origin + '/portfolio/' + (member.page.slug || member.page.id)}
+                description={seoDescription}
+                canonical={portfolioUrl}
+                url={portfolioUrl}
             />
             <div className="page__header">
                 <Breadcrumbs

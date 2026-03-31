@@ -15,6 +15,59 @@ async function fetchJson(path) {
     return res.json()
 }
 
+function collectStringsDeep(value, bucket = []) {
+    if (value == null) return bucket
+    if (typeof value === 'string') {
+        const normalized = value
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+        if (normalized) bucket.push(normalized)
+        return bucket
+    }
+    if (Array.isArray(value)) {
+        for (const item of value) collectStringsDeep(item, bucket)
+        return bucket
+    }
+    if (typeof value === 'object') {
+        for (const key of Object.keys(value)) {
+            collectStringsDeep(value[key], bucket)
+        }
+    }
+    return bucket
+}
+
+function getFlattenBlocks(blocks, output = []) {
+    if (!Array.isArray(blocks)) return output
+    for (const block of blocks) {
+        if (!block) continue
+        output.push(block)
+        if (Array.isArray(block.children) && block.children.length > 0) {
+            getFlattenBlocks(block.children, output)
+        }
+    }
+    return output
+}
+
+function hasUsefulPortfolioContent(member) {
+    const page = member?.page
+    if (!page) return false
+    if (page.isDraft) return false
+
+    const titleText = (page.title || '').trim()
+    const blocks = getFlattenBlocks(page.blocks)
+    const textParts = collectStringsDeep(blocks.map((b) => b?.content || {}))
+    const text = [titleText, ...textParts].join(' ').replace(/\s+/g, ' ').trim()
+    const textLength = text.length
+
+    const nonEmptyBlocks = blocks.filter((block) => {
+        const contentText = collectStringsDeep(block?.content || {}).join(' ').trim()
+        return contentText.length >= 40
+    }).length
+
+    return textLength >= 220 && nonEmptyBlocks >= 2
+}
+
 function formatUrl(loc, lastmod) {
     let xml = '  <url>\n'
     xml += `    <loc>${loc}</loc>\n`
@@ -93,20 +146,28 @@ async function build() {
         console.warn('Failed to fetch sections for sitemap:', e.message)
     }
 
-    try {
-        const members = await fetchJson('/rar-members')
-        if (Array.isArray(members)) {
-            for (const m of members) {
-                if (!m || !m.page || !m.page.slug) continue
-                if (m.page.isDraft) continue
-                const slug = m.page.slug.replace(/^portfolio\//, '')
-                const lm = toIsoDate(m.page.updatedAt || m.page.publishedAt || m.page.createdAt || m.updatedAt)
-                xml += formatUrl(`${origin}/portfolio/${slug}`, lm)
-            }
-        }
-    } catch (e) {
-        console.warn('Failed to fetch members for sitemap:', e.message)
-    }
+    // try {
+    //     const members = await fetchJson('/rar-members?isDraft=false')
+    //     if (Array.isArray(members)) {
+    //         let excludedByQuality = 0
+    //         for (const m of members) {
+    //             if (!m || !m.page || !m.page.slug) continue
+    //             if (m.page.isDraft) continue
+    //             if (!hasUsefulPortfolioContent(m)) {
+    //                 excludedByQuality += 1
+    //                 continue
+    //             }
+    //             const slug = m.page.slug.replace(/^portfolio\//, '')
+    //             const lm = toIsoDate(m.page.updatedAt || m.page.publishedAt || m.page.createdAt || m.updatedAt)
+    //             xml += formatUrl(`${origin}/portfolio/${slug}`, lm)
+    //         }
+    //         if (excludedByQuality > 0) {
+    //             console.log(`Excluded ${excludedByQuality} low-value portfolio pages from sitemap`)
+    //         }
+    //     }
+    // } catch (e) {
+    //     console.warn('Failed to fetch members for sitemap:', e.message)
+    // }
 
     try {
         const books = await fetchJson('/library?type=book&limit=1000')

@@ -41,6 +41,30 @@ interface Service {
     contacts: ServiceContact[]
 }
 
+function collectStringsDeep(value: unknown, bucket: string[] = []): string[] {
+    if (value == null) return bucket
+    if (typeof value === 'string') {
+        const cleaned = value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+        if (cleaned) bucket.push(cleaned)
+        return bucket
+    }
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectStringsDeep(item, bucket))
+        return bucket
+    }
+    if (typeof value === 'object') {
+        Object.values(value as Record<string, unknown>).forEach((item) => collectStringsDeep(item, bucket))
+    }
+    return bucket
+}
+
+function buildSeoDescription(page: Service['page']): string {
+    const fallback = `${page.title} - услуга Российской ассоциации реставраторов: содержание услуги, формат взаимодействия и контакты.`
+    const text = collectStringsDeep(page.blocks.map((block) => block.content)).join(' ').replace(/\s+/g, ' ').trim()
+    if (!text) return fallback
+    return text.length > 190 ? `${text.slice(0, 187).trim()}...` : text
+}
+
 export default function ServiceDetailPage() {
     const { slug } = useParams<{ slug: string }>()
     const [service, setService] = useState<Service | null>(null)
@@ -88,13 +112,17 @@ export default function ServiceDetailPage() {
     }
     if (!service) return null
 
+    const serviceSlug = service.page.slug.replace(/^services\//, '')
+    const serviceUrl = `${window.location.origin}/services/${serviceSlug}`
+    const seoDescription = buildSeoDescription(service.page)
+
     return (
         <div className="page-main">
             <Seo
                 title={`${service.page.title} - Услуга Российской ассоциации реставраторов`}
-                description={service.page.title + ' — услуга, предлагаемая Российской ассоциацией реставраторов.'}
-                canonical={window.location.origin + '/services/' + (service.page.slug || service.page.id)}
-                url={window.location.origin + '/services/' + (service.page.slug || service.page.id)}
+                description={seoDescription}
+                canonical={serviceUrl}
+                url={serviceUrl}
             />
             <div className="page__header">
                 <Breadcrumbs

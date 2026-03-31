@@ -41,6 +41,30 @@ interface NewsItem {
     tags: NewsTag[]
 }
 
+function collectStringsDeep(value: unknown, bucket: string[] = []): string[] {
+    if (value == null) return bucket
+    if (typeof value === 'string') {
+        const cleaned = value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+        if (cleaned) bucket.push(cleaned)
+        return bucket
+    }
+    if (Array.isArray(value)) {
+        value.forEach((item) => collectStringsDeep(item, bucket))
+        return bucket
+    }
+    if (typeof value === 'object') {
+        Object.values(value as Record<string, unknown>).forEach((item) => collectStringsDeep(item, bucket))
+    }
+    return bucket
+}
+
+function buildSeoDescription(item: NewsItem): string {
+    const fallback = `${item.page.title} - новость Российской ассоциации реставраторов с ключевыми фактами, датами и подробностями события.`
+    const text = collectStringsDeep(item.page.blocks.map((block) => block.content)).join(' ').replace(/\s+/g, ' ').trim()
+    if (!text) return fallback
+    return text.length > 190 ? `${text.slice(0, 187).trim()}...` : text
+}
+
 const MONTH_NAMES = [
     'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
@@ -170,13 +194,17 @@ export default function NewsDetailPage() {
     }
     if (!item) return null
 
+    const newsSlug = item.page.slug.replace(/^news\//, '')
+    const newsUrl = `${window.location.origin}/news/${newsSlug}`
+    const seoDescription = buildSeoDescription(item)
+
     return (
         <div className="page-main news-detail-page">
             <Seo
                 title={`${item.page.title} - Новости Российской ассоциации реставраторов`}
-                description={item.page.title + ' — новость Российской ассоциации реставраторов.'}
-                canonical={window.location.origin + '/news/' + (item.page.slug || item.page.id)}
-                url={window.location.origin + '/news/' + (item.page.slug || item.page.id)}
+                description={seoDescription}
+                canonical={newsUrl}
+                url={newsUrl}
                 image={getFileUrl(item.previewImage) || undefined}
             />
             <div className="page__header">
