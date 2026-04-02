@@ -194,7 +194,6 @@ export class NewsletterService {
     });
 
     const subscribers = await this.subscriptionService.getActiveSubscriptions();
-    const text = this.mailTemplateService.generateDigestText(newsItems);
     const subject = `Рассылка новостей — ${new Date().toLocaleDateString('ru-RU')}`;
 
     let sent = 0;
@@ -203,6 +202,7 @@ export class NewsletterService {
 
     for (const subscriber of subscribers) {
       const html = this.mailTemplateService.generateDigestEmail(newsItems, subscriber.email);
+      const text = this.mailTemplateService.generateDigestText(newsItems, subscriber.email);
       const sendResult = await this.emailService.sendBulkEmail(
         [subscriber.email],
         subject,

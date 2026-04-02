@@ -245,17 +245,31 @@ export default function CharterPage() {
     <DashboardLayout title="Устав и ежегодные отчеты">
       <Container className="py-4">
         <div className="d-flex flex-column gap-4">
-          <div className="mb-4">
-            <h1>Устав и ежегодные отчеты</h1>
-            <p className="text-muted">Для того, чтобы опубликовать документ, достаточно указать название документа и загрузить основной PDF файл.</p>
-            <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.9tz90gcw1hmy"
+          <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <h1>Устав и ежегодные отчеты</h1>
+              <p className="text-muted">Для того, чтобы опубликовать документ, достаточно указать название документа и загрузить основной PDF файл.</p>
+              <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.9tz90gcw1hmy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline-dark  d-flex align-items-center"
+                style={{ width: 'fit-content', margin: '20px 0' }}
+              >
+                <i className="bi bi-info-lg me-2"></i>
+                Советы по публикации
+              </a>
+            </div>
+
+            <a
+              href="https://rosrest.com/charter"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline-dark  d-flex align-items-center"
-              style={{ width: 'fit-content', margin: '20px 0' }}
+              className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+              style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+              title="Открыть страницу на сайте"
+              aria-label="Открыть страницу на сайте"
             >
-              <i className="bi bi-info-lg me-2"></i>
-              Советы по публикации
+              <i className="bi bi-box-arrow-up-right"></i>
             </a>
           </div>
 

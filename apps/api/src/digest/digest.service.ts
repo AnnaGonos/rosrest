@@ -169,15 +169,13 @@ export class DigestService {
       return { sent: 0, failed: 0 };
     }
 
-    const text = this.mailTemplateService.generateDigestText(
-      newsItems.map((n) => ({
-        id: n.id,
-        slug: n.slug,
-        title: n.title,
-        excerpt: '',
-        publishedAt: n.publishedAt ? new Date(n.publishedAt) : undefined,
-      })),
-    );
+    const digestItemsForText = newsItems.map((n) => ({
+      id: n.id,
+      slug: n.slug,
+      title: n.title,
+      excerpt: '',
+      publishedAt: n.publishedAt ? new Date(n.publishedAt) : undefined,
+    }));
     const subject = `Дайджест новостей РАР — ${new Date().toLocaleDateString('ru-RU')}`;
 
     if (!this.emailService.isConfigured()) {
@@ -188,13 +186,15 @@ export class DigestService {
       };
     }
 
-    // Generate individual HTML for each subscriber with their email in unsubscribe URL
-    const recipientEmails = subscribers.map((s) => s.email);
     let sent = 0;
     let failed = 0;
 
     for (const subscriber of subscribers) {
       const html = this.generateDigestHtml(newsItems, subscriber.email);
+      const text = this.mailTemplateService.generateDigestText(
+        digestItemsForText,
+        subscriber.email,
+      );
       const result = await this.emailService.sendBulkEmail(
         [subscriber.email],
         subject,

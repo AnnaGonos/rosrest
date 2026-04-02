@@ -64,6 +64,49 @@ export class MailTemplateService {
     return '';
   }
 
+  private decodeHtmlEntities(input: string): string {
+    return input
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&amp;/gi, '&')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>');
+  }
+
+  private htmlToPlainText(html: string): string {
+    if (!html) return '';
+
+    let text = html;
+
+    text = text.replace(/<style[\s\S]*?<\/style>/gi, '');
+    text = text.replace(/<script[\s\S]*?<\/script>/gi, '');
+
+    text = text.replace(
+      /<a\s+[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi,
+      (_match, href, label) => {
+        const cleanLabel = String(label || '').replace(/<[^>]+>/g, '').trim();
+        if (!cleanLabel) {
+          return String(href).trim();
+        }
+        return `${cleanLabel} (${String(href).trim()})`;
+      },
+    );
+
+    text = text.replace(/<\s*br\s*\/?\s*>/gi, '\n');
+    text = text.replace(/<\/(p|div|h1|h2|h3|h4|h5|h6|tr|li|table|section|article)>/gi, '\n');
+    text = text.replace(/<li[^>]*>/gi, '- ');
+
+    text = text.replace(/<[^>]+>/g, '');
+    text = this.decodeHtmlEntities(text);
+
+    text = text.replace(/\r\n/g, '\n');
+    text = text.replace(/\n{3,}/g, '\n\n');
+    text = text.replace(/[ \t]{2,}/g, ' ');
+
+    return text.trim();
+  }
+
 
   renderTemplate(
     templateName: string,
@@ -111,32 +154,8 @@ export class MailTemplateService {
   }
 
   generateWelcomeEmailText(email: string, name?: string): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
-    return `
-Добро пожаловать${name ? ', ' + name : ''}!
-
-Спасибо за подписку на рассылку новостей Российской ассоциации реставраторов.
-
-ЧТО ВЫ ПОЛУЧИТЕ:
-- Еженедельный дайджест с новыми публикациями
-- Важные новости из ассоциации
-- Информацию о событиях и мониторинге законодательства
-- Все новости в одном письме
-
-Письма будут приходить на ${email} один раз в неделю или по мере необходимости.
-
-РЕКОМЕНДУЕМ:
-Посетите сайт РАР для прочтения всех последних новостей:
-${siteUrl}
-
-Если у вас есть вопросы, свяжитесь с нами на сайте.
-
-Чтобы отписаться от рассылки, перейдите по ссылке: ${siteUrl}/unsubscribe?email=${encodeURIComponent(email)}
-
----
-Это письмо было отправлено автоматически. 
-Пожалуйста, не отвечайте на это письмо.
-    `;
+    const html = this.generateWelcomeEmail(email, name);
+    return this.htmlToPlainText(html);
   }
 
   private getDigestFileUrl(url?: string | null): string | null {
@@ -151,7 +170,6 @@ ${siteUrl}
 
     const base = process.env.FILE_BASE_URL || process.env.VITE_FILES_BASE_URL || 'https://document.rosrest.com';
 
-    // Guard against accidentally passing news slug as image path.
     if (raw.startsWith('news/')) {
       return null;
     }
@@ -181,22 +199,21 @@ ${siteUrl}
     tags?: Array<{ id?: number; name?: string; title?: string; label?: string }>;
   }): string {
     const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
-    
-    // Determine URL path: prefer slug, fallback to id
+
     let pathForUrl: string;
     if (newsItem.slug && String(newsItem.slug).trim()) {
       pathForUrl = String(newsItem.slug).trim();
     } else {
       pathForUrl = String(newsItem.id).trim();
     }
-    
-    // Clean up the path (remove leading slashes and potential news/ prefix)
+
     const normalizedPath = pathForUrl.replace(/^\/+/, '').replace(/^news\//, '');
     const newsUrl = `${siteUrl}/news/${normalizedPath}`;
-    
+
     this.logger.log(
       `formatNewsItemHtml: slug="${newsItem.slug}", normalized="${normalizedPath}", url="${newsUrl}"`,
     );
+
     const publishedDate = newsItem.publishedAt
       ? new Date(newsItem.publishedAt).toLocaleDateString('ru-RU', {
         year: 'numeric',
@@ -219,7 +236,6 @@ ${siteUrl}
       })()
       : '';
 
-    // Use table-based markup for reliable email client rendering and omit excerpt/description
     return `
     <table class="news-table" role="presentation" cellpadding="0" cellspacing="0" width="100%">
       <tr class="news-row">
@@ -249,7 +265,7 @@ ${siteUrl}
     }>,
     subscriberEmail?: string,
   ): string {
-    const apiUrl = process.env.API_URL || 'http://localhost:3002';
+
     const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
 
     let unsubscribeUrl: string;
@@ -288,47 +304,9 @@ ${siteUrl}
       publishedAt?: Date;
       id: string | number;
     }>,
+    subscriberEmail?: string,
   ): string {
-    const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
-
-    const newsSection = newsItems
-      .map((item) => {
-        const publishedDate = item.publishedAt
-          ? new Date(item.publishedAt).toLocaleDateString('ru-RU', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })
-          : '';
-        const rawPath = (item.slug && String(item.slug).trim())
-          ? String(item.slug).trim()
-          : String(item.id).trim();
-        const normalizedPath = rawPath.replace(/^\/+/, '').replace(/^news\//, '');
-
-        return `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${publishedDate}
-
-${item.title}
-
-      Читать: ${siteUrl}/news/${normalizedPath}
-        `;
-      })
-      .join('\n');
-
-    return `
-ДАЙДЖЕСТ НОВОСТЕЙ
-Российская ассоциация реставраторов
-
-${newsItems.length > 0 ? newsSection : '\nК сожалению, в этот раз нет новых публикаций.\n'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Посетите наш сайт для получения полной информации:
-${siteUrl}
-
-Это письмо было отправлено автоматически.
-Пожалуйста, не отвечайте на это письмо.
-    `;
+    const html = this.generateDigestEmail(newsItems, subscriberEmail);
+    return this.htmlToPlainText(html);
   }
 }

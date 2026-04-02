@@ -97,6 +97,10 @@ export class EmailService {
     try {
       const from = process.env.MAIL_FROM || 'noreply@rosrest.com';
       const authUser = process.env.MAIL_USER || process.env.SMTP_USER || '';
+      const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
+      const unsubscribeUrl = `${siteUrl}/unsubscribe`;
+      const unsubscribeMailTo = `mailto:${from}?subject=${encodeURIComponent('Отписка от рассылки')}`;
+      const listUnsubscribeValue = `<${unsubscribeUrl}>, <${unsubscribeMailTo}>`;
 
       const mailOptions: any = {
         from: `Российская ассоциация реставраторов <${from}>`,
@@ -104,19 +108,21 @@ export class EmailService {
         subject: options.subject,
         html: options.html,
         text: options.text,
+        replyTo: process.env.MAIL_REPLY_TO || from,
         headers: {
           'X-Mailer': 'RosRest Newsletter System',
-          'List-Unsubscribe': `<${process.env.API_URL || 'http://localhost:3002'}/subscriptions/news/unsubscribe>`,
+          'List-Unsubscribe': listUnsubscribeValue,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+        envelope: {
+          from,
+          to: Array.isArray(options.to) ? options.to : [options.to],
         },
       };
 
       if (authUser) {
-        mailOptions.envelope = { from: authUser, to: mailOptions.to };
-        mailOptions.sender = authUser;
-        mailOptions.headers = {
-          ...mailOptions.headers,
-          Sender: authUser,
-        };
+        
+        this.logger.debug(`SMTP auth user configured: ${authUser}`);
       }
 
       const info = await this.transporter.sendMail(mailOptions);
