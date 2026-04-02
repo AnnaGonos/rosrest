@@ -99,7 +99,7 @@ export class EmailService {
       const authUser = process.env.MAIL_USER || process.env.SMTP_USER || '';
       const siteUrl = process.env.SITE_URL || 'https://rosrest.com';
       const unsubscribeUrl = `${siteUrl}/unsubscribe`;
-      const unsubscribeMailTo = `mailto:${from}?subject=${encodeURIComponent('Отписка от рассылки')}`;
+      const unsubscribeMailTo = `mailto:${from}?subject=unsubscribe`;
       const listUnsubscribeValue = `<${unsubscribeUrl}>, <${unsubscribeMailTo}>`;
 
       const mailOptions: any = {
@@ -111,6 +111,7 @@ export class EmailService {
         replyTo: process.env.MAIL_REPLY_TO || from,
         headers: {
           'X-Mailer': 'RosRest Newsletter System',
+          'List-ID': 'rosrest.com newsletter',
           'List-Unsubscribe': listUnsubscribeValue,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
