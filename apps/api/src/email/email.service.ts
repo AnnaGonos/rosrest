@@ -23,6 +23,7 @@ export class EmailService {
     const port = parseInt(process.env.MAIL_PORT || '25', 10);
     const user = process.env.MAIL_USER;
     const pass = process.env.MAIL_PASSWORD;
+    const ehloName = process.env.MAIL_EHLO_NAME || 'mail.rosrest.com';
 
     try {
       if (host === 'localhost' || host === '127.0.0.1') {
@@ -48,6 +49,7 @@ export class EmailService {
         this.transporter = nodemailer.createTransport({
           host,
           port,
+          name: ehloName,
           secure: port === 465,
           auth: {
             user,
@@ -101,17 +103,20 @@ export class EmailService {
       const unsubscribeUrl = `${siteUrl}/unsubscribe`;
       const unsubscribeMailTo = `mailto:${from}?subject=unsubscribe`;
       const listUnsubscribeValue = `<${unsubscribeUrl}>, <${unsubscribeMailTo}>`;
+      const generatedText = options.text || options.html.replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim();
+      const messageId = `<${Date.now()}.${Math.random().toString(36).slice(2)}@rosrest.com>`;
 
       const mailOptions: any = {
         from: `Российская ассоциация реставраторов <${from}>`,
         to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
         subject: options.subject,
         html: options.html,
-        text: options.text,
+        text: generatedText,
         replyTo: process.env.MAIL_REPLY_TO || from,
+        messageId,
         headers: {
           'X-Mailer': 'RosRest Newsletter System',
-          'List-ID': 'rosrest.com newsletter',
+          'List-ID': 'newsletter.rosrest.com',
           'List-Unsubscribe': listUnsubscribeValue,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },

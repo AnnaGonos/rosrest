@@ -63,7 +63,7 @@ export class SubscriptionService {
 
     const success = await this.emailService.sendEmail({
       to: email,
-      subject: 'Добро пожаловать! Вы успешно подписались на новости РАР',
+      subject: 'Подтверждение подписки на новости РАР',
       html,
       text,
     });

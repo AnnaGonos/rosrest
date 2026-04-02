@@ -121,6 +121,8 @@ export class MailTemplateService {
         html = html.replace(placeholder, value || '');
       });
 
+      html = html.replace(/{{\s*[^}]+\s*}}/g, '');
+
       return html;
     } catch (error) {
       this.logger.error(
