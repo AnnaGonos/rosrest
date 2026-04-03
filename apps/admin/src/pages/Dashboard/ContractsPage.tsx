@@ -17,6 +17,7 @@ import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageU
 type ContractDocument = {
   id: string
   title: string
+  fileUrl?: string
   pdfUrl?: string
   isPublished: boolean
   createdAt?: string
@@ -316,18 +317,6 @@ export default function ContractsPage() {
                       </td>
                       <td>
                         <div className="d-flex gap-1 justify-content-end">
-                          {doc.pdfUrl && (
-                            <Button
-                              as="a"
-                              href={getFileUrl(doc.pdfUrl)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              size="sm"
-                              variant="outline-primary"
-                            >
-                              <i className="bi bi-box-arrow-up-right"></i>
-                            </Button>
-                          )}
                           <Button
                             size="sm"
                             variant="outline-secondary"
@@ -335,6 +324,20 @@ export default function ContractsPage() {
                           >
                             <i className="bi bi-pencil"></i>
                           </Button>
+                          {doc.fileUrl && (
+                            <Button
+                              as="a"
+                              href={getFileUrl(doc.fileUrl)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              size="sm"
+                              variant="outline-primary"
+                              title="Открыть документ"
+                              aria-label="Открыть документ"
+                            >
+                              <i className="bi bi-box-arrow-up-right"></i>
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="outline-danger"
