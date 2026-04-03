@@ -17,6 +17,7 @@ import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageU
 type CharterDocument = {
   id: string
   title: string
+  fileUrl?: string
   pdfUrl?: string
   isPublished: boolean
   createdAt?: string
@@ -316,14 +317,16 @@ export default function CharterPage() {
                       </td>
                       <td>
                         <div className="d-flex gap-1 justify-content-end">
-                          {doc.pdfUrl && (
+                          {doc.fileUrl && (
                             <Button
                               as="a"
-                              href={getFileUrl(doc.pdfUrl)}
+                              href={getFileUrl(doc.fileUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               size="sm"
                               variant="outline-primary"
+                              title="Открыть документ"
+                              aria-label="Открыть документ"
                             >
                               <i className="bi bi-box-arrow-up-right"></i>
                             </Button>

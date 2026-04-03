@@ -317,13 +317,6 @@ export default function ContractsPage() {
                       </td>
                       <td>
                         <div className="d-flex gap-1 justify-content-end">
-                          <Button
-                            size="sm"
-                            variant="outline-secondary"
-                            onClick={() => openEditModal(doc)}
-                          >
-                            <i className="bi bi-pencil"></i>
-                          </Button>
                           {doc.fileUrl && (
                             <Button
                               as="a"
@@ -338,6 +331,13 @@ export default function ContractsPage() {
                               <i className="bi bi-box-arrow-up-right"></i>
                             </Button>
                           )}
+                          <Button
+                            size="sm"
+                            variant="outline-secondary"
+                            onClick={() => openEditModal(doc)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </Button>
                           <Button
                             size="sm"
                             variant="outline-danger"
