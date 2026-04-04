@@ -102,7 +102,7 @@ export default function AwardsPage() {
       if (!res.ok) throw new Error('Не удалось загрузить награду')
 
       setAddModalOpened(false)
-			setUploadSource({ mode: 'file', file: null, url: '' })
+      setUploadSource({ mode: 'file', file: null, url: '' })
       await loadAwards()
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Неизвестная ошибка')
@@ -164,22 +164,36 @@ export default function AwardsPage() {
     <DashboardLayout title="Награды и дипломы">
       <Container className="py-4">
         <div className="mb-4">
-          <h1>Награды и дипломы</h1>
-          <div className="mb-4">
+          <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <h1>Награды и дипломы</h1>
+              <p className="text-muted">Загрузите изображения и подписи для раздела "Награды и дипломы".</p>
 
-            <p className="text-muted">Загрузите изображения и подписи для раздела "Награды и дипломы".</p>
 
-            <a href="https://disk.yandex.ru/d/fs6mtyFlrmn9yw"
+              <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.lb76qcl7dw7a"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-outline-dark  d-flex align-items-center"
+                style={{ width: 'fit-content', margin: '20px 0' }}
+              >
+                <i className="bi bi-info-lg me-2"></i>
+                Советы по публикации
+              </a>
+
+              <small className="text-primary">Всего: {items.length}</small>
+            </div>
+
+            <a
+              href="https://rosrest.com/about/awards"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-outline-dark  d-flex align-items-center"
-              style={{ width: 'fit-content', margin: '20px 0' }}
+              className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+              style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+              title="Открыть страницу на сайте"
+              aria-label="Открыть страницу на сайте"
             >
-              <i className="bi bi-info-lg me-2"></i>
-              Советы по публикации
+              <i className="bi bi-box-arrow-up-right"></i>
             </a>
-
-            <small className="text-primary">Всего: {items.length}</small>
           </div>
 
           <div className="d-flex gap-2 mb-4">
