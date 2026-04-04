@@ -587,19 +587,38 @@ export default function EventsPage() {
         <Row className="mb-4">
           <Col>
             <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <h2 className="h4 mb-1">События и мероприятия</h2>
-                <p className="text-muted small mb-0">Управление событиями и мероприятиями</p>
-                <a href="https://disk.yandex.ru/d/VzIXk5bRPAn-2w"
+
+              <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+                <div>
+                  <h1 className="mb-1">События и мероприятия</h1>
+                  <p className="text-muted small mb-0">Управление событиями и мероприятиями</p>
+
+
+                  <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.kyw8l9ucl4q"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline-dark  d-flex align-items-center"
+                    style={{ width: 'fit-content', margin: '20px 0' }}
+                  >
+                    <i className="bi bi-info-lg me-2"></i>
+                    Советы по публикации
+                  </a>
+                </div>
+
+                <a
+                  href="https://rosrest.com/events"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-outline-dark  d-flex align-items-center"
-                  style={{ width: 'fit-content', margin: '20px 0' }}
+                  className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                  style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+                  title="Открыть страницу на сайте"
+                  aria-label="Открыть страницу на сайте"
                 >
-                  <i className="bi bi-info-lg me-2"></i>
-                  Советы по публикации
+                  <i className="bi bi-box-arrow-up-right"></i>
                 </a>
               </div>
+
+
               <Button
                 variant="primary"
                 className="d-inline-flex align-items-center gap-2"
@@ -703,6 +722,18 @@ export default function EventsPage() {
                               <td>
                                 <div className="d-flex gap-2">
                                   <Button
+                                    as="a"
+                                    href={`https://rosrest.com/events/${event.id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    variant="outline-primary"
+                                    size="sm"
+                                    title="Открыть событие на сайте"
+                                    aria-label="Открыть событие на сайте"
+                                  >
+                                    <i className="bi bi-box-arrow-up-right" />
+                                  </Button>
+                                  <Button
                                     variant="outline-secondary"
                                     size="sm"
                                     onClick={() => openEditModal(event)}
@@ -785,12 +816,32 @@ export default function EventsPage() {
                                 <td>
                                   <div className="d-flex gap-2">
                                     <Button
+                                      as="a"
+                                      href={`https://rosrest.com/events/${event.id}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      variant="outline-primary"
+                                      size="sm"
+                                      title="Открыть событие на сайте"
+                                      aria-label="Открыть событие на сайте"
+                                    >
+                                      <i className="bi bi-box-arrow-up-right" />
+                                    </Button>
+                                    <Button
                                       variant="outline-secondary"
                                       size="sm"
                                       onClick={() => openEditModal(event)}
                                       title="Редактировать"
                                     >
                                       <i className="bi bi-pencil" />
+                                    </Button>
+                                    <Button
+                                      variant="outline-danger"
+                                      size="sm"
+                                      onClick={() => openDeleteModal(event)}
+                                      title="Удалить"
+                                    >
+                                      <i className="bi bi-trash" />
                                     </Button>
                                   </div>
                                 </td>
@@ -1036,7 +1087,7 @@ export default function EventsPage() {
                               if (blockIndex <= 0) return
                               const newSchedule = [...schedule]
                               const blocks = newSchedule[dayIndex].blocks
-                              ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
+                                ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
                               setSchedule(newSchedule)
                             }}
                           >
@@ -1050,7 +1101,7 @@ export default function EventsPage() {
                               const newSchedule = [...schedule]
                               const blocks = newSchedule[dayIndex].blocks
                               if (blockIndex >= blocks.length - 1) return
-                              ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
+                                ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
                               setSchedule(newSchedule)
                             }}
                           >
@@ -1663,7 +1714,7 @@ export default function EventsPage() {
                               if (blockIndex <= 0) return
                               const newSchedule = [...editSchedule]
                               const blocks = newSchedule[dayIndex].blocks
-                              ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
+                                ;[blocks[blockIndex - 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex - 1]]
                               setEditSchedule(newSchedule)
                             }}
                           >
@@ -1677,7 +1728,7 @@ export default function EventsPage() {
                               const newSchedule = [...editSchedule]
                               const blocks = newSchedule[dayIndex].blocks
                               if (blockIndex >= blocks.length - 1) return
-                              ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
+                                ;[blocks[blockIndex + 1], blocks[blockIndex]] = [blocks[blockIndex], blocks[blockIndex + 1]]
                               setEditSchedule(newSchedule)
                             }}
                           >
