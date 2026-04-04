@@ -138,67 +138,67 @@ export default function EducationPage() {
       const token = localStorage.getItem('admin_token')
 
       if (editingItem) {
-      if (hasFile) {
+        if (hasFile) {
+          const fd = new FormData()
+          fd.append('name', name.trim())
+          fd.append('websiteUrl', websiteUrl.trim())
+          fd.append('type', addModalType)
+          if (specialtiesClean.length > 0) {
+            fd.append('specialties', JSON.stringify(specialtiesClean))
+          } else {
+            fd.append('specialties', JSON.stringify([]))
+          }
+          fd.append('imageFile', imageSource.file as File)
+
+          const res = await fetch(API_ENDPOINTS.EDUCATION_UPDATE(editingItem.id), {
+            method: 'PATCH',
+            headers: {
+              Authorization: token ? `Bearer ${token}` : '',
+            },
+            body: fd,
+          })
+          if (!res.ok) throw new Error('Не удалось обновить запись')
+        } else {
+          const body: Record<string, unknown> = {
+            name: name.trim(),
+            websiteUrl: websiteUrl.trim(),
+            type: addModalType,
+          }
+          if (specialtiesClean.length > 0) {
+            body.specialties = JSON.stringify(specialtiesClean)
+          } else {
+            body.specialties = JSON.stringify([])
+          }
+
+          if (imageSource.mode === 'url') {
+            body.imageUrl = trimmedImageUrl || ''
+          }
+
+          const res = await fetch(API_ENDPOINTS.EDUCATION_UPDATE(editingItem.id), {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: token ? `Bearer ${token}` : '',
+            },
+            body: JSON.stringify(body),
+          })
+          if (!res.ok) throw new Error('Не удалось обновить запись')
+        }
+      } else {
         const fd = new FormData()
+        fd.append('type', addModalType)
         fd.append('name', name.trim())
         fd.append('websiteUrl', websiteUrl.trim())
-        fd.append('type', addModalType)
         if (specialtiesClean.length > 0) {
           fd.append('specialties', JSON.stringify(specialtiesClean))
         } else {
           fd.append('specialties', JSON.stringify([]))
         }
-        fd.append('imageFile', imageSource.file as File)
-
-        const res = await fetch(API_ENDPOINTS.EDUCATION_UPDATE(editingItem.id), {
-          method: 'PATCH',
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: fd,
-        })
-        if (!res.ok) throw new Error('Не удалось обновить запись')
-      } else {
-        const body: Record<string, unknown> = {
-          name: name.trim(),
-          websiteUrl: websiteUrl.trim(),
-          type: addModalType,
+        if (hasFile) {
+          fd.append('imageFile', imageSource.file as File)
+        } else if (hasUrl) {
+          fd.append('imageUrl', trimmedImageUrl)
         }
-        if (specialtiesClean.length > 0) {
-          body.specialties = JSON.stringify(specialtiesClean)
-        } else {
-          body.specialties = JSON.stringify([])
-        }
-
-        if (imageSource.mode === 'url') {
-          body.imageUrl = trimmedImageUrl || ''
-        }
-
-        const res = await fetch(API_ENDPOINTS.EDUCATION_UPDATE(editingItem.id), {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-          body: JSON.stringify(body),
-        })
-        if (!res.ok) throw new Error('Не удалось обновить запись')
-      }
-      } else {
-        const fd = new FormData()
-        fd.append('type', addModalType)
-        fd.append('name', name.trim())
-        fd.append('websiteUrl', websiteUrl.trim())
-      if (specialtiesClean.length > 0) {
-        fd.append('specialties', JSON.stringify(specialtiesClean))
-      } else {
-        fd.append('specialties', JSON.stringify([]))
-      }
-      if (hasFile) {
-        fd.append('imageFile', imageSource.file as File)
-      } else if (hasUrl) {
-        fd.append('imageUrl', trimmedImageUrl)
-      }
 
         const res = await fetch(API_ENDPOINTS.EDUCATION_CREATE, {
           method: 'POST',
@@ -358,13 +358,13 @@ export default function EducationPage() {
   return (
     <DashboardLayout title="Образование">
       <Container className="py-4">
-        <div className="d-flex flex-column gap-4">
+        <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
           <div>
             <h1 className="mb-1">Образование</h1>
             <p className="text-muted mb-1">
               Три списка: повышение квалификации, среднее профессиональное, высшее профессиональное образование
             </p>
-            <a href="https://disk.yandex.ru/d/Zsqi-3wjBVmYqA"
+            <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.36ziylf0ugau"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-outline-dark  d-flex align-items-center"
@@ -373,9 +373,22 @@ export default function EducationPage() {
               <i className="bi bi-info-lg me-2"></i>
               Советы по публикации
             </a>
-            <p className="mb-0 text-primary">Всего записей: {items.length}</p>
           </div>
 
+          <a
+            href="https://rosrest.com/education"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+            style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+            title="Открыть страницу на сайте"
+            aria-label="Открыть страницу на сайте"
+          >
+            <i className="bi bi-box-arrow-up-right"></i>
+          </a>
+        </div>
+
+        <div className="d-flex flex-column gap-4">
           {TYPE_ORDER.map((type) => (
             <div key={type} className="d-flex flex-column gap-2">
               <div className="d-flex justify-content-between align-items-center mb-1">

@@ -401,7 +401,7 @@ export default function PartnersPage() {
               id="partnerLogo"
               label="Логотип"
               required
-              helpText="Загрузите логотип или вставьте ссылку на изображение. Поддерживаются JPG, PNG, WEBP, SVG, GIF."
+              helpText="Загрузите логотип или вставьте ссылку на изображение. Поддерживаются JPG, PNG, WEBP."
               value={logoSource}
               onChange={(val: ImageUploadValue) => {
                 setLogoSource(val)
