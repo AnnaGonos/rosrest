@@ -594,7 +594,7 @@ export default function EventsPage() {
                   <p className="text-muted small mb-0">Управление событиями и мероприятиями</p>
 
 
-                  <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.kyw8l9ucl4q"
+                  <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.3e636pcykkwu"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-outline-dark  d-flex align-items-center"
