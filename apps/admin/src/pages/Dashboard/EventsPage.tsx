@@ -1241,19 +1241,6 @@ export default function EventsPage() {
                               setSchedule(newSchedule);
                             }}
                           />
-                          <Form.Group controlId={`editModeratorComment${dayIndex}-${blockIndex}-${moderatorIndex}`} className="mb-2">
-                            <Form.Label>Комментарий / Описание выступления</Form.Label>
-                            <Form.Control
-                              type="text"
-                              placeholder="О чем будет выступать модератор (необязательно)"
-                              value={moderator.comment || ''}
-                              onChange={e => {
-                                const newSchedule = [...editSchedule];
-                                newSchedule[dayIndex].blocks[blockIndex].moderators![moderatorIndex].comment = e.currentTarget.value;
-                                setEditSchedule(newSchedule);
-                              }}
-                            />
-                          </Form.Group>
                         </div>
                       ))}
                       <Button
