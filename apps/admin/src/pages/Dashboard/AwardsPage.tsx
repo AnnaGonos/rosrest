@@ -9,7 +9,6 @@ import {
   Spinner,
   Alert,
   Modal,
-  Form,
 } from 'react-bootstrap'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
@@ -18,7 +17,6 @@ import { ImageUploadInput, type ImageUploadValue } from '../../components/ImageU
 type Award = {
   id: string
   imageUrl: string
-  caption?: string | null
   createdAt?: string
 }
 
@@ -34,7 +32,6 @@ export default function AwardsPage() {
     file: null,
     url: '',
   })
-  const [caption, setCaption] = useState('')
   const [formError, setFormError] = useState('')
 
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -64,7 +61,6 @@ export default function AwardsPage() {
 
   const openAddModal = () => {
     setUploadSource({ mode: 'file', file: null, url: '' })
-    setCaption('')
     setFormError('')
     setAddModalOpened(true)
   }
@@ -89,7 +85,6 @@ export default function AwardsPage() {
       } else if (trimmedUrl) {
         fd.append('imageUrl', trimmedUrl)
       }
-      if (caption) fd.append('caption', caption)
 
       const res = await fetch(API_ENDPOINTS.AWARDS_CREATE, {
         method: 'POST',
@@ -247,11 +242,7 @@ export default function AwardsPage() {
                             }}
                           />
                         </div>
-                        {it.caption && (
-                          <p className="mb-0 text-muted" style={{ fontSize: '0.9rem' }}>
-                            {it.caption}
-                          </p>
-                        )}
+                       
                         <p className="mb-0 text-muted" style={{ fontSize: '0.8rem' }}>
                           {it.createdAt ? new Date(it.createdAt).toLocaleString('ru-RU') : ''}
                         </p>
@@ -290,16 +281,6 @@ export default function AwardsPage() {
               disabled={uploading}
               accept="image/jpeg,image/png,image/webp"
             />
-
-            <Form.Group controlId="awardCaption">
-              <Form.Label>Подпись</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Короткое описание (опционально)"
-                value={caption}
-                onChange={(e) => setCaption(e.currentTarget.value)}
-              />
-            </Form.Group>
           </div>
         </Modal.Body>
         <Modal.Footer>
@@ -330,7 +311,7 @@ export default function AwardsPage() {
             onClick={() => setDeleteModalOpened(false)}
             disabled={deletingId !== null}
           >
-            Отменить
+            Отмена
           </Button>
           <Button variant="danger" onClick={handleDelete} disabled={deletingId !== null}>
             {deletingId !== null && <Spinner animation="border" size="sm" className="me-2" />}
