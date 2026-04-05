@@ -224,6 +224,7 @@ export default function SubcategoriesPage() {
       setError('')
 
       const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_LIST, {
+        cache: 'no-store',
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -248,6 +249,7 @@ export default function SubcategoriesPage() {
       const docRes = await fetch(
         `${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${numCategoryId}`,
         {
+          cache: 'no-store',
           headers: {
             Authorization: `Bearer ${token}`,
           },

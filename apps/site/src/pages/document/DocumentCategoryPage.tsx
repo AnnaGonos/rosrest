@@ -41,7 +41,7 @@ export default function DocumentCategoryPage() {
   useEffect(() => {
     let mounted = true
     setLoading(true)
-    fetch(`${API_BASE}/document-categories/tree`)
+    fetch(`${API_BASE}/document-categories/tree`, { cache: 'no-store' })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((data: Category[]) => { if (mounted) setTree(data || []) })
       .catch((err) => { if (mounted) setError(String(err)) })
@@ -70,7 +70,7 @@ export default function DocumentCategoryPage() {
     if (!category) return
     let mounted = true
     setDocsLoading(true)
-    fetch(`${API_BASE}/documents?type=documents&categoryId=${category.id}&isPublished=true`)
+    fetch(`${API_BASE}/documents?type=documents&categoryId=${category.id}&isPublished=true`, { cache: 'no-store' })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((data: DocumentItem[]) => {
         if (mounted) {
