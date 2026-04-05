@@ -9,6 +9,8 @@ type Document = {
   fileName?: string
   fileSize?: number
   uploadedAt?: string
+  createdAt?: string
+  orderIndex?: number | null
 }
 
 type Subcategory = {
@@ -34,7 +36,15 @@ export default function CategoryAccordion({ subcategories, getDocuments, loading
     <div className="category-accordion">
       {subcategories.map((subcat) => {
         const isExpanded = expandedId === subcat.id
-        const docs = getDocuments(subcat.id)
+        const docs = [...getDocuments(subcat.id)].sort((a, b) => {
+          const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
+          const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
+          if (aOrder !== bOrder) return aOrder - bOrder
+
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+          return bTime - aTime
+        })
         const loading = loadingMap[subcat.id] || false
         const error = errorMap[subcat.id] || null
 
