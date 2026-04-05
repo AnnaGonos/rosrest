@@ -264,7 +264,10 @@ export class DocumentService {
 		fileUploadService?: FileUploadService,
 		previewFile?: UploadFile,
 	) {
-		const document = await this.documentRepo.findOne({ where: { id } })
+		const document = await this.documentRepo.findOne({
+			where: { id },
+			relations: ['category', 'subcategory'],
+		})
 		if (!document) {
 			throw new NotFoundException(`Document with ID ${id} not found`)
 		}
