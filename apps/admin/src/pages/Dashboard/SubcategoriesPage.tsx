@@ -131,6 +131,8 @@ export default function SubcategoriesPage() {
       })
 
       if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+
+      await loadCategoryAndSubcategories()
     } catch (err: any) {
       setParentDocuments(current)
       setError(err.message || 'Ошибка изменения порядка документа')
@@ -173,6 +175,8 @@ export default function SubcategoriesPage() {
       })
 
       if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+
+      await loadCategoryAndSubcategories()
     } catch (err: any) {
       setSubcategoryDocuments((prev) => ({
         ...prev,
@@ -259,7 +263,16 @@ export default function SubcategoriesPage() {
       if (docRes.ok) {
         const docData = await docRes.json()
         const sorted = Array.isArray(docData) ? docData : []
-        setDocuments(sorted)
+        const sortedByOrder = [...sorted].sort((a, b) => {
+          const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
+          const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
+          if (aOrder !== bOrder) return aOrder - bOrder
+
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+          return bTime - aTime
+        })
+        setDocuments(sortedByOrder)
         const parentDocs: Document[] = []
         const subcatDocs: { [key: number]: Document[] } = {}
 
@@ -269,7 +282,7 @@ export default function SubcategoriesPage() {
           })
         }
 
-        sorted.forEach((doc: any) => {
+        sortedByOrder.forEach((doc: any) => {
           if (doc.subcategory && doc.subcategory.id in subcatDocs) {
             subcatDocs[doc.subcategory.id].push(doc)
           } else {

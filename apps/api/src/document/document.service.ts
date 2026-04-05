@@ -209,7 +209,8 @@ export class DocumentService {
 			document.orderIndex = dto.orderIndex
 			await this.shiftOrderIndexesForInsert(dto.type, categoryId, subcategoryId, dto.orderIndex)
 		} else {
-			document.orderIndex = await this.getNextOrderIndex(dto.type, categoryId, subcategoryId)
+			document.orderIndex = 0
+			await this.shiftOrderIndexesForInsert(dto.type, categoryId, subcategoryId, 0)
 		}
 
 		const saved = await this.documentRepo.save(document);
@@ -334,7 +335,14 @@ export class DocumentService {
 					document.id,
 				)
 			} else {
-				document.orderIndex = await this.getNextOrderIndex(newType, newCategoryId, newSubcategoryId)
+				document.orderIndex = 0
+				await this.shiftOrderIndexesForInsert(
+					newType,
+					newCategoryId,
+					newSubcategoryId,
+					0,
+					document.id,
+				)
 			}
 		} else if (dto.orderIndex !== undefined && dto.orderIndex >= 0 && dto.orderIndex !== document.orderIndex) {
 			const targetOrder = dto.orderIndex
