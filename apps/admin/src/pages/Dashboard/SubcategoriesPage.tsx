@@ -104,6 +104,11 @@ export default function SubcategoriesPage() {
   const [editingCategoryForBlocks, setEditingCategoryForBlocks] = useState<Category | null>(null)
   const [editingBlocks, setEditingBlocks] = useState<any[] | undefined>(undefined)
 
+  const withCacheBust = (url: string) => {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}_ts=${Date.now()}`
+  }
+
   const moveParentDocument = async (docId: string, direction: 'up' | 'down') => {
     const current = [...parentDocuments]
     const index = current.findIndex((doc) => doc.id === docId)
@@ -227,7 +232,7 @@ export default function SubcategoriesPage() {
       setLoading(true)
       setError('')
 
-      const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_LIST, {
+      const res = await fetch(withCacheBust(API_ENDPOINTS.DOCUMENT_CATEGORIES_LIST), {
         cache: 'no-store',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -251,7 +256,7 @@ export default function SubcategoriesPage() {
       setSubcategories(parent.children || [])
 
       const docRes = await fetch(
-        `${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${numCategoryId}`,
+        withCacheBust(`${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${numCategoryId}`),
         {
           cache: 'no-store',
           headers: {

@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	Header,
 	HttpCode,
 	Param,
 	Patch,
@@ -60,6 +61,9 @@ export class DocumentController {
 	@ApiQuery({ name: 'categoryId', required: false, type: Number })
 	@ApiQuery({ name: 'subcategoryId', required: false, type: Number })
 	@ApiQuery({ name: 'isPublished', required: false, type: Boolean, description: 'Filter by publication status. If not provided, returns all documents' })
+	@Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+	@Header('Pragma', 'no-cache')
+	@Header('Expires', '0')
 	async findAll(
 		@Query('type') type?: DocumentType,
 		@Query('categoryId') categoryId?: string,
@@ -188,6 +192,9 @@ export class DocumentCategoryController {
 	constructor(private readonly documentService: DocumentService) { }
 
 	@Get('tree')
+	@Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+	@Header('Pragma', 'no-cache')
+	@Header('Expires', '0')
 	@ApiOkResponse({ type: DocumentCategory, isArray: true })
 	async getTree() {
 		return await this.documentService.getCategoryTree();
