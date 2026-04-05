@@ -52,6 +52,10 @@ export class Document {
 	@Column({ type: 'boolean', default: true })
 	isPublished!: boolean;
 
+	@ApiProperty({ example: 0, description: 'Порядок сортировки внутри типа/категории/подкатегории' })
+	@Column({ type: 'int', default: 0 })
+	orderIndex!: number;
+
 	@ApiProperty({ example: '2025-12-28T10:00:00.000Z' })
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt!: Date;

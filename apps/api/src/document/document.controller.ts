@@ -91,6 +91,7 @@ export class DocumentController {
 			properties: {
 				title: { type: 'string', example: 'Письмо Минэкономразвития от 25.06.2012' },
 				type: { type: 'string', enum: ['charter', 'contracts', 'documents'], example: 'charter' },
+					orderIndex: { type: 'number', example: 0, description: 'Порядок сортировки внутри группы документов' },
 				categoryId: { type: 'number', example: 1, description: 'ID категории (используется когда нет подкатегории)' },
 				subcategoryId: { type: 'number', example: 2, description: 'ID подкатегории (категория берётся из parent)' },
 				fileUrl: { type: 'string', example: 'https://drive.google.com/file/d/abc/document.pdf', description: 'URL на файл документа (либо загрузите file)' },
@@ -135,6 +136,7 @@ export class DocumentController {
 			properties: {
 				title: { type: 'string', example: 'Письмо Минэкономразвития от 25.06.2012' },
 				type: { type: 'string', enum: ['charter', 'contracts', 'documents'], example: 'charter' },
+					orderIndex: { type: 'number', example: 0, description: 'Порядок сортировки внутри группы документов' },
 				categoryId: { type: 'number', example: 1, description: 'ID категории (используется когда нет подкатегории)' },
 				subcategoryId: { type: 'number', example: 2, description: 'ID подкатегории (категория берётся из parent)' },
 				fileUrl: { type: 'string', example: 'https://drive.google.com/file/d/abc/document.pdf', description: 'URL на файл документа (либо загрузите file)' },

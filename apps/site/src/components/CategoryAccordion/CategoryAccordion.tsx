@@ -3,9 +3,9 @@ import DocumentList from '../DocumentList/DocumentList'
 import './CategoryAccordion.css'
 
 type Document = {
-  id: number
-  name: string
-  title?: string // добавлено для совместимости с DocItem
+  id: string | number
+  name?: string
+  title?: string
   fileName?: string
   fileSize?: number
   uploadedAt?: string
@@ -53,7 +53,11 @@ export default function CategoryAccordion({ subcategories, getDocuments, loading
             {isExpanded && (
               <div className="accordion-content">
                 <DocumentList
-                  items={docs.map((doc) => ({ ...doc, title: doc.title || doc.name, id: String(doc.id) }))}
+                  items={docs.map((doc) => ({
+                    ...doc,
+                    title: doc.title || doc.name || 'Без названия документа',
+                    id: String(doc.id),
+                  }))}
                   loading={loading}
                   error={error}
                   emptyMessage={`Документы в "${subcat.name}" не найдены.`}

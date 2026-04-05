@@ -34,6 +34,66 @@ export class DocumentService {
 	private readonly documentCacheKeys = new Set<string>()
 	private readonly CATEGORY_TREE_CACHE_KEY = 'document_categories_tree'
 
+	private async getNextOrderIndex(
+		type: DocumentTypeEnum,
+		categoryId: number | null,
+		subcategoryId: number | null,
+	) {
+		const qb = this.documentRepo
+			.createQueryBuilder('document')
+			.select('COALESCE(MAX(document.orderIndex), -1)', 'maxOrder')
+			.where('document.type = :type', { type })
+
+		if (categoryId === null) {
+			qb.andWhere('document.category_id IS NULL')
+		} else {
+			qb.andWhere('document.category_id = :categoryId', { categoryId })
+		}
+
+		if (subcategoryId === null) {
+			qb.andWhere('document.subcategory_id IS NULL')
+		} else {
+			qb.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
+		}
+
+		const row = await qb.getRawOne<{ maxOrder: string }>()
+		const maxOrder = row?.maxOrder !== undefined ? Number(row.maxOrder) : -1
+		return Number.isFinite(maxOrder) ? maxOrder + 1 : 0
+	}
+
+	private async shiftOrderIndexesForInsert(
+		type: DocumentTypeEnum,
+		categoryId: number | null,
+		subcategoryId: number | null,
+		fromOrder: number,
+		excludedId?: string,
+	) {
+		const qb = this.documentRepo
+			.createQueryBuilder()
+			.update(Document)
+			.set({ orderIndex: () => '"orderIndex" + 1' })
+			.where('type = :type', { type })
+			.andWhere('"orderIndex" >= :fromOrder', { fromOrder })
+
+		if (categoryId === null) {
+			qb.andWhere('category_id IS NULL')
+		} else {
+			qb.andWhere('category_id = :categoryId', { categoryId })
+		}
+
+		if (subcategoryId === null) {
+			qb.andWhere('subcategory_id IS NULL')
+		} else {
+			qb.andWhere('subcategory_id = :subcategoryId', { subcategoryId })
+		}
+
+		if (excludedId) {
+			qb.andWhere('id != :excludedId', { excludedId })
+		}
+
+		await qb.execute()
+	}
+
 	private getCacheKey(
 		type?: DocumentTypeEnum,
 		categoryId?: number,
@@ -139,7 +199,18 @@ export class DocumentService {
 			category,
 			subcategory,
 			isPublished: dto.isPublished ?? true,
+			orderIndex: 0,
 		});
+
+		const categoryId = category?.id ?? null
+		const subcategoryId = subcategory?.id ?? null
+
+		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
+			document.orderIndex = dto.orderIndex
+			await this.shiftOrderIndexesForInsert(dto.type, categoryId, subcategoryId, dto.orderIndex)
+		} else {
+			document.orderIndex = await this.getNextOrderIndex(dto.type, categoryId, subcategoryId)
+		}
 
 		const saved = await this.documentRepo.save(document);
 		await this.invalidateCache();
@@ -167,7 +238,7 @@ export class DocumentService {
 		const list = await this.documentRepo.find({
 			where,
 			relations: ['category', 'subcategory'],
-			order: { createdAt: 'DESC' },
+			order: { orderIndex: 'ASC', createdAt: 'DESC' },
 		})
 
 		await this.cacheManager.set(cacheKey, list)
@@ -197,6 +268,10 @@ export class DocumentService {
 		if (!document) {
 			throw new NotFoundException(`Document with ID ${id} not found`)
 		}
+
+		const oldType = document.type
+		const oldCategoryId = document.category?.id ?? null
+		const oldSubcategoryId = document.subcategory?.id ?? null
 
 		if (dto.type) {
 			document.type = dto.type
@@ -235,6 +310,60 @@ export class DocumentService {
 			document.fileUrl = await fileUploadService.upload(file, type, 'documents/files');
 		} else if (dto.fileUrl !== undefined) {
 			document.fileUrl = dto.fileUrl;
+		}
+
+		const newType = document.type
+		const newCategoryId = document.category?.id ?? null
+		const newSubcategoryId = document.subcategory?.id ?? null
+		const scopeChanged =
+			oldType !== newType ||
+			oldCategoryId !== newCategoryId ||
+			oldSubcategoryId !== newSubcategoryId
+
+		if (scopeChanged) {
+			if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
+				document.orderIndex = dto.orderIndex
+				await this.shiftOrderIndexesForInsert(
+					newType,
+					newCategoryId,
+					newSubcategoryId,
+					dto.orderIndex,
+					document.id,
+				)
+			} else {
+				document.orderIndex = await this.getNextOrderIndex(newType, newCategoryId, newSubcategoryId)
+			}
+		} else if (dto.orderIndex !== undefined && dto.orderIndex >= 0 && dto.orderIndex !== document.orderIndex) {
+			const targetOrder = dto.orderIndex
+			const previousOrder = document.orderIndex
+
+			if (targetOrder > previousOrder) {
+				await this.documentRepo
+					.createQueryBuilder()
+					.update(Document)
+					.set({ orderIndex: () => '"orderIndex" - 1' })
+					.where('type = :type', { type: newType })
+					.andWhere('id != :id', { id: document.id })
+					.andWhere('"orderIndex" > :previousOrder', { previousOrder })
+					.andWhere('"orderIndex" <= :targetOrder', { targetOrder })
+					.andWhere(newCategoryId === null ? 'category_id IS NULL' : 'category_id = :categoryId', { categoryId: newCategoryId ?? undefined })
+					.andWhere(newSubcategoryId === null ? 'subcategory_id IS NULL' : 'subcategory_id = :subcategoryId', { subcategoryId: newSubcategoryId ?? undefined })
+					.execute()
+			} else {
+				await this.documentRepo
+					.createQueryBuilder()
+					.update(Document)
+					.set({ orderIndex: () => '"orderIndex" + 1' })
+					.where('type = :type', { type: newType })
+					.andWhere('id != :id', { id: document.id })
+					.andWhere('"orderIndex" >= :targetOrder', { targetOrder })
+					.andWhere('"orderIndex" < :previousOrder', { previousOrder })
+					.andWhere(newCategoryId === null ? 'category_id IS NULL' : 'category_id = :categoryId', { categoryId: newCategoryId ?? undefined })
+					.andWhere(newSubcategoryId === null ? 'subcategory_id IS NULL' : 'subcategory_id = :subcategoryId', { subcategoryId: newSubcategoryId ?? undefined })
+					.execute()
+			}
+
+			document.orderIndex = targetOrder
 		}
 
 		const saved = await this.documentRepo.save(document)

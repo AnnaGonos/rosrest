@@ -18,15 +18,25 @@ type Category = {
   children?: Category[]
 }
 
+type DocumentItem = {
+  id: string
+  title: string
+  fileUrl?: string | null
+  previewUrl?: string | null
+  createdAt?: string
+  subcategory?: { id: number } | null
+  orderIndex?: number | null
+}
+
 export default function DocumentCategoryPage() {
   const { slug } = useParams<{ slug?: string }>()
   const [tree, setTree] = useState<Category[]>([])
   const [category, setCategory] = useState<Category | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [documents, setDocuments] = useState<any[]>([])
+  const [documents, setDocuments] = useState<DocumentItem[]>([])
   const [docsLoading, setDocsLoading] = useState(true)
-  const [subcategoryDocs, setSubcategoryDocs] = useState<{ [key: string]: any[] }>({})
+  const [subcategoryDocs, setSubcategoryDocs] = useState<{ [key: string]: DocumentItem[] }>({})
 
   useEffect(() => {
     let mounted = true
@@ -62,19 +72,29 @@ export default function DocumentCategoryPage() {
     setDocsLoading(true)
     fetch(`${API_BASE}/documents?type=documents&categoryId=${category.id}&isPublished=true`)
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
-      .then((data) => {
+      .then((data: DocumentItem[]) => {
         if (mounted) {
-          const allDocs = data || []
-          setDocuments(allDocs)
+          const allDocs = Array.isArray(data) ? data : []
+          const sortedDocs = [...allDocs].sort((a, b) => {
+            const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
+            const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
+            if (aOrder !== bOrder) return aOrder - bOrder
 
-          const grouped: { [key: string]: any[] } = {}
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+            return bTime - aTime
+          })
+
+          setDocuments(sortedDocs)
+
+          const grouped: { [key: string]: DocumentItem[] } = {}
           if (category.children) {
             category.children.forEach((subcat) => {
               grouped[subcat.id] = []
             })
           }
 
-          allDocs.forEach((doc: any) => {
+          sortedDocs.forEach((doc: DocumentItem) => {
             if (doc.subcategory && doc.subcategory.id in grouped) {
               grouped[doc.subcategory.id].push(doc)
             } else if (!doc.subcategory) {

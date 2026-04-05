@@ -31,12 +31,14 @@ type Category = {
 type Document = {
   id: string;
   title: string;
+  fileUrl?: string;
   pdfUrl?: string;
   type: string;
   category?: any;
   subcategory?: any;
   isPublished: boolean;
   createdAt: string;
+  orderIndex?: number;
 }
 
 export default function SubcategoriesPage() {
@@ -95,11 +97,92 @@ export default function SubcategoriesPage() {
   const [editDocIsPublished, setEditDocIsPublished] = useState(true)
   const [editDocFormError, setEditDocFormError] = useState('')
   const [isEditingDoc, setIsEditingDoc] = useState(false)
+  const [movingDocumentId, setMovingDocumentId] = useState<string | null>(null)
 
   // Page blocks editor modal
   const [pageEditorOpened, setPageEditorOpened] = useState(false)
   const [editingCategoryForBlocks, setEditingCategoryForBlocks] = useState<Category | null>(null)
   const [editingBlocks, setEditingBlocks] = useState<any[] | undefined>(undefined)
+
+  const moveParentDocument = async (docId: string, direction: 'up' | 'down') => {
+    const current = [...parentDocuments]
+    const index = current.findIndex((doc) => doc.id === docId)
+    if (index === -1) return
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= current.length) return
+    const targetOrderIndex = current[targetIndex].orderIndex ?? targetIndex
+
+    const next = [...current]
+    const [moved] = next.splice(index, 1)
+    next.splice(targetIndex, 0, moved)
+
+    setParentDocuments(next)
+    setMovingDocumentId(docId)
+
+    try {
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ orderIndex: targetOrderIndex }),
+      })
+
+      if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+    } catch (err: any) {
+      setParentDocuments(current)
+      setError(err.message || 'Ошибка изменения порядка документа')
+    } finally {
+      setMovingDocumentId(null)
+    }
+  }
+
+  const moveSubcategoryDocument = async (
+    subcategoryId: number,
+    docId: string,
+    direction: 'up' | 'down'
+  ) => {
+    const current = subcategoryDocuments[subcategoryId] || []
+    const index = current.findIndex((doc) => doc.id === docId)
+    if (index === -1) return
+
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= current.length) return
+    const targetOrderIndex = current[targetIndex].orderIndex ?? targetIndex
+
+    const reordered = [...current]
+    const [moved] = reordered.splice(index, 1)
+    reordered.splice(targetIndex, 0, moved)
+
+    setSubcategoryDocuments((prev) => ({
+      ...prev,
+      [subcategoryId]: reordered,
+    }))
+    setMovingDocumentId(docId)
+
+    try {
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ orderIndex: targetOrderIndex }),
+      })
+
+      if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+    } catch (err: any) {
+      setSubcategoryDocuments((prev) => ({
+        ...prev,
+        [subcategoryId]: current,
+      }))
+      setError(err.message || 'Ошибка изменения порядка документа')
+    } finally {
+      setMovingDocumentId(null)
+    }
+  }
 
   const handleSavePageBlocks = async () => {
     if (!editingCategoryForBlocks) return
@@ -173,11 +256,7 @@ export default function SubcategoriesPage() {
 
       if (docRes.ok) {
         const docData = await docRes.json()
-        const sorted = (Array.isArray(docData) ? docData : []).sort((a, b) => {
-          const dateA = new Date(a.createdAt || 0).getTime()
-          const dateB = new Date(b.createdAt || 0).getTime()
-          return dateB - dateA
-        })
+        const sorted = Array.isArray(docData) ? docData : []
         setDocuments(sorted)
         const parentDocs: Document[] = []
         const subcatDocs: { [key: number]: Document[] } = {}
@@ -371,15 +450,6 @@ export default function SubcategoriesPage() {
 
       const newDoc = await res.json()
       setDocuments((prev) => [newDoc, ...prev])
-      if (docPlacement === 'subcategory' && selectedSubcategoryForDoc) {
-        const subcatId = selectedSubcategoryForDoc.id
-        setSubcategoryDocuments((prev) => ({
-          ...prev,
-          [subcatId]: [newDoc, ...(prev[subcatId] || [])],
-        }))
-      } else {
-        setParentDocuments((prev) => [newDoc, ...prev])
-      }
 
       setDocTitle('')
       setDocSource({ mode: 'file', file: null, url: '' })
@@ -387,6 +457,7 @@ export default function SubcategoriesPage() {
       setDocIsPublished(true)
       setAddDocumentModalOpened(false)
       setSelectedSubcategoryForDoc(null)
+      await loadCategoryAndSubcategories()
     } catch (err: any) {
       setDocFormError(err.message || 'Ошибка при добавлении документа')
       console.error('Add document error:', err)
@@ -469,8 +540,9 @@ export default function SubcategoriesPage() {
         }
 
         const trimmedUrl = editDocSource.url.trim()
-        if (editDocSource.mode === 'url' && trimmedUrl && trimmedUrl !== editingDocument.pdfUrl) {
-          updateData.pdfUrl = trimmedUrl
+        const currentDocUrl = editingDocument.fileUrl || editingDocument.pdfUrl || ''
+        if (editDocSource.mode === 'url' && trimmedUrl && trimmedUrl !== currentDocUrl) {
+          updateData.fileUrl = trimmedUrl
         }
 
         res = await fetch(`${API_ENDPOINTS.DOCUMENTS_UPDATE(editingDocument.id)}`, {
@@ -625,12 +697,12 @@ export default function SubcategoriesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {parentDocuments.map((doc) => (
+                  {parentDocuments.map((doc, index) => (
                     <tr key={doc.id}>
                       <td>
-                        {doc.pdfUrl ? (
+                        {(doc.fileUrl || doc.pdfUrl) ? (
                           <a
-                            href={getFileUrl(doc.pdfUrl)}
+                            href={getFileUrl(doc.fileUrl || doc.pdfUrl || '')}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ color: '#0d6efd', textDecoration: 'none' }}
@@ -650,16 +722,35 @@ export default function SubcategoriesPage() {
                       <td style={{ textAlign: 'right' }}>
                         <div className="d-flex justify-content-end gap-2">
                           <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => moveParentDocument(doc.id, 'up')}
+                            title="Переместить выше"
+                            disabled={index === 0 || movingDocumentId !== null}
+                          >
+                            <i className="bi bi-chevron-up" />
+                          </Button>
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => moveParentDocument(doc.id, 'down')}
+                            title="Переместить ниже"
+                            disabled={index === parentDocuments.length - 1 || movingDocumentId !== null}
+                          >
+                            <i className="bi bi-chevron-down" />
+                          </Button>
+                          <Button
                             variant="outline-secondary"
                             size="sm"
                             onClick={() => {
                               setEditingDocument(doc)
                               setEditDocTitle(doc.title)
+                              const docUrl = doc.fileUrl || doc.pdfUrl || ''
                               // Pre-fill editDocSource with current file or URL
-                              if (doc.pdfUrl && (doc.pdfUrl.startsWith('http://') || doc.pdfUrl.startsWith('https://'))) {
-                                setEditDocSource({ mode: 'url', file: null, url: doc.pdfUrl })
-                              } else if (doc.pdfUrl) {
-                                setEditDocSource({ mode: 'file', file: null, url: doc.pdfUrl })
+                              if (docUrl && (docUrl.startsWith('http://') || docUrl.startsWith('https://'))) {
+                                setEditDocSource({ mode: 'url', file: null, url: docUrl })
+                              } else if (docUrl) {
+                                setEditDocSource({ mode: 'file', file: null, url: docUrl })
                               } else {
                                 setEditDocSource({ mode: 'file', file: null, url: '' })
                               }
@@ -782,12 +873,12 @@ export default function SubcategoriesPage() {
                                 </tr>
                               </thead>
                               <tbody>
-                                {subcatDocs.map((doc) => (
+                                {subcatDocs.map((doc, index) => (
                                   <tr key={doc.id}>
                                     <td>
-                                      {doc.pdfUrl ? (
+                                      {(doc.fileUrl || doc.pdfUrl) ? (
                                         <a
-                                          href={getFileUrl(doc.pdfUrl)}
+                                          href={getFileUrl(doc.fileUrl || doc.pdfUrl || '')}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           style={{ color: '#0d6efd', textDecoration: 'none' }}
@@ -807,12 +898,35 @@ export default function SubcategoriesPage() {
                                     <td style={{ textAlign: 'right' }}>
                                       <div className="d-flex justify-content-end gap-2">
                                         <Button
+                                          variant="outline-primary"
+                                          size="sm"
+                                          onClick={() => moveSubcategoryDocument(subcategory.id, doc.id, 'up')}
+                                          title="Переместить выше"
+                                          disabled={index === 0 || movingDocumentId !== null}
+                                        >
+                                          <i className="bi bi-chevron-up" />
+                                        </Button>
+                                        <Button
+                                          variant="outline-primary"
+                                          size="sm"
+                                          onClick={() => moveSubcategoryDocument(subcategory.id, doc.id, 'down')}
+                                          title="Переместить ниже"
+                                          disabled={index === subcatDocs.length - 1 || movingDocumentId !== null}
+                                        >
+                                          <i className="bi bi-chevron-down" />
+                                        </Button>
+                                        <Button
                                           variant="outline-secondary"
                                           size="sm"
                                           onClick={() => {
                                             setEditingDocument(doc)
                                             setEditDocTitle(doc.title)
-                                            setEditDocSource({ mode: 'file', file: null, url: '' })
+                                            const docUrl = doc.fileUrl || doc.pdfUrl || ''
+                                            if (docUrl && (docUrl.startsWith('http://') || docUrl.startsWith('https://'))) {
+                                              setEditDocSource({ mode: 'url', file: null, url: docUrl })
+                                            } else {
+                                              setEditDocSource({ mode: 'file', file: null, url: docUrl })
+                                            }
                                             setEditDocIsPublished(doc.isPublished)
                                             setEditDocFormError('')
                                             setEditDocModalOpened(true)

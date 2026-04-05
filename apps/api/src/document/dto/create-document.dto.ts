@@ -51,5 +51,11 @@ export class CreateDocumentDto {
 	})
 	@IsBoolean()
 	isPublished?: boolean;
+
+	@ApiProperty({ example: 0, required: false, description: 'Порядок сортировки внутри группы документов' })
+	@IsOptional()
+	@Transform(({ value }) => (value === '' || value === undefined || value === null ? undefined : parseInt(value, 10)))
+	@IsNumber()
+	orderIndex?: number;
 }
 
