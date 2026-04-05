@@ -94,6 +94,52 @@ export class DocumentService {
 		await qb.execute()
 	}
 
+	private async normalizeOrderIndexesForScope(
+		type: DocumentTypeEnum,
+		categoryId: number | null,
+		subcategoryId: number | null,
+	) {
+		const parameters: Array<string | number> = [type]
+		const conditions: string[] = ['type = $1']
+
+		if (categoryId === null) {
+			conditions.push('category_id IS NULL')
+		} else {
+			parameters.push(categoryId)
+			conditions.push(`category_id = $${parameters.length}`)
+		}
+
+		if (subcategoryId === null) {
+			conditions.push('subcategory_id IS NULL')
+		} else {
+			parameters.push(subcategoryId)
+			conditions.push(`subcategory_id = $${parameters.length}`)
+		}
+
+		await this.documentRepo.query(
+			`
+				WITH ranked AS (
+					SELECT
+						id,
+						ROW_NUMBER() OVER (
+							PARTITION BY type, category_id, subcategory_id
+							ORDER BY
+								COALESCE("orderIndex", 2147483647) ASC,
+								"createdAt" ASC,
+								id ASC
+						) - 1 AS rn
+					FROM documents
+					WHERE ${conditions.join(' AND ')}
+				)
+				UPDATE documents d
+				SET "orderIndex" = ranked.rn
+				FROM ranked
+				WHERE d.id = ranked.id
+			`,
+			parameters,
+		)
+	}
+
 	private getCacheKey(
 		type?: DocumentTypeEnum,
 		categoryId?: number,
@@ -322,6 +368,22 @@ export class DocumentService {
 			oldType !== newType ||
 			oldCategoryId !== newCategoryId ||
 			oldSubcategoryId !== newSubcategoryId
+
+		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
+			await this.normalizeOrderIndexesForScope(newType, newCategoryId, newSubcategoryId)
+
+			if (!scopeChanged) {
+				const refreshed = await this.documentRepo
+					.createQueryBuilder('document')
+					.select('document.orderIndex', 'orderIndex')
+					.where('document.id = :id', { id })
+					.getRawOne<{ orderIndex: string }>()
+
+				if (refreshed?.orderIndex !== undefined) {
+					document.orderIndex = Number(refreshed.orderIndex)
+				}
+			}
+		}
 
 		if (scopeChanged) {
 			if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
