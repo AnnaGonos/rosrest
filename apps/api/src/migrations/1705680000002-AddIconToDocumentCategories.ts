@@ -11,5 +11,3 @@ export class AddIconToDocumentCategories1705680000002 implements MigrationInterf
         await queryRunner.query(`ALTER TABLE document_categories DROP COLUMN IF EXISTS icon`);
     }
 }
-
-export default AddIconToDocumentCategories1705680000002;

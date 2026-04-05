@@ -25,5 +25,3 @@ export class AddOrderIndexToDocuments1712300000003 implements MigrationInterface
     await queryRunner.query(`ALTER TABLE documents DROP COLUMN IF EXISTS "orderIndex"`);
   }
 }
-
-export default AddOrderIndexToDocuments1712300000003;

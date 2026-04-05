@@ -26,5 +26,3 @@ export class DeleteAllDocumentsAndCategories1705680000001 implements MigrationIn
         // Intentionally left blank.
     }
 }
-
-export default DeleteAllDocumentsAndCategories1705680000001;

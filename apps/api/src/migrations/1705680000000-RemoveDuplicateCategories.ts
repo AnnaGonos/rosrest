@@ -34,5 +34,3 @@ export class RemoveDuplicateCategories1705680000000 implements MigrationInterfac
         await queryRunner.query(`ALTER TABLE document_categories DROP CONSTRAINT IF EXISTS UQ_document_categories_name`);
     }
 }
-
-export default RemoveDuplicateCategories1705680000000;

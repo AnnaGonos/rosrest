@@ -19,5 +19,3 @@ export class AddFaqToEvents1705945600000 implements MigrationInterface {
     await queryRunner.dropColumn('events', 'faq')
   }
 }
-
-export default AddFaqToEvents1705945600000

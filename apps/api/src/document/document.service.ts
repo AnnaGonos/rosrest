@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository, IsNull } from 'typeorm';
+import { Repository, TreeRepository, IsNull, In } from 'typeorm';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { CreateDocumentCategoryDto } from './dto/create-document-category.dto';
@@ -525,6 +525,23 @@ export class DocumentService {
 		if (!category) {
 			throw new NotFoundException(`Category with ID ${id} not found`)
 		}
+
+		const descendants = await this.categoryTreeRepo.findDescendants(category)
+		const categoryIds = descendants.map((item) => item.id)
+
+		const linkedDocumentsCount = await this.documentRepo.count({
+			where: [
+				{ category: { id: In(categoryIds) } },
+				{ subcategory: { id: In(categoryIds) } },
+			],
+		})
+
+		if (linkedDocumentsCount > 0) {
+			throw new BadRequestException(
+				`Нельзя удалить категорию, пока в ней или её подкатегориях есть документы (${linkedDocumentsCount}). Сначала удалите или перенесите документы.`,
+			)
+		}
+
 		await this.categoryTreeRepo.delete(id)
 		await this.invalidateCache()
 		return { deleted: true }

@@ -148,5 +148,3 @@ export class CreateNewsAndNewsTags1740000000000 implements MigrationInterface {
     await queryRunner.dropTable('news_tags', true);
   }
 }
-
-export default CreateNewsAndNewsTags1740000000000;

@@ -38,5 +38,3 @@ export class AddPageToLibraryItems1739739600000 implements MigrationInterface {
     await queryRunner.dropColumn('library_items', 'pageId')
   }
 }
-
-export default AddPageToLibraryItems1739739600000
