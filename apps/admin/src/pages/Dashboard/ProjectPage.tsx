@@ -115,6 +115,11 @@ export default function ProjectsPage() {
         })
     }
 
+    const getProjectPublicUrl = (slug: string): string => {
+        const normalizedSlug = slug.startsWith('projects/') ? slug : `projects/${slug}`
+        return `https://rosrest.com/${normalizedSlug}`
+    }
+
     useEffect(() => {
         loadProjects()
     }, [])
@@ -222,7 +227,7 @@ export default function ProjectsPage() {
     const handleSaveProject = async () => {
         const title = projectTitle.trim()
         const slug = projectSlug.trim()
-        
+
         if (!title) {
             setProjectFormError('Укажите название проекта')
             return
@@ -252,11 +257,11 @@ export default function ProjectsPage() {
             formData.set('isDraft', JSON.stringify(projectIsDraft));
             formData.append('publishedAt', projectPublishedAt?.toISOString() || new Date().toISOString())
 
-            
+
             const blocksToSend = projectBlocks.map(({ id, ...block }: any) => block)
             formData.append('blocks', JSON.stringify(Array.isArray(blocksToSend) ? blocksToSend : []))
 
-        
+
 
             if (projectPreviewImage.file) {
                 formData.append('previewImage', projectPreviewImage.file)
@@ -387,17 +392,32 @@ export default function ProjectsPage() {
     return (
         <DashboardLayout title="Проекты">
             <Container>
-                <div className="mb-4">
-                    <h1 className="mb-2">Проекты</h1>
-                    <p className="text-muted">Управление проектами организации</p>
-                    <a href="https://disk.yandex.ru/d/6FzDg2-pa__2Ig"
+                <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h1 className="mb-2">Проекты</h1>
+                        <p className="text-muted">Управление проектами организации</p>
+
+                        <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.elkd92bcdiwp"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline-dark  d-flex align-items-center"
+                            style={{ width: 'fit-content', margin: '20px 0' }}
+                        >
+                            <i className="bi bi-info-lg me-2"></i>
+                            Советы по публикации
+                        </a>
+                    </div>
+
+                    <a
+                        href="https://rosrest.com/library"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-outline-dark  d-flex align-items-center"
-                        style={{ width: 'fit-content', margin: '20px 0' }}
+                        className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+                        title="Открыть страницу на сайте"
+                        aria-label="Открыть страницу на сайте"
                     >
-                        <i className="bi bi-info-lg me-2"></i>
-                        Советы по публикации
+                        <i className="bi bi-box-arrow-up-right"></i>
                     </a>
                 </div>
 
@@ -444,6 +464,18 @@ export default function ProjectsPage() {
                                                 {project.page.isDraft ? 'Черновик' : 'Опубликовано'}
                                             </Badge>
                                             <div className="btn-group">
+                                                <Button
+                                                    as="a"
+                                                    href={getProjectPublicUrl(project.page.slug)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    title="Открыть проект на сайте"
+                                                    aria-label="Открыть проект на сайте"
+                                                >
+                                                    <i className="bi bi-box-arrow-up-right"></i>
+                                                </Button>
                                                 <Button
                                                     variant="outline-primary"
                                                     size="sm"

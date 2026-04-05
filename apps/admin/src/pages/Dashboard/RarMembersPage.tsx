@@ -103,6 +103,15 @@ export default function RarMembersPage() {
         }
     }
 
+    const getSectionPublicUrl = (slug: string): string => {
+        return `https://rosrest.com/members/${slug}`
+    }
+
+    const getPortfolioPublicUrl = (slug: string): string => {
+        const normalizedSlug = slug.startsWith('portfolio/') ? slug.slice('portfolio/'.length) : slug
+        return `https://rosrest.com/portfolio/${normalizedSlug}`
+    }
+
     useEffect(() => {
         loadMembers()
         loadSections()
@@ -392,15 +401,35 @@ export default function RarMembersPage() {
     return (
         <DashboardLayout title="Члены РАР">
             <Container fluid>
-                <a href="https://disk.yandex.ru/d/GbXMSFQza8tZOA"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline-dark  d-flex align-items-center"
-                    style={{ width: 'fit-content', margin: '20px 0' }}
-                >
-                    <i className="bi bi-info-lg me-2"></i>
-                    Советы по публикации
-                </a>
+                <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h1 className="mb-1">Члены РАР</h1>
+                        <p className="text-muted mb-3">Управление портфолио и секциями членов РАР</p>
+
+                        <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.7aeptvjrk8r2"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline-dark  d-flex align-items-center"
+                            style={{ width: 'fit-content', margin: '20px 0' }}
+                        >
+                            <i className="bi bi-info-lg me-2"></i>
+                            Советы по публикации
+                        </a>
+                    </div>
+
+                    <a
+                        href="https://rosrest.com/members"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+                        title="Открыть страницу на сайте"
+                        aria-label="Открыть страницу на сайте"
+                    >
+                        <i className="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+
                 <Row className="mb-4">
 
                     <Col>
@@ -451,6 +480,19 @@ export default function RarMembersPage() {
                                                 <div className="text-muted">/{section.slug}</div>
                                             </div>
                                             <div className="d-flex gap-2" style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline-primary"
+                                                    as="a"
+                                                    href={getSectionPublicUrl(section.slug)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    title="Открыть секцию на сайте"
+                                                    aria-label="Открыть секцию на сайте"
+                                                >
+                                                    <i className="bi bi-box-arrow-up-right"></i>
+                                                </Button>
                                                 <Button size="sm" variant="outline-primary" onClick={(e) => { e.stopPropagation(); openEditSectionModal(section); }} title="Редактировать">
                                                     <i className="bi bi-pencil"></i>
                                                 </Button>
@@ -540,6 +582,18 @@ export default function RarMembersPage() {
                                             </div>
                                         </div>
                                         <div className="d-flex gap-2" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                            <Button
+                                                size="sm"
+                                                variant="outline-primary"
+                                                as="a"
+                                                href={getPortfolioPublicUrl(member.page?.slug || '')}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                title="Открыть портфолио на сайте"
+                                                aria-label="Открыть портфолио на сайте"
+                                            >
+                                                <i className="bi bi-box-arrow-up-right"></i>
+                                            </Button>
                                             <Button size="sm" variant="outline-primary" onClick={() => openEditMemberModal(member)}>
                                                 <i className="bi bi-pencil"></i>
                                             </Button>
