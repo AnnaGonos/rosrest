@@ -131,13 +131,13 @@ export default function SubcategoriesPage() {
     setMovingDocumentId(docId)
 
     try {
-      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
-        method: 'PATCH',
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_MOVE_ORDER(docId), {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${tokenValue}`,
         },
-        body: JSON.stringify({ orderIndex: targetIndex }),
+        body: JSON.stringify({ direction }),
       })
 
       if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
@@ -180,13 +180,13 @@ export default function SubcategoriesPage() {
     setMovingDocumentId(docId)
 
     try {
-      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
-        method: 'PATCH',
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_MOVE_ORDER(docId), {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${tokenValue}`,
         },
-        body: JSON.stringify({ orderIndex: targetIndex }),
+        body: JSON.stringify({ direction }),
       })
 
       if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)

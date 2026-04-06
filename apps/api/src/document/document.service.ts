@@ -206,6 +206,79 @@ export class DocumentService {
 		return updatedOrderIndex
 	}
 
+	async moveDocumentOrder(
+		id: string,
+		direction: 'up' | 'down',
+	) {
+		if (direction !== 'up' && direction !== 'down') {
+			throw new BadRequestException('Direction must be "up" or "down"')
+		}
+
+		const document = await this.documentRepo.findOne({
+			where: { id },
+			relations: ['category', 'subcategory'],
+		})
+
+		if (!document) {
+			throw new NotFoundException(`Document with ID ${id} not found`)
+		}
+
+		const type = document.type
+		const categoryId = document.category?.id ?? null
+		const subcategoryId = document.subcategory?.id ?? null
+
+		const qb = this.documentRepo
+			.createQueryBuilder('document')
+			.where('document.type = :type', { type })
+
+		if (categoryId === null) {
+			qb.andWhere('document.category_id IS NULL')
+		} else {
+			qb.andWhere('document.category_id = :categoryId', { categoryId })
+		}
+
+		if (subcategoryId === null) {
+			qb.andWhere('document.subcategory_id IS NULL')
+		} else {
+			qb.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
+		}
+
+		const documents = await qb
+			.orderBy('COALESCE(document.orderIndex, 2147483647)', 'ASC')
+			.addOrderBy('document.createdAt', 'ASC')
+			.addOrderBy('document.id', 'ASC')
+			.getMany()
+
+		const currentIndex = documents.findIndex((item) => item.id === id)
+		if (currentIndex === -1) {
+			throw new NotFoundException(`Document with ID ${id} not found in target scope`)
+		}
+
+		const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+		if (targetIndex < 0 || targetIndex >= documents.length) {
+			return document
+		}
+
+		const currentDocument = documents[currentIndex]
+		const targetDocument = documents[targetIndex]
+		const currentOrderIndex = currentDocument.orderIndex
+		const targetOrderIndex = targetDocument.orderIndex
+
+		await this.documentRepo.manager.transaction(async (manager) => {
+			await manager.getRepository(Document).update(currentDocument.id, {
+				orderIndex: targetOrderIndex,
+			})
+
+			await manager.getRepository(Document).update(targetDocument.id, {
+				orderIndex: currentOrderIndex,
+			})
+		})
+
+		document.orderIndex = targetOrderIndex
+		await this.invalidateCache()
+		return document
+	}
+
 	private getCacheKey(
 		type?: DocumentTypeEnum,
 		categoryId?: number,

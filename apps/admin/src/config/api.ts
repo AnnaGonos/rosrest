@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   DOCUMENTS_LIST_BY_TYPE: (type: string) => buildApiUrl(`documents?type=${type}`),
   DOCUMENTS_UPDATE: (id: string) => buildApiUrl(`documents/${id}`),
   DOCUMENTS_DELETE: (id: string) => buildApiUrl(`documents/${id}`),
+  DOCUMENTS_MOVE_ORDER: (id: string) => buildApiUrl(`documents/${id}/move-order`),
 
   DOCUMENT_CATEGORIES_LIST: buildApiUrl('document-categories/tree'),
   DOCUMENT_CATEGORIES_CREATE: buildApiUrl('document-categories'),

@@ -185,6 +185,29 @@ export class DocumentController {
 		return await this.documentService.removeDocument(id);
 	}
 
+	@Post(':id/move-order')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@ApiBody({
+		description: 'Move document up or down by swapping with the neighbor',
+		schema: {
+			type: 'object',
+			properties: {
+				direction: { type: 'string', enum: ['up', 'down'], example: 'up' },
+			},
+			required: ['direction'],
+		},
+	})
+	@ApiOkResponse({ description: 'Document order updated successfully' })
+	@ApiResponse({ status: 400, description: 'Bad request' })
+	@ApiResponse({ status: 404, description: 'Document not found' })
+	async moveOrder(
+		@Param('id', new ParseUUIDPipe()) id: string,
+		@Body('direction') direction: 'up' | 'down',
+	) {
+		return await this.documentService.moveDocumentOrder(id, direction)
+	}
+
 	@Post('reindex/all')
 	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
