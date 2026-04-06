@@ -113,11 +113,13 @@ export default function SubcategoriesPage() {
     return [...items].sort((a, b) => {
       const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER
       const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER
-      if (aOrder !== bOrder) return aOrder - bOrder
+      if (aOrder !== bOrder) return bOrder - aOrder
 
       const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
       const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
-      return bTime - aTime
+      if (aTime !== bTime) return bTime - aTime
+
+      return b.id.localeCompare(a.id)
     })
   }
 

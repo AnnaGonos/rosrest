@@ -227,57 +227,45 @@ export class DocumentService {
 		const categoryId = document.category?.id ?? null
 		const subcategoryId = document.subcategory?.id ?? null
 
-		// Ensure the scope has a contiguous orderIndex sequence (0..N-1)
-		await this.normalizeOrderIndexesForScope(type, categoryId, subcategoryId)
-
-		const refreshedDocument = await this.documentRepo.findOne({
-			where: { id },
-			relations: ['category', 'subcategory'],
-		})
-
-		if (!refreshedDocument) {
-			throw new NotFoundException(`Document with ID ${id} not found after normalization`)
-		}
-
-		const currentOrderIndex = refreshedDocument.orderIndex
-		const neighborOrderIndex = direction === 'up' ? currentOrderIndex - 1 : currentOrderIndex + 1
-
-		if (neighborOrderIndex < 0) {
-			return refreshedDocument
-		}
-
-		const neighborQuery = this.documentRepo
+		const scopeQuery = this.documentRepo
 			.createQueryBuilder('document')
 			.where('document.type = :type', { type })
 
 		if (categoryId === null) {
-			neighborQuery.andWhere('document.category_id IS NULL')
+			scopeQuery.andWhere('document.category_id IS NULL')
 		} else {
-			neighborQuery.andWhere('document.category_id = :categoryId', { categoryId })
+			scopeQuery.andWhere('document.category_id = :categoryId', { categoryId })
 		}
 
 		if (subcategoryId === null) {
-			neighborQuery.andWhere('document.subcategory_id IS NULL')
+			scopeQuery.andWhere('document.subcategory_id IS NULL')
 		} else {
-			neighborQuery.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
+			scopeQuery.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
 		}
 
-		neighborQuery.andWhere('document.orderIndex = :neighborOrderIndex', {
-			neighborOrderIndex,
-		})
+		const documents = await scopeQuery
+			.orderBy('document.orderIndex', 'DESC')
+			.addOrderBy('document.createdAt', 'DESC')
+			.addOrderBy('document.id', 'DESC')
+			.getMany()
 
-		neighborQuery
-			.orderBy('document.createdAt', 'ASC')
-			.addOrderBy('document.id', 'ASC')
-			.limit(1)
-
-		const neighbor = await neighborQuery.getOne()
-		if (!neighbor) {
-			return refreshedDocument
+		const currentIndex = documents.findIndex((item) => item.id === id)
+		if (currentIndex === -1) {
+			throw new NotFoundException(`Document with ID ${id} not found in target scope`)
 		}
+
+		const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+		if (targetIndex < 0 || targetIndex >= documents.length) {
+			return document
+		}
+
+		const currentDocument = documents[currentIndex]
+		const neighbor = documents[targetIndex]
+		const currentOrderIndex = currentDocument.orderIndex
+		const neighborOrderIndex = neighbor.orderIndex
 
 		await this.documentRepo.manager.transaction(async (manager) => {
-			await manager.getRepository(Document).update(refreshedDocument.id, {
+			await manager.getRepository(Document).update(currentDocument.id, {
 				orderIndex: neighborOrderIndex,
 			})
 
@@ -286,9 +274,9 @@ export class DocumentService {
 			})
 		})
 
-		refreshedDocument.orderIndex = neighborOrderIndex
+		document.orderIndex = neighborOrderIndex
 		await this.invalidateCache()
-		return refreshedDocument
+		return document
 	}
 
 	private getCacheKey(
@@ -435,7 +423,7 @@ export class DocumentService {
 		const list = await this.documentRepo.find({
 			where,
 			relations: ['category', 'subcategory'],
-			order: { orderIndex: 'ASC', createdAt: 'DESC' },
+			order: { orderIndex: 'DESC', createdAt: 'DESC' },
 		})
 
 		await this.cacheManager.set(cacheKey, list)
