@@ -7,6 +7,7 @@ import DocumentList from '../../components/DocumentList/DocumentList'
 import CategoryAccordion from '../../components/CategoryAccordion/CategoryAccordion'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import Seo from '../../components/Seo/Seo'
+import RequestState from '../../components/RequestState/RequestState'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -113,7 +114,12 @@ export default function DocumentCategoryPage() {
     return () => { mounted = false }
   }, [category])
 
-  if (loading) return <div>Загрузка...</div>
+  const isPageLoading = loading || (!!category && docsLoading)
+
+  if (isPageLoading || error) {
+    return <RequestState loading={isPageLoading} error={error} loadingText="Загрузка документов..." />
+  }
+
   if (!category) return <div className="page-main">Категория не найдена</div>
 
   const hasBlocks = Array.isArray((category as any).blocks) && (category as any).blocks.length > 0
