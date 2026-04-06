@@ -145,7 +145,7 @@ export class SearchService {
 
 	private getScopes(scope: SearchScope): Array<Exclude<SearchScope, 'all'>> {
 		if (scope === 'all') {
-			return ['news', 'projects', 'events', 'services', 'members', 'documents', 'library', 'pages', 'for-journalist']
+			return ['news', 'projects', 'events', 'services', 'members', 'monitoring-zakon', 'documents', 'library', 'pages', 'for-journalist']
 		}
 
 		return [scope]
@@ -163,6 +163,8 @@ export class SearchService {
 				return this.servicesSubquery()
 			case 'members':
 				return this.membersSubquery()
+			case 'monitoring-zakon':
+				return this.monitoringZakonSubquery()
 			case 'documents':
 				return this.documentsSubquery()
 			case 'library':
@@ -323,6 +325,22 @@ export class SearchService {
 		})
 	}
 
+	private monitoringZakonSubquery(): string {
+		return this.pageEntitySql({
+			type: 'monitoring-zakon',
+			entityTable: 'monitoring_zakon',
+			entityAlias: 'mz',
+			joinPageCondition: 'page.id = mz."pageId"',
+			urlExpression: `'/' || 'monitoring-zakon/' || regexp_replace(page.slug, '^monitoring-zakon/', '')`,
+			publishedAtExpression: `page."publishedAt"`,
+			extraWhere: [
+				`page."isDraft" = false`,
+				`page."publishedAt" IS NOT NULL`,
+				`page."publishedAt" <= NOW()`,
+			],
+		})
+	}
+
 	private pagesSubquery(): string {
 		return `
 			SELECT
@@ -341,11 +359,19 @@ export class SearchService {
 			WHERE page."isDraft" = false
 				AND page."publishedAt" IS NOT NULL
 				AND page."publishedAt" <= NOW()
+				AND NOT EXISTS (SELECT 1 FROM news n WHERE n."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM projects p WHERE p."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM services s WHERE s."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM rar_members rm WHERE rm."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM library_items li WHERE li."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM for_journalist fj WHERE fj."pageId" = page.id)
+				AND NOT EXISTS (SELECT 1 FROM monitoring_zakon mz WHERE mz."pageId" = page.id)
 				AND page.slug NOT LIKE 'news/%'
 				AND page.slug NOT LIKE 'projects/%'
 				AND page.slug NOT LIKE 'services/%'
 				AND page.slug NOT LIKE 'portfolio/%'
 				AND page.slug NOT LIKE 'library/%'
+				AND page.slug NOT LIKE 'monitoring-zakon/%'
 				AND page.slug NOT LIKE 'press-center/for-journalist%'
 				AND page.slug NOT LIKE 'for-journalist%'
 				AND to_tsvector('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, '')) @@ search_q.query

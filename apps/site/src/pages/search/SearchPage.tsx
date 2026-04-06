@@ -5,13 +5,14 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import Pagination from '../../components/Pagination/Pagination'
 import RequestState from '../../components/RequestState/RequestState'
+import SearchTypeSearchBar from '../../components/SearchTypeSearchBar/SearchTypeSearchBar'
 import Seo from '../../components/Seo/Seo'
 import { getFileUrl } from '../../utils/getFileUrl'
 import './SearchPage.css'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
-type SearchScope = 'all' | 'news' | 'projects' | 'events' | 'services' | 'members' | 'documents' | 'library' | 'pages' | 'for-journalist'
+type SearchScope = 'all' | 'news' | 'projects' | 'events' | 'services' | 'members' | 'monitoring-zakon' | 'documents' | 'library' | 'pages' | 'for-journalist'
 
 type SearchResultItem = {
 	type: Exclude<SearchScope, 'all'>
@@ -42,6 +43,7 @@ const FILTERS: Array<{ value: SearchScope; label: string }> = [
 	{ value: 'events', label: 'События' },
 	{ value: 'services', label: 'Услуги' },
 	{ value: 'members', label: 'Члены РАР' },
+	{ value: 'monitoring-zakon', label: 'Мониторинг законодательства' },
 	{ value: 'documents', label: 'Документы' },
 	{ value: 'library', label: 'Библиотека' },
 	{ value: 'pages', label: 'Страницы' },
@@ -54,6 +56,7 @@ const TYPE_LABELS: Record<string, string> = {
 	event: 'Событие',
 	service: 'Услуга',
 	member: 'Член РАР',
+	'monitoring-zakon': 'Мониторинг законодательства',
 	document: 'Документ',
 	library: 'Библиотека',
 	page: 'Страница',
@@ -196,34 +199,17 @@ export default function SearchPage() {
 					</div>
 				</div>
 
-				<form className="search-page__form" onSubmit={handleSubmit}>
-					<label className="search-page__field">
-						<span className="search-page__label">Что ищем</span>
-						<input
-							type="search"
-							value={queryInput}
-							onChange={(event) => setQueryInput(event.currentTarget.value)}
-							placeholder="Например: конференция"
-							autoComplete="off"
-						/>
-					</label>
-					<button type="submit" className="search-page__submit btn btn-primary">
-						Поиск
-					</button>
-				</form>
-
-				<div className="search-page__filters" role="tablist" aria-label="Фильтр результатов поиска">
-					{FILTERS.map((filter) => (
-						<button
-							key={filter.value}
-							type="button"
-							className={`search-page__filter ${scope === filter.value ? 'search-page__filter--active' : ''}`}
-							onClick={() => handleScopeChange(filter.value)}
-						>
-							{filter.label}
-						</button>
-					))}
-				</div>
+				<SearchTypeSearchBar
+					query={queryInput}
+					onQueryChange={setQueryInput}
+					selectedType={scope}
+					onTypeChange={handleScopeChange}
+					options={FILTERS.filter((filter) => filter.value !== 'all')}
+					onSubmit={handleSubmit}
+					placeholder="Например: конференция"
+					submitLabel="Поиск"
+					allLabel="Все"
+				/>
 
 				{!query && (
 					<ContentSection columns={1}>
@@ -274,7 +260,7 @@ export default function SearchPage() {
 											</div>
 											<h3 className="search-page__result-title">{item.title}</h3>
 											{item.section && <p className="search-page__section">{item.section}</p>}
-											<p className="search-page__link">{item.url}</p>
+											{/* <p className="search-page__link">{item.url}</p> */}
 											<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: item.snippet }} />
 											</div>
 										</>
