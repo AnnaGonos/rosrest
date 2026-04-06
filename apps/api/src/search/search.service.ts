@@ -27,11 +27,49 @@ export class SearchService {
 		}
 
 		const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 100))
-		const subqueries = this.buildSubqueries(scope)
+		const scopes = this.getScopes(scope)
 
-		if (subqueries.length === 0) {
+		if (scopes.length === 0) {
 			return { query: normalizedQuery, scope, total: 0, items: [] }
 		}
+
+		const allRows = await Promise.all(
+			scopes.map(async (currentScope) => this.runScopeQuery(currentScope, normalizedQuery, safeLimit)),
+		)
+
+		const rows = allRows.flat()
+		const items = rows
+			.map((row) => ({
+				type: row.type,
+				id: row.id,
+				title: row.title,
+				url: row.url,
+				previewImage: row.preview_image ?? null,
+				snippet: row.snippet,
+				publishedAt: row.published_at,
+				rank: Number(row.rank || 0),
+				section: row.section ?? null,
+			}))
+			.sort((a, b) => {
+				if (b.rank !== a.rank) return b.rank - a.rank
+				const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0
+				const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0
+				if (bTime !== aTime) return bTime - aTime
+				return a.title.localeCompare(b.title)
+			})
+			.slice(0, safeLimit)
+
+		return {
+			query: normalizedQuery,
+			scope,
+			total: items.length,
+			items,
+		}
+	}
+
+	private async runScopeQuery(scope: Exclude<SearchScope, 'all'>, query: string, limit: number): Promise<RawSearchRow[]> {
+		const subqueries = [this.getScopeSubquery(scope)]
+		if (subqueries.length === 0) return []
 
 		const sql = `
 			WITH RECURSIVE block_tree AS (
@@ -66,57 +104,52 @@ export class SearchService {
 			)
 			SELECT *
 			FROM (
-				${subqueries.join('\n\t\t\t\tUNION ALL\n\t\t\t\t')}
+				${subqueries[0]}
 			) results
 			ORDER BY rank DESC, published_at DESC NULLS LAST, title ASC
 			LIMIT $2
 		`
 
-		let rows: RawSearchRow[] = []
 		try {
-			rows = await this.dataSource.query(sql, [normalizedQuery, safeLimit]) as RawSearchRow[]
+			return await this.dataSource.query(sql, [query, limit]) as RawSearchRow[]
 		} catch (error) {
 			this.logger.error(
-				`Search query failed. q="${normalizedQuery}", scope="${scope}", limit=${safeLimit}`,
+				`Search query failed. q="${query}", scope="${scope}", limit=${limit}`,
 				error instanceof Error ? error.stack : String(error),
 			)
-			throw error
-		}
-
-		const items = rows.map((row) => ({
-			type: row.type,
-			id: row.id,
-			title: row.title,
-			url: row.url,
-			previewImage: row.preview_image ?? null,
-			snippet: row.snippet,
-			publishedAt: row.published_at,
-			rank: Number(row.rank || 0),
-			section: row.section ?? null,
-		}))
-
-		return {
-			query: normalizedQuery,
-			scope,
-			total: items.length,
-			items,
+			return []
 		}
 	}
 
-	private buildSubqueries(scope: SearchScope): string[] {
-		const queries: string[] = []
+	private getScopes(scope: SearchScope): Array<Exclude<SearchScope, 'all'>> {
+		if (scope === 'all') {
+			return ['news', 'projects', 'events', 'services', 'members', 'documents', 'library', 'pages', 'for-journalist']
+		}
 
-		if (scope === 'all' || scope === 'news') queries.push(this.newsSubquery())
-		if (scope === 'all' || scope === 'projects') queries.push(this.projectsSubquery())
-		if (scope === 'all' || scope === 'events') queries.push(this.eventsSubquery())
-		if (scope === 'all' || scope === 'services') queries.push(this.servicesSubquery())
-		if (scope === 'all' || scope === 'members') queries.push(this.membersSubquery())
-		if (scope === 'all' || scope === 'documents') queries.push(this.documentsSubquery())
-		if (scope === 'all' || scope === 'library') queries.push(this.librarySubquery())
-		if (scope === 'all' || scope === 'pages') queries.push(this.pagesSubquery())
-		if (scope === 'all' || scope === 'for-journalist') queries.push(this.forJournalistSubquery())
+		return [scope]
+	}
 
-		return queries
+	private getScopeSubquery(scope: Exclude<SearchScope, 'all'>): string {
+		switch (scope) {
+			case 'news':
+				return this.newsSubquery()
+			case 'projects':
+				return this.projectsSubquery()
+			case 'events':
+				return this.eventsSubquery()
+			case 'services':
+				return this.servicesSubquery()
+			case 'members':
+				return this.membersSubquery()
+			case 'documents':
+				return this.documentsSubquery()
+			case 'library':
+				return this.librarySubquery()
+			case 'pages':
+				return this.pagesSubquery()
+			case 'for-journalist':
+				return this.forJournalistSubquery()
+		}
 	}
 
 	private pageTextExpression(alias: string): string {
