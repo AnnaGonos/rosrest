@@ -409,7 +409,8 @@ export class SearchService {
 				item.id::text AS id,
 				COALESCE(page.title, item.title) AS title,
 				CASE
-					WHEN item.type = 'article' THEN '/' || 'articles/' || regexp_replace(page.slug, '^library/', '')
+					WHEN item.type = 'article' AND page.slug IS NOT NULL THEN '/' || 'articles/' || regexp_replace(page.slug, '^library/', '')
+					WHEN item.type = 'article' THEN '/' || 'library/' || item.id::text
 					ELSE '/' || 'library/' || item.id::text
 				END AS url,
 				item."previewImage" AS preview_image,
@@ -428,7 +429,13 @@ export class SearchService {
 			WHERE item.isPublished = true
 				AND (
 					item.type != 'article'
-					OR (page."isDraft" = false AND page."publishedAt" IS NOT NULL AND page."publishedAt" <= NOW())
+					OR (
+						page.id IS NOT NULL
+						AND page.slug IS NOT NULL
+						AND page."isDraft" = false
+						AND page."publishedAt" IS NOT NULL
+						AND page."publishedAt" <= NOW()
+					)
 				)
 				AND to_tsvector('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, '')) @@ search_q.query
 		`
