@@ -227,6 +227,25 @@ export class DocumentService {
 		const categoryId = document.category?.id ?? null
 		const subcategoryId = document.subcategory?.id ?? null
 
+		// Ensure the scope has a contiguous orderIndex sequence (0..N-1)
+		await this.normalizeOrderIndexesForScope(type, categoryId, subcategoryId)
+
+		const refreshedDocument = await this.documentRepo.findOne({
+			where: { id },
+			relations: ['category', 'subcategory'],
+		})
+
+		if (!refreshedDocument) {
+			throw new NotFoundException(`Document with ID ${id} not found after normalization`)
+		}
+
+		const currentOrderIndex = refreshedDocument.orderIndex
+		const neighborOrderIndex = direction === 'up' ? currentOrderIndex - 1 : currentOrderIndex + 1
+
+		if (neighborOrderIndex < 0) {
+			return refreshedDocument
+		}
+
 		const neighborQuery = this.documentRepo
 			.createQueryBuilder('document')
 			.where('document.type = :type', { type })
@@ -243,22 +262,22 @@ export class DocumentService {
 			neighborQuery.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
 		}
 
-		neighborQuery.andWhere(direction === 'up' ? 'document.orderIndex < :currentOrderIndex' : 'document.orderIndex > :currentOrderIndex', {
-			currentOrderIndex: document.orderIndex,
+		neighborQuery.andWhere('document.orderIndex = :neighborOrderIndex', {
+			neighborOrderIndex,
 		})
 
-		neighborQuery.orderBy('document.orderIndex', direction === 'up' ? 'DESC' : 'ASC').addOrderBy('document.createdAt', 'ASC').addOrderBy('document.id', 'ASC').limit(1)
+		neighborQuery
+			.orderBy('document.createdAt', 'ASC')
+			.addOrderBy('document.id', 'ASC')
+			.limit(1)
 
 		const neighbor = await neighborQuery.getOne()
 		if (!neighbor) {
-			return document
+			return refreshedDocument
 		}
 
-		const currentOrderIndex = document.orderIndex
-		const neighborOrderIndex = neighbor.orderIndex
-
 		await this.documentRepo.manager.transaction(async (manager) => {
-			await manager.getRepository(Document).update(document.id, {
+			await manager.getRepository(Document).update(refreshedDocument.id, {
 				orderIndex: neighborOrderIndex,
 			})
 
@@ -267,9 +286,9 @@ export class DocumentService {
 			})
 		})
 
-		document.orderIndex = neighborOrderIndex
+		refreshedDocument.orderIndex = neighborOrderIndex
 		await this.invalidateCache()
-		return document
+		return refreshedDocument
 	}
 
 	private getCacheKey(

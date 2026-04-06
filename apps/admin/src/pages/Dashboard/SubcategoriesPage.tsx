@@ -109,6 +109,18 @@ export default function SubcategoriesPage() {
     return `${url}${separator}_ts=${Date.now()}`
   }
 
+  const sortDocumentsByOrder = (items: Document[]) => {
+    return [...items].sort((a, b) => {
+      const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER
+      const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER
+      if (aOrder !== bOrder) return aOrder - bOrder
+
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
+      return bTime - aTime
+    })
+  }
+
   const moveParentDocument = async (docId: string, direction: 'up' | 'down') => {
     const current = [...parentDocuments]
     const index = current.findIndex((doc) => doc.id === docId)
@@ -278,15 +290,7 @@ export default function SubcategoriesPage() {
       if (docRes.ok) {
         const docData = await docRes.json()
         const sorted = Array.isArray(docData) ? docData : []
-        const sortedByOrder = [...sorted].sort((a, b) => {
-          const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
-          const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
-          if (aOrder !== bOrder) return aOrder - bOrder
-
-          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
-          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
-          return bTime - aTime
-        })
+        const sortedByOrder = sortDocumentsByOrder(sorted)
         setDocuments(sortedByOrder)
         const parentDocs: Document[] = []
         const subcatDocs: { [key: number]: Document[] } = {}
@@ -305,8 +309,13 @@ export default function SubcategoriesPage() {
           }
         })
 
-        setSubcategoryDocuments(subcatDocs)
-        setParentDocuments(parentDocs)
+        const normalizedSubcatDocs: { [key: number]: Document[] } = {}
+        Object.entries(subcatDocs).forEach(([key, docs]) => {
+          normalizedSubcatDocs[Number(key)] = sortDocumentsByOrder(docs)
+        })
+
+        setSubcategoryDocuments(normalizedSubcatDocs)
+        setParentDocuments(sortDocumentsByOrder(parentDocs))
       }
     } catch (err: any) {
       setError(err.message || 'Ошибка загрузки категорий')
