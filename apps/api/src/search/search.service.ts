@@ -117,7 +117,9 @@ export class SearchService {
 				GROUP BY page_id
 			),
 			search_q AS (
-				SELECT plainto_tsquery('russian', $1) AS query
+				SELECT
+					plainto_tsquery('russian', $1) AS query,
+					$1::text AS raw_query
 			)
 			SELECT *
 			FROM (
@@ -442,12 +444,19 @@ export class SearchService {
 					)
 				)
 				AND (
-					to_tsvector('russian', COALESCE(item.title, '')) ||
-					to_tsvector('russian', COALESCE(item.description, '')) ||
-					to_tsvector('russian', COALESCE(cat.name, '')) ||
-					to_tsvector('russian', COALESCE(page.title, '')) ||
-					to_tsvector('russian', COALESCE(pt.body, ''))
-				) @@ search_q.query
+					(
+						to_tsvector('russian', COALESCE(item.title, '')) ||
+						to_tsvector('russian', COALESCE(item.description, '')) ||
+						to_tsvector('russian', COALESCE(cat.name, '')) ||
+						to_tsvector('russian', COALESCE(page.title, '')) ||
+						to_tsvector('russian', COALESCE(pt.body, ''))
+					) @@ search_q.query
+					OR COALESCE(item.title, '') ILIKE '%' || search_q.raw_query || '%'
+					OR COALESCE(item.description, '') ILIKE '%' || search_q.raw_query || '%'
+					OR COALESCE(cat.name, '') ILIKE '%' || search_q.raw_query || '%'
+					OR COALESCE(page.title, '') ILIKE '%' || search_q.raw_query || '%'
+					OR COALESCE(pt.body, '') ILIKE '%' || search_q.raw_query || '%'
+				)
 		`
 	}
 
