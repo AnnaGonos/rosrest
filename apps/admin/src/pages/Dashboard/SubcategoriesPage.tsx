@@ -738,7 +738,7 @@ export default function SubcategoriesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {parentDocuments.map((doc, index) => (
+                  {sortDocumentsByOrder(parentDocuments).map((doc, index) => (
                     <tr key={doc.id}>
                       <td>
                         {(doc.fileUrl || doc.pdfUrl) ? (
@@ -836,7 +836,7 @@ export default function SubcategoriesPage() {
                 ) : (
                   <div className="d-flex flex-column gap-3 mt-3">
                     {subcategories.map((subcategory) => {
-                      const subcatDocs = subcategoryDocuments[subcategory.id] || []
+                      const subcatDocs = sortDocumentsByOrder(subcategoryDocuments[subcategory.id] || [])
                       return (
                         <div key={subcategory.id} className="bg-white border rounded p-3">
                           <div className="d-flex justify-content-between align-items-center mb-3">
