@@ -32,7 +32,12 @@ export default function SearchTypeSearchBar<T extends string>({
 	const [isOpen, setIsOpen] = useState(false)
 	const rootRef = useRef<HTMLFormElement | null>(null)
 
-	const selectedOption = useMemo(() => options.find((item) => item.value === selectedType) || options[0], [options, selectedType])
+	const selectedOption = useMemo(() => {
+		if (selectedType === 'all') {
+			return { value: 'all' as T, label: allLabel }
+		}
+		return options.find((item) => item.value === selectedType) || options[0]
+	}, [options, selectedType, allLabel])
 
 	useEffect(() => {
 		const handleDocumentClick = (event: MouseEvent) => {

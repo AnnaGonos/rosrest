@@ -12,10 +12,10 @@ import './SearchPage.css'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
-type SearchScope = 'all' | 'news' | 'projects' | 'events' | 'services' | 'members' | 'monitoring-zakon' | 'documents' | 'library' | 'pages' | 'for-journalist'
+type SearchScope = 'all' | 'news' | 'projects' | 'events' | 'services' | 'members' | 'monitoring-zakon' | 'documents' | 'library' | 'for-journalist'
 
 type SearchResultItem = {
-	type: Exclude<SearchScope, 'all'>
+	type: 'news' | 'project' | 'event' | 'service' | 'member' | 'monitoring-zakon' | 'document' | 'library' | 'content-page' | 'for-journalist'
 	id: string
 	title: string
 	url: string
@@ -50,6 +50,7 @@ const FILTERS: Array<{ value: SearchScope; label: string }> = [
 ]
 
 const TYPE_LABELS: Record<string, string> = {
+	all: 'Все',
 	news: 'Новость',
 	project: 'Проект',
 	event: 'Событие',
@@ -58,6 +59,7 @@ const TYPE_LABELS: Record<string, string> = {
 	'monitoring-zakon': 'Мониторинг законодательства',
 	document: 'Документ',
 	library: 'Библиотека',
+	'page': 'Страницы',
 	'for-journalist': 'Журналистам',
 }
 

@@ -416,7 +416,11 @@ export class SearchService {
 				item."previewImage" AS preview_image,
 				COALESCE(page."publishedAt", item."createdAt") AS published_at,
 				ts_rank_cd(
-					to_tsvector('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, '')),
+					setweight(to_tsvector('russian', COALESCE(item.title, '')), 'A') ||
+					setweight(to_tsvector('russian', COALESCE(item.description, '')), 'B') ||
+					setweight(to_tsvector('russian', COALESCE(cat.name, '')), 'B') ||
+					setweight(to_tsvector('russian', COALESCE(page.title, '')), 'A') ||
+					setweight(to_tsvector('russian', COALESCE(pt.body, '')), 'C'),
 					search_q.query
 				) AS rank,
 				ts_headline('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
@@ -437,7 +441,13 @@ export class SearchService {
 						AND page."publishedAt" <= NOW()
 					)
 				)
-				AND to_tsvector('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, '')) @@ search_q.query
+				AND (
+					to_tsvector('russian', COALESCE(item.title, '')) ||
+					to_tsvector('russian', COALESCE(item.description, '')) ||
+					to_tsvector('russian', COALESCE(cat.name, '')) ||
+					to_tsvector('russian', COALESCE(page.title, '')) ||
+					to_tsvector('russian', COALESCE(pt.body, ''))
+				) @@ search_q.query
 		`
 	}
 
