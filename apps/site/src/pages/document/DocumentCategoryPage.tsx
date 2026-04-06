@@ -134,7 +134,7 @@ export default function DocumentCategoryPage() {
         <Breadcrumbs items={[{ label: 'Главная', to: '/' }, { label: 'Документы', to: '/documents' }, { label: category.name, isCurrent: true }]} />
       </div>
 
-      <div className="page__container">
+      <div className="page__container page__container--27">
         <div style={{ display: 'flex', alignItems: 'start', gap: '20px', marginBottom: '80px', marginTop: '-30px' }}>
           <BackToSectionButton to="/documents" label="К разделу Документы" />
           <h1 className="page-title">{category.name}</h1>
