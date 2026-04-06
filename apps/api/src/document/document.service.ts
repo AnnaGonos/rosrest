@@ -227,54 +227,47 @@ export class DocumentService {
 		const categoryId = document.category?.id ?? null
 		const subcategoryId = document.subcategory?.id ?? null
 
-		const qb = this.documentRepo
+		const neighborQuery = this.documentRepo
 			.createQueryBuilder('document')
 			.where('document.type = :type', { type })
 
 		if (categoryId === null) {
-			qb.andWhere('document.category_id IS NULL')
+			neighborQuery.andWhere('document.category_id IS NULL')
 		} else {
-			qb.andWhere('document.category_id = :categoryId', { categoryId })
+			neighborQuery.andWhere('document.category_id = :categoryId', { categoryId })
 		}
 
 		if (subcategoryId === null) {
-			qb.andWhere('document.subcategory_id IS NULL')
+			neighborQuery.andWhere('document.subcategory_id IS NULL')
 		} else {
-			qb.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
+			neighborQuery.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
 		}
 
-		const documents = await qb
-			.orderBy('COALESCE(document.orderIndex, 2147483647)', 'ASC')
-			.addOrderBy('document.createdAt', 'ASC')
-			.addOrderBy('document.id', 'ASC')
-			.getMany()
+		neighborQuery.andWhere(direction === 'up' ? 'document.orderIndex < :currentOrderIndex' : 'document.orderIndex > :currentOrderIndex', {
+			currentOrderIndex: document.orderIndex,
+		})
 
-		const currentIndex = documents.findIndex((item) => item.id === id)
-		if (currentIndex === -1) {
-			throw new NotFoundException(`Document with ID ${id} not found in target scope`)
-		}
+		neighborQuery.orderBy('document.orderIndex', direction === 'up' ? 'DESC' : 'ASC').addOrderBy('document.createdAt', 'ASC').addOrderBy('document.id', 'ASC').limit(1)
 
-		const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
-		if (targetIndex < 0 || targetIndex >= documents.length) {
+		const neighbor = await neighborQuery.getOne()
+		if (!neighbor) {
 			return document
 		}
 
-		const currentDocument = documents[currentIndex]
-		const targetDocument = documents[targetIndex]
-		const currentOrderIndex = currentDocument.orderIndex
-		const targetOrderIndex = targetDocument.orderIndex
+		const currentOrderIndex = document.orderIndex
+		const neighborOrderIndex = neighbor.orderIndex
 
 		await this.documentRepo.manager.transaction(async (manager) => {
-			await manager.getRepository(Document).update(currentDocument.id, {
-				orderIndex: targetOrderIndex,
+			await manager.getRepository(Document).update(document.id, {
+				orderIndex: neighborOrderIndex,
 			})
 
-			await manager.getRepository(Document).update(targetDocument.id, {
+			await manager.getRepository(Document).update(neighbor.id, {
 				orderIndex: currentOrderIndex,
 			})
 		})
 
-		document.orderIndex = targetOrderIndex
+		document.orderIndex = neighborOrderIndex
 		await this.invalidateCache()
 		return document
 	}
