@@ -70,6 +70,63 @@ const DATE_FORMAT = new Intl.DateTimeFormat('ru-RU', {
 	year: 'numeric',
 })
 
+const EVENT_MONTH_NAMES = [
+	'январь',
+	'февраль',
+	'март',
+	'апрель',
+	'май',
+	'июнь',
+	'июль',
+	'август',
+	'сентябрь',
+	'октябрь',
+	'ноябрь',
+	'декабрь',
+]
+
+const EVENT_MONTH_NAMES_GEN = [
+	'января',
+	'февраля',
+	'марта',
+	'апреля',
+	'мая',
+	'июня',
+	'июля',
+	'августа',
+	'сентября',
+	'октября',
+	'ноября',
+	'декабря',
+]
+
+const formatEventDate = (value?: string | null): string => {
+	if (!value) return ''
+	const trimmed = value.trim()
+	if (!trimmed) return ''
+
+	const parts = trimmed.split('.')
+
+	if (parts.length === 3) {
+		const day = Number(parts[0])
+		const month = Number(parts[1])
+		const year = Number(parts[2])
+		if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year) && month >= 1 && month <= 12) {
+			return `${day} ${EVENT_MONTH_NAMES_GEN[month - 1]} ${year}`
+		}
+	}
+
+	if (parts.length === 2) {
+		const month = Number(parts[0])
+		const year = Number(parts[1])
+		if (!Number.isNaN(month) && !Number.isNaN(year) && month >= 1 && month <= 12) {
+			return `${EVENT_MONTH_NAMES[month - 1]} ${year}`
+		}
+	}
+
+	return trimmed
+}
+
 const isExternalUrl = (url: string) => /^https?:\/\//i.test(url)
 
 export default function SearchPage() {
@@ -239,7 +296,9 @@ export default function SearchPage() {
 							<div className="search-page__results">
 								{results.map((item) => {
 									const previewSrc = item.previewImage ? getFileUrl(item.previewImage) : ''
-									const displayDate = item.type === 'event' ? item.eventDate : item.publishedAt
+									const displayDate = item.type === 'event'
+										? formatEventDate(item.eventDate)
+										: item.publishedAt
 									const content = (
 										<>
 											<div className={`search-page__thumb-wrap ${previewSrc ? '' : 'search-page__thumb-wrap--empty'}`}>
