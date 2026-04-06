@@ -200,10 +200,7 @@
 
     .search-type-search-bar__submit {
         min-height: 56px;
-        padding: 10px 5px;
-        
-        width: calc(0);
-        /* margin-left: -5px; */
+        padding: 10px 5px 10px 15px;
     }
 
     .search-type-search-bar__submit i {
