@@ -141,7 +141,7 @@ export class SearchService {
 			LEFT JOIN library_categories cat ON cat.id = item."categoryId"
 			LEFT JOIN "page" page ON page.id = item."pageId"
 			LEFT JOIN page_text pt ON pt.page_id = page.id
-			WHERE item.isPublished = true
+			WHERE item."isPublished" = true
 				AND (
 					item.type != 'article'
 					OR (
@@ -679,7 +679,7 @@ export class SearchService {
 			LEFT JOIN "page" page ON page.id = item."pageId"
 			LEFT JOIN page_text pt ON pt.page_id = page.id
 			CROSS JOIN search_q
-			WHERE item.isPublished = true
+			WHERE item."isPublished" = true
 				AND (
 					item.type != 'article'
 					OR (
