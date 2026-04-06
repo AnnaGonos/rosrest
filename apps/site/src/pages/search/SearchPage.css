@@ -1,20 +1,3 @@
-.search-page {
-	background:
-		radial-gradient(circle at top left, rgba(14, 48, 92, 0.08), transparent 30%),
-		radial-gradient(circle at top right, rgba(189, 158, 105, 0.12), transparent 28%),
-		linear-gradient(180deg, rgba(245, 247, 250, 0.9), #fff 28%);
-}
-
-.search-page__hero {
-	margin-bottom: 24px;
-}
-
-.search-page__subtitle {
-	max-width: 760px;
-	margin-top: 12px;
-	margin-bottom: 0;
-	color: rgba(19, 33, 58, 0.78);
-}
 
 .search-page__form {
 	display: flex;

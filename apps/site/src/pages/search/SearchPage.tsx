@@ -129,6 +129,17 @@ const formatEventDate = (value?: string | null): string => {
 
 const isExternalUrl = (url: string) => /^https?:\/\//i.test(url)
 
+const getResultsWord = (count: number): string => {
+	const absCount = Math.abs(count)
+	const lastTwo = absCount % 100
+	const last = absCount % 10
+
+	if (lastTwo >= 11 && lastTwo <= 14) return 'результатов'
+	if (last === 1) return 'результат'
+	if (last >= 2 && last <= 4) return 'результата'
+	return 'результатов'
+}
+
 export default function SearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const [queryInput, setQueryInput] = useState(searchParams.get('q') || '')
@@ -250,7 +261,12 @@ export default function SearchPage() {
 				<div className="page__header-title search-page__hero">
 					<BackToSectionButton to="/" label="На главную" />
 					<div>
-						<h1 className="page-title">Поиск по сайту</h1>
+
+						<h1 className="page-title">{totalResults} {getResultsWord(totalResults)} по запросу</h1>
+						<h2 className="section-title--lg" style={{ marginTop: '10px' }}>
+							{query?`«${query}»`: ''}
+						</h2>
+
 					</div>
 				</div>
 
@@ -277,12 +293,6 @@ export default function SearchPage() {
 
 				{query && (
 					<ContentSection columns={1}>
-						<div className="search-page__results-head">
-							<h2 className="section-title--lg">Результаты</h2>
-							<p className="body-text search-page__count">
-								Найдено: {totalResults}
-							</p>
-						</div>
 
 						{(showLoadingState || error) && (
 							<RequestState loading={showLoadingState} error={error} loadingText="Поиск по сайту..." />
@@ -304,25 +314,25 @@ export default function SearchPage() {
 											<div className={`search-page__thumb-wrap ${previewSrc ? '' : 'search-page__thumb-wrap--empty'}`}>
 												{previewSrc && (
 													<img className="search-page__thumb" src={previewSrc} alt={item.title} loading="lazy" />
-											)}
-											</div>
-											<div className="search-page__content">
-											<div className="search-page__result-meta">
-												<span className="search-page__badge">{TYPE_LABELS[item.type] || item.type}</span>
-												{displayDate && (
-													item.type === 'event' ? (
-														<span className="search-page__date">{displayDate}</span>
-													) : (
-														<time className="search-page__date" dateTime={displayDate}>
-															{DATE_FORMAT.format(new Date(displayDate))}
-														</time>
-													)
 												)}
 											</div>
-											<h3 className="search-page__result-title">{item.title}</h3>
-											{item.section && <p className="search-page__section">{item.section}</p>}
-											{/* <p className="search-page__link">{item.url}</p> */}
-											<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: item.snippet }} />
+											<div className="search-page__content">
+												<div className="search-page__result-meta">
+													<span className="search-page__badge">{TYPE_LABELS[item.type] || item.type}</span>
+													{displayDate && (
+														item.type === 'event' ? (
+															<span className="search-page__date">{displayDate}</span>
+														) : (
+															<time className="search-page__date" dateTime={displayDate}>
+																{DATE_FORMAT.format(new Date(displayDate))}
+															</time>
+														)
+													)}
+												</div>
+												<h3 className="search-page__result-title">{item.title}</h3>
+												{item.section && <p className="search-page__section">{item.section}</p>}
+												{/* <p className="search-page__link">{item.url}</p> */}
+												<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: item.snippet }} />
 											</div>
 										</>
 									)
