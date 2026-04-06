@@ -184,6 +184,36 @@ export class DocumentController {
 	async remove(@Param('id', new ParseUUIDPipe()) id: string) {
 		return await this.documentService.removeDocument(id);
 	}
+
+	@Post('reindex/all')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@HttpCode(200)
+	@ApiOkResponse({ description: 'All documents reindexed successfully' })
+	@ApiResponse({ status: 403, description: 'Unauthorized' })
+	async reindexAll() {
+		return await this.documentService.reindexAllDocuments();
+	}
+
+	@Post('reindex/type/:type')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@HttpCode(200)
+	@ApiOkResponse({ description: 'Documents reindexed successfully' })
+	@ApiResponse({ status: 403, description: 'Unauthorized' })
+	async reindexByType(@Param('type') type: DocumentType) {
+		return await this.documentService.reindexDocumentsByType(type);
+	}
+
+	@Post('reindex/subcategory/:subcategoryId')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@HttpCode(200)
+	@ApiOkResponse({ description: 'Documents in subcategory reindexed successfully' })
+	@ApiResponse({ status: 403, description: 'Unauthorized' })
+	async reindexBySubcategory(@Param('subcategoryId', new ParseIntPipe()) subcategoryId: number) {
+		return await this.documentService.reindexDocumentsBySubcategory(subcategoryId);
+	}
 }
 
 @ApiTags('document-categories')

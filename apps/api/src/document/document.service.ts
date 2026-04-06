@@ -608,5 +608,103 @@ export class DocumentService {
 		await this.invalidateCache()
 		return { deleted: true }
 	}
+
+	async reindexAllDocuments() {
+		// Переиндексируем все документы по каждой комбинации type/category/subcategory
+		await this.documentRepo.query(`
+			WITH ranked_documents AS (
+				SELECT
+					id,
+					type,
+					category_id,
+					subcategory_id,
+					"createdAt",
+					ROW_NUMBER() OVER (
+						PARTITION BY type, category_id, subcategory_id
+						ORDER BY
+							COALESCE("orderIndex", 2147483647) ASC,
+							"createdAt" ASC,
+							id ASC
+					) - 1 AS new_index
+				FROM documents
+			)
+			UPDATE documents d
+			SET "orderIndex" = rd.new_index
+			FROM ranked_documents rd
+			WHERE d.id = rd.id
+		`)
+		
+		await this.invalidateCache()
+		return { 
+			success: true, 
+			message: 'Все документы были успешно переиндексированы' 
+		}
+	}
+
+	async reindexDocumentsByType(type: DocumentTypeEnum) {
+		// Переиндексируем документы конкретного типа
+		await this.documentRepo.query(`
+			WITH ranked_documents AS (
+				SELECT
+					id,
+					type,
+					category_id,
+					subcategory_id,
+					"createdAt",
+					ROW_NUMBER() OVER (
+						PARTITION BY type, category_id, subcategory_id
+						ORDER BY
+							COALESCE("orderIndex", 2147483647) ASC,
+							"createdAt" ASC,
+							id ASC
+					) - 1 AS new_index
+				FROM documents
+				WHERE type = $1
+			)
+			UPDATE documents d
+			SET "orderIndex" = rd.new_index
+			FROM ranked_documents rd
+			WHERE d.id = rd.id
+		`, [type])
+		
+		await this.invalidateCache()
+		return { 
+			success: true, 
+			message: `Документы типа "${type}" были успешно переиндексированы` 
+		}
+	}
+
+	async reindexDocumentsBySubcategory(subcategoryId: number) {
+		// Переиндексируем документы конкретной подкатегории
+		await this.documentRepo.query(`
+			WITH ranked_documents AS (
+				SELECT
+					id,
+					type,
+					category_id,
+					subcategory_id,
+					"createdAt",
+					ROW_NUMBER() OVER (
+						PARTITION BY type, category_id, subcategory_id
+						ORDER BY
+							COALESCE("orderIndex", 2147483647) ASC,
+							"createdAt" ASC,
+							id ASC
+					) - 1 AS new_index
+				FROM documents
+				WHERE subcategory_id = $1
+			)
+			UPDATE documents d
+			SET "orderIndex" = rd.new_index
+			FROM ranked_documents rd
+			WHERE d.id = rd.id
+		`, [subcategoryId])
+		
+		await this.invalidateCache()
+		return { 
+			success: true, 
+			message: `Документы подкатегории с ID ${subcategoryId} были успешно переиндексированы` 
+		}
+	}
 }
 
