@@ -34,6 +34,11 @@ export class SearchService {
 
 		const safePage = Math.max(1, Math.floor(Number(page) || 1))
 		const safePageSize = Math.max(1, Math.min(Math.floor(Number(pageSize) || 12), 24))
+
+		if (scope === 'library') {
+			return this.searchLibrary(normalizedQuery, safePage, safePageSize)
+		}
+
 		const scopes = this.getScopes(scope)
 
 		if (scopes.length === 0) {
@@ -83,6 +88,241 @@ export class SearchService {
 			totalPages,
 			items: pageItems,
 		}
+	}
+
+	private async searchLibrary(
+		query: string,
+		page: number,
+		pageSize: number,
+	): Promise<{ query: string; scope: SearchScope; page: number; pageSize: number; total: number; totalPages: number; items: SearchResultItem[] }> {
+		const sql = `
+			WITH RECURSIVE block_tree AS (
+				SELECT
+					b.id,
+					b."pageId" AS page_id,
+					regexp_replace(COALESCE(b.content ->> 'html', b.content::text, ''), '<[^>]+>', ' ', 'g') AS body,
+					b."parentBlockId"
+				FROM "block" b
+				WHERE b."pageId" IS NOT NULL
+					AND b."parentBlockId" IS NULL
+
+				UNION ALL
+
+				SELECT
+					child.id,
+					parent.page_id,
+					regexp_replace(COALESCE(child.content ->> 'html', child.content::text, ''), '<[^>]+>', ' ', 'g') AS body,
+					child."parentBlockId"
+				FROM "block" child
+				INNER JOIN block_tree parent ON child."parentBlockId" = parent.id
+			),
+			page_text AS (
+				SELECT
+					page_id,
+					string_agg(body, ' ' ORDER BY id) AS body
+				FROM block_tree
+				GROUP BY page_id
+			)
+			SELECT
+				item.id::text AS id,
+				item.type::text AS item_type,
+				COALESCE(page.title, item.title) AS title,
+				item.title AS item_title,
+				item.description AS item_description,
+				cat.name AS category_name,
+				page.title AS page_title,
+				COALESCE(pt.body, '') AS page_body,
+				page.slug AS page_slug,
+				item."previewImage" AS preview_image,
+				COALESCE(page."publishedAt", item."createdAt") AS published_at
+			FROM library_items item
+			LEFT JOIN library_categories cat ON cat.id = item."categoryId"
+			LEFT JOIN "page" page ON page.id = item."pageId"
+			LEFT JOIN page_text pt ON pt.page_id = page.id
+			WHERE item.isPublished = true
+				AND (
+					item.type != 'article'
+					OR (
+						page.id IS NOT NULL
+						AND page.slug IS NOT NULL
+						AND page."isDraft" = false
+						AND page."publishedAt" IS NOT NULL
+						AND page."publishedAt" <= NOW()
+					)
+				)
+			ORDER BY COALESCE(page."publishedAt", item."createdAt") DESC, item.id DESC
+		`
+
+		type RawLibraryRow = {
+			id: string
+			item_type: string
+			title: string
+			item_title: string | null
+			item_description: string | null
+			category_name: string | null
+			page_title: string | null
+			page_body: string | null
+			page_slug: string | null
+			preview_image: string | null
+			published_at: string | null
+		}
+
+		const rows = (await this.dataSource.query(sql)) as RawLibraryRow[]
+		const normalizedQuery = this.normalizeSearchText(query)
+		const scoredRows = rows
+			.map((row) => {
+				const score = this.scoreLibraryRow(row, normalizedQuery)
+				return score === null ? null : { row, score }
+			})
+			.filter((value): value is { row: RawLibraryRow; score: number } => value !== null)
+			.sort((left, right) => {
+				if (right.score !== left.score) return right.score - left.score
+				const leftTime = left.row.published_at ? new Date(left.row.published_at).getTime() : 0
+				const rightTime = right.row.published_at ? new Date(right.row.published_at).getTime() : 0
+				if (rightTime !== leftTime) return rightTime - leftTime
+				return Number(right.row.id) - Number(left.row.id)
+			})
+
+		const total = scoredRows.length
+		const totalPages = total > 0 ? Math.ceil(total / pageSize) : 0
+		const resolvedPage = totalPages > 0 ? Math.min(page, totalPages) : 1
+		const offset = (resolvedPage - 1) * pageSize
+		const pageRows = scoredRows.slice(offset, offset + pageSize).map(({ row, score }) => ({
+			type: 'library' as const,
+			id: row.id,
+			title: row.title,
+			url: this.buildLibraryUrl(row),
+			previewImage: row.preview_image,
+			snippet: this.buildLibrarySnippet(row, query),
+			publishedAt: row.published_at,
+			rank: score,
+			section: null,
+		}))
+
+		return {
+			query,
+			scope: 'library',
+			page: resolvedPage,
+			pageSize,
+			total,
+			totalPages,
+			items: pageRows,
+		}
+	}
+
+	private normalizeSearchText(value: string): string {
+		return value
+			.toLowerCase()
+			.normalize('NFKD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/ё/g, 'е')
+			.replace(/й/g, 'и')
+			.replace(/[^\p{L}\p{N}]+/gu, ' ')
+			.trim()
+			.replace(/\s+/g, ' ')
+	}
+
+	private scoreLibraryRow(row: { item_title: string | null; item_description: string | null; category_name: string | null; page_title: string | null; page_body: string | null }, normalizedQuery: string): number | null {
+		if (!normalizedQuery) {
+			return null
+		}
+
+		const haystack = this.normalizeSearchText([
+			row.item_title ?? '',
+			row.item_description ?? '',
+			row.category_name ?? '',
+			row.page_title ?? '',
+			row.page_body ?? '',
+		].join(' '))
+
+		if (!haystack) {
+			return null
+		}
+
+		if (haystack.includes(normalizedQuery)) {
+			return 1000 - haystack.indexOf(normalizedQuery)
+		}
+
+		const queryTokens = normalizedQuery.split(' ')
+		const haystackTokens = haystack.split(' ')
+		let score = 0
+
+		for (const token of queryTokens) {
+			let tokenMatched = false
+			for (const candidate of haystackTokens) {
+				if (!candidate) continue
+				if (candidate === token || candidate.startsWith(token) || token.startsWith(candidate)) {
+					tokenMatched = true
+					score += 100
+					break
+				}
+
+				if (this.levenshteinDistance(token, candidate) <= 2) {
+					tokenMatched = true
+					score += 60
+					break
+				}
+			}
+
+			if (!tokenMatched) {
+				return null
+			}
+		}
+
+		return score + Math.min(50, haystackTokens.length)
+	}
+
+	private levenshteinDistance(left: string, right: string): number {
+		if (left === right) return 0
+		if (left.length === 0) return right.length
+		if (right.length === 0) return left.length
+
+		const previousRow = Array.from({ length: right.length + 1 }, (_, index) => index)
+
+		for (let rowIndex = 1; rowIndex <= left.length; rowIndex += 1) {
+			let previousDiagonal = rowIndex - 1
+			previousRow[0] = rowIndex
+
+			for (let columnIndex = 1; columnIndex <= right.length; columnIndex += 1) {
+				const temp = previousRow[columnIndex]
+				const cost = left[rowIndex - 1] === right[columnIndex - 1] ? 0 : 1
+				previousRow[columnIndex] = Math.min(
+					previousRow[columnIndex] + 1,
+					previousRow[columnIndex - 1] + 1,
+					previousDiagonal + cost,
+				)
+				previousDiagonal = temp
+			}
+		}
+
+		return previousRow[right.length]
+	}
+
+	private buildLibraryUrl(row: { item_type: string; id: string; page_slug: string | null }): string {
+		if (row.item_type === 'article' && row.page_slug) {
+			return '/' + 'articles/' + row.page_slug.replace(/^library\//, '')
+		}
+
+		return '/' + 'library/' + row.id
+	}
+
+	private buildLibrarySnippet(row: { title: string; item_description: string | null; category_name: string | null; page_title: string | null; page_body: string | null }, query: string): string {
+		const source = [
+			row.title,
+			row.item_description,
+			row.category_name,
+			row.page_title,
+			row.page_body,
+		]
+			.filter(Boolean)
+			.join(' ')
+			.trim()
+
+		if (!source) {
+			return row.title
+		}
+
+		return source.length > 220 ? `${source.slice(0, 217)}...` : source
 	}
 
 	private async runScopeQuery(scope: Exclude<SearchScope, 'all'>, query: string, limit: number): Promise<RawSearchRow[]> {
