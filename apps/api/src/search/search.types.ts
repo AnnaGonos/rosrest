@@ -31,6 +31,7 @@ export interface SearchResultItem {
 	previewImage?: string | null
 	snippet: string
 	publishedAt: string | null
+	eventDate?: string | null
 	rank: number
 	section?: string | null
 }

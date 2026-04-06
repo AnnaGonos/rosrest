@@ -10,6 +10,7 @@ interface RawSearchRow {
 	preview_image?: string | null
 	snippet: string
 	published_at: string | null
+	event_date?: string | null
 	rank: string | number | null
 	section?: string | null
 	total_count?: string | number | null
@@ -63,6 +64,7 @@ export class SearchService {
 				previewImage: row.preview_image ?? null,
 				snippet: row.snippet,
 				publishedAt: row.published_at,
+				eventDate: row.event_date ?? null,
 				rank: Number(row.rank || 0),
 				section: row.section ?? null,
 			}))
@@ -195,6 +197,7 @@ export class SearchService {
 			previewImage: row.preview_image,
 			snippet: this.buildLibrarySnippet(row, query),
 			publishedAt: row.published_at,
+			eventDate: null,
 			rank: score,
 			section: null,
 		}))
@@ -471,6 +474,7 @@ export class SearchService {
 				${urlExpression} AS url,
 				${previewImageExpression}::text AS preview_image,
 				${publishedAtExpression} AS published_at,
+				NULL::text AS event_date,
 				${this.pageRankExpression('page')} AS rank,
 				${this.pageHeadlineExpression('page')} AS snippet,
 				NULL::text AS section${extraSelect ? `,
@@ -592,6 +596,7 @@ export class SearchService {
 				'/' || page.slug AS url,
 				NULL::text AS preview_image,
 				page."publishedAt" AS published_at,
+				NULL::text AS event_date,
 				ts_rank_cd(to_tsvector('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, '')), search_q.query) AS rank,
 				ts_headline('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
 				NULL::text AS section
@@ -629,6 +634,7 @@ export class SearchService {
 				doc."fileUrl" AS url,
 				doc."previewUrl" AS preview_image,
 				doc."createdAt" AS published_at,
+				NULL::text AS event_date,
 				ts_rank_cd(
 					to_tsvector('russian', COALESCE(doc.title, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(subcat.name, '')),
 					search_q.query
@@ -657,6 +663,7 @@ export class SearchService {
 				END AS url,
 				item."previewImage" AS preview_image,
 				COALESCE(page."publishedAt", item."createdAt") AS published_at,
+				NULL::text AS event_date,
 				ts_rank_cd(
 					setweight(to_tsvector('russian', COALESCE(item.title, '')), 'A') ||
 					setweight(to_tsvector('russian', COALESCE(item.description, '')), 'B') ||
@@ -709,6 +716,7 @@ export class SearchService {
 				'/' || 'events/' || event.id::text AS url,
 				event."previewImageUrl" AS preview_image,
 				event."createdAt" AS published_at,
+				event."startDate"::text AS event_date,
 				ts_rank_cd(
 					to_tsvector('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event."registrationUrl", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, '')),
 					search_q.query

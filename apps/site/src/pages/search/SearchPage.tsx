@@ -22,6 +22,7 @@ type SearchResultItem = {
 	previewImage?: string | null
 	snippet: string
 	publishedAt?: string | null
+	eventDate?: string | null
 	rank?: number
 	section?: string | null
 }
@@ -238,6 +239,7 @@ export default function SearchPage() {
 							<div className="search-page__results">
 								{results.map((item) => {
 									const previewSrc = item.previewImage ? getFileUrl(item.previewImage) : ''
+									const displayDate = item.type === 'event' ? item.eventDate : item.publishedAt
 									const content = (
 										<>
 											<div className={`search-page__thumb-wrap ${previewSrc ? '' : 'search-page__thumb-wrap--empty'}`}>
@@ -248,10 +250,14 @@ export default function SearchPage() {
 											<div className="search-page__content">
 											<div className="search-page__result-meta">
 												<span className="search-page__badge">{TYPE_LABELS[item.type] || item.type}</span>
-												{item.publishedAt && (
-													<time className="search-page__date" dateTime={item.publishedAt}>
-														{DATE_FORMAT.format(new Date(item.publishedAt))}
-													</time>
+												{displayDate && (
+													item.type === 'event' ? (
+														<span className="search-page__date">{displayDate}</span>
+													) : (
+														<time className="search-page__date" dateTime={displayDate}>
+															{DATE_FORMAT.format(new Date(displayDate))}
+														</time>
+													)
 												)}
 											</div>
 											<h3 className="search-page__result-title">{item.title}</h3>
