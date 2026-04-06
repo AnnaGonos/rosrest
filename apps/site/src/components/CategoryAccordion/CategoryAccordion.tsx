@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import DocumentList from '../DocumentList/DocumentList'
 import './CategoryAccordion.css'
 
@@ -26,24 +26,34 @@ interface CategoryAccordionProps {
 }
 
 export default function CategoryAccordion({ subcategories, getDocuments, loadingMap, errorMap }: CategoryAccordionProps) {
-  const [expandedId, setExpandedId] = useState<number | null>(subcategories.length > 0 ? subcategories[0].id : null)
+  const [expandedIds, setExpandedIds] = useState<number[]>([])
+
+  useEffect(() => {
+    setExpandedIds(subcategories.map((subcategory) => subcategory.id))
+  }, [subcategories])
 
   const toggleExpand = (categoryId: number) => {
-    setExpandedId(expandedId === categoryId ? null : categoryId)
+    setExpandedIds((current) =>
+      current.includes(categoryId)
+        ? current.filter((id) => id !== categoryId)
+        : [...current, categoryId]
+    )
   }
 
   return (
     <div className="category-accordion">
       {subcategories.map((subcat) => {
-        const isExpanded = expandedId === subcat.id
+        const isExpanded = expandedIds.includes(subcat.id)
         const docs = [...getDocuments(subcat.id)].sort((a, b) => {
           const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
           const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
-          if (aOrder !== bOrder) return aOrder - bOrder
+          if (aOrder !== bOrder) return bOrder - aOrder
 
           const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
           const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
-          return bTime - aTime
+          if (aTime !== bTime) return bTime - aTime
+
+          return String(b.id).localeCompare(String(a.id))
         })
         const loading = loadingMap[subcat.id] || false
         const error = errorMap[subcat.id] || null

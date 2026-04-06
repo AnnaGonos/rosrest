@@ -78,11 +78,13 @@ export default function DocumentCategoryPage() {
           const sortedDocs = [...allDocs].sort((a, b) => {
             const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
             const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
-            if (aOrder !== bOrder) return aOrder - bOrder
+            if (aOrder !== bOrder) return bOrder - aOrder
 
             const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0
             const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
-            return bTime - aTime
+            if (aTime !== bTime) return bTime - aTime
+
+            return String(b.id).localeCompare(String(a.id))
           })
 
           setDocuments(sortedDocs)
