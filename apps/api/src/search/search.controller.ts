@@ -10,8 +10,11 @@ export class SearchController {
 	async search(
 		@Query('q') query = '',
 		@Query('type') type: SearchScope = 'all',
+		@Query('page') page?: string,
+		@Query('pageSize') pageSize?: string,
 		@Query('limit') limit?: string,
 	) {
-		return this.searchService.search(query, type, limit ? Number(limit) : 50)
+		const resolvedPageSize = pageSize ? Number(pageSize) : (limit ? Number(limit) : 12)
+		return this.searchService.search(query, type, page ? Number(page) : 1, resolvedPageSize)
 	}
 }

@@ -12,6 +12,7 @@ interface RawSearchRow {
 	published_at: string | null
 	rank: string | number | null
 	section?: string | null
+	total_count?: string | number | null
 }
 
 @Injectable()
@@ -20,24 +21,34 @@ export class SearchService {
 
 	constructor(private readonly dataSource: DataSource) {}
 
-	async search(query: string, scope: SearchScope = 'all', limit = 50): Promise<{ query: string; scope: SearchScope; total: number; items: SearchResultItem[] }> {
+	async search(
+		query: string,
+		scope: SearchScope = 'all',
+		page = 1,
+		pageSize = 12,
+	): Promise<{ query: string; scope: SearchScope; page: number; pageSize: number; total: number; totalPages: number; items: SearchResultItem[] }> {
 		const normalizedQuery = query.trim().replace(/\s+/g, ' ')
 		if (normalizedQuery.length < 2) {
-			return { query: normalizedQuery, scope, total: 0, items: [] }
+			return { query: normalizedQuery, scope, page: 1, pageSize, total: 0, totalPages: 0, items: [] }
 		}
 
-		const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 100))
+		const safePage = Math.max(1, Math.floor(Number(page) || 1))
+		const safePageSize = Math.max(1, Math.min(Math.floor(Number(pageSize) || 12), 24))
 		const scopes = this.getScopes(scope)
 
 		if (scopes.length === 0) {
-			return { query: normalizedQuery, scope, total: 0, items: [] }
+			return { query: normalizedQuery, scope, page: safePage, pageSize: safePageSize, total: 0, totalPages: 0, items: [] }
 		}
 
 		const allRows = await Promise.all(
-			scopes.map(async (currentScope) => this.runScopeQuery(currentScope, normalizedQuery, safeLimit)),
+			scopes.map(async (currentScope) => this.runScopeQuery(currentScope, normalizedQuery, safePage * safePageSize)),
 		)
 
 		const rows = allRows.flat()
+		const total = allRows.reduce((sum, scopeRows) => {
+			const scopeTotal = Number(scopeRows[0]?.total_count || 0)
+			return sum + (Number.isFinite(scopeTotal) ? scopeTotal : 0)
+		}, 0)
 		const items = rows
 			.map((row) => ({
 				type: row.type,
@@ -51,25 +62,31 @@ export class SearchService {
 				section: row.section ?? null,
 			}))
 			.sort((a, b) => {
-				if (b.rank !== a.rank) return b.rank - a.rank
 				const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0
 				const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0
 				if (bTime !== aTime) return bTime - aTime
+				if (b.rank !== a.rank) return b.rank - a.rank
 				return a.title.localeCompare(b.title)
 			})
-			.slice(0, safeLimit)
+
+		const totalPages = total > 0 ? Math.ceil(total / safePageSize) : 0
+		const resolvedPage = totalPages > 0 ? Math.min(safePage, totalPages) : 1
+		const offset = (resolvedPage - 1) * safePageSize
+		const pageItems = items.slice(offset, offset + safePageSize)
 
 		return {
 			query: normalizedQuery,
 			scope,
-			total: items.length,
-			items,
+			page: resolvedPage,
+			pageSize: safePageSize,
+			total,
+			totalPages,
+			items: pageItems,
 		}
 	}
 
 	private async runScopeQuery(scope: Exclude<SearchScope, 'all'>, query: string, limit: number): Promise<RawSearchRow[]> {
-		const subqueries = [this.getScopeSubquery(scope)]
-		if (subqueries.length === 0) return []
+		const subquery = this.getScopeSubquery(scope)
 
 		const sql = `
 			WITH RECURSIVE block_tree AS (
@@ -104,17 +121,22 @@ export class SearchService {
 			)
 			SELECT *
 			FROM (
-				${subqueries[0]}
+				SELECT
+					results.*,
+					COUNT(*) OVER() AS total_count
+				FROM (
+					${subquery}
+				) results
 			) results
-			ORDER BY rank DESC, published_at DESC NULLS LAST, title ASC
+			ORDER BY published_at DESC NULLS LAST, rank DESC, title ASC
 			LIMIT $2
 		`
 
 		try {
 			return await this.dataSource.query(sql, [query, limit]) as RawSearchRow[]
 		} catch (error) {
-			this.logger.error(
-				`Search query failed. q="${query}", scope="${scope}", limit=${limit}`,
+				this.logger.error(
+					`Search query failed. q="${query}", scope="${scope}", limit=${limit}`,
 				error instanceof Error ? error.stack : String(error),
 			)
 			return []

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
+import Pagination from '../../components/Pagination/Pagination'
 import RequestState from '../../components/RequestState/RequestState'
 import Seo from '../../components/Seo/Seo'
 import { getFileUrl } from '../../utils/getFileUrl'
@@ -27,7 +28,10 @@ type SearchResultItem = {
 type SearchResponse = {
 	query: string
 	scope: SearchScope
+	page: number
+	pageSize: number
 	total: number
+	totalPages: number
 	items: SearchResultItem[]
 }
 
@@ -68,14 +72,22 @@ export default function SearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams()
 	const [queryInput, setQueryInput] = useState(searchParams.get('q') || '')
 	const query = useMemo(() => (searchParams.get('q') || '').trim(), [searchParams])
+	const currentPage = useMemo(() => {
+		const raw = Number(searchParams.get('page') || '1')
+		return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : 1
+	}, [searchParams])
 	const scope = useMemo<SearchScope>(() => {
 		const value = searchParams.get('type') as SearchScope | null
 		return value && FILTERS.some((item) => item.value === value) ? value : 'all'
 	}, [searchParams])
+	const pageSize = 12
 
 	const [results, setResults] = useState<SearchResultItem[]>([])
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [totalPages, setTotalPages] = useState(0)
+	const [totalResults, setTotalResults] = useState(0)
+	const effectivePage = totalPages > 0 ? Math.min(currentPage, totalPages) : currentPage
 
 	useEffect(() => {
 		setQueryInput(searchParams.get('q') || '')
@@ -84,6 +96,8 @@ export default function SearchPage() {
 	useEffect(() => {
 		if (!query) {
 			setResults([])
+			setTotalPages(0)
+			setTotalResults(0)
 			setError(null)
 			setLoading(false)
 			return
@@ -97,7 +111,7 @@ export default function SearchPage() {
 			setError(null)
 
 			try {
-				const params = new URLSearchParams({ q: query, type: scope, limit: '50' })
+				const params = new URLSearchParams({ q: query, type: scope, page: String(currentPage), pageSize: String(pageSize) })
 				const response = await fetch(`${API_BASE}/search?${params.toString()}`, {
 					signal: controller.signal,
 					cache: 'no-store',
@@ -110,6 +124,8 @@ export default function SearchPage() {
 				const data = (await response.json()) as SearchResponse
 				if (active) {
 					setResults(Array.isArray(data.items) ? data.items : [])
+					setTotalPages(Number(data.totalPages || 0))
+					setTotalResults(Number(data.total || 0))
 				}
 			} catch (err) {
 				if (!active || controller.signal.aborted) return
@@ -125,7 +141,7 @@ export default function SearchPage() {
 			active = false
 			controller.abort()
 		}
-	}, [query, scope])
+	}, [query, scope, currentPage])
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -133,6 +149,7 @@ export default function SearchPage() {
 		const trimmed = queryInput.trim()
 		if (trimmed) nextParams.q = trimmed
 		if (scope !== 'all') nextParams.type = scope
+		nextParams.page = '1'
 		setSearchParams(nextParams)
 	}
 
@@ -141,14 +158,19 @@ export default function SearchPage() {
 		const trimmed = queryInput.trim() || query
 		if (trimmed) nextParams.q = trimmed
 		if (value !== 'all') nextParams.type = value
+		nextParams.page = '1'
+		setSearchParams(nextParams)
+	}
+
+	const handlePageChange = (page: number) => {
+		const nextParams: Record<string, string> = { page: String(page) }
+		const trimmed = queryInput.trim() || query
+		if (trimmed) nextParams.q = trimmed
+		if (scope !== 'all') nextParams.type = scope
 		setSearchParams(nextParams)
 	}
 
 	const showLoadingState = loading && query.length > 0
-
-	if (showLoadingState || error) {
-		return <RequestState loading={showLoadingState} error={error} loadingText="Поиск по сайту..." />
-	}
 
 	return (
 		<div className="page-main search-page">
@@ -218,25 +240,29 @@ export default function SearchPage() {
 						<div className="search-page__results-head">
 							<h2 className="section-title--lg">Результаты</h2>
 							<p className="body-text search-page__count">
-								Найдено: {results.length}
+								Найдено: {totalResults}
 							</p>
 						</div>
 
-						{results.length === 0 ? (
+						{(showLoadingState || error) && (
+							<RequestState loading={showLoadingState} error={error} loadingText="Поиск по сайту..." />
+						)}
+
+						{!showLoadingState && !error && results.length === 0 ? (
 							<div className="search-page__empty-state">
 								<p className="body-text">Ничего не найдено. Попробуйте другой запрос.</p>
 							</div>
-						) : (
+						) : !showLoadingState && !error ? (
 							<div className="search-page__results">
 								{results.map((item) => {
 									const previewSrc = item.previewImage ? getFileUrl(item.previewImage) : ''
 									const content = (
 										<>
-											{previewSrc && (
-												<div className="search-page__thumb-wrap">
+											<div className={`search-page__thumb-wrap ${previewSrc ? '' : 'search-page__thumb-wrap--empty'}`}>
+												{previewSrc && (
 													<img className="search-page__thumb" src={previewSrc} alt={item.title} loading="lazy" />
-												</div>
 											)}
+											</div>
 											<div className="search-page__content">
 											<div className="search-page__result-meta">
 												<span className="search-page__badge">{TYPE_LABELS[item.type] || item.type}</span>
@@ -265,7 +291,9 @@ export default function SearchPage() {
 									)
 								})}
 							</div>
-						)}
+						) : null}
+
+						<Pagination currentPage={effectivePage} totalPages={totalPages} onPageChange={handlePageChange} />
 					</ContentSection>
 				)}
 			</div>
