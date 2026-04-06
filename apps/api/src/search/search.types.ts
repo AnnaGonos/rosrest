@@ -20,7 +20,7 @@ export type SearchResultType =
 	| 'monitoring-zakon'
 	| 'document'
 	| 'library'
-	| 'page'
+	| 'content-page'
 	| 'for-journalist'
 
 export interface SearchResultItem {

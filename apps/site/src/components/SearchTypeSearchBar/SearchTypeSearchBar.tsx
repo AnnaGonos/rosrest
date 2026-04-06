@@ -1,38 +1,36 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import './SearchTypeSearchBar.css'
 
-export type SearchTypeSearchBarOption = {
-	value: string
+export type SearchTypeSearchBarOption<T extends string = string> = {
+	value: T
 	label: string
 }
 
-type SearchTypeSearchBarProps = {
+type SearchTypeSearchBarProps<T extends string = string> = {
 	query: string
 	onQueryChange: (value: string) => void
-	selectedType: string
-	onTypeChange: (value: string) => void
-	options: SearchTypeSearchBarOption[]
+	selectedType: T | 'all'
+	onTypeChange: (value: T | 'all') => void
+	options: SearchTypeSearchBarOption<T>[]
 	onSubmit: (event: FormEvent<HTMLFormElement>) => void
 	placeholder?: string
-	submitLabel?: string
 	allLabel?: string
 	className?: string
 }
 
-export default function SearchTypeSearchBar({
+export default function SearchTypeSearchBar<T extends string>({
 	query,
 	onQueryChange,
 	selectedType,
 	onTypeChange,
 	options,
 	onSubmit,
-	placeholder = 'Например: конференция',
-	submitLabel = 'Поиск',
+	placeholder = 'Поиск',
 	allLabel = 'Все',
 	className = '',
-}: SearchTypeSearchBarProps) {
+}: SearchTypeSearchBarProps<T>) {
 	const [isOpen, setIsOpen] = useState(false)
-	const rootRef = useRef<HTMLDivElement | null>(null)
+	const rootRef = useRef<HTMLFormElement | null>(null)
 
 	const selectedOption = useMemo(() => options.find((item) => item.value === selectedType) || options[0], [options, selectedType])
 
@@ -58,7 +56,7 @@ export default function SearchTypeSearchBar({
 		}
 	}, [])
 
-	const handleTypeSelect = (value: string) => {
+	const handleTypeSelect = (value: T | 'all') => {
 		onTypeChange(value)
 		setIsOpen(false)
 	}
@@ -103,7 +101,7 @@ export default function SearchTypeSearchBar({
 			</div>
 
 			<label className="search-type-search-bar__field">
-				<span className="search-type-search-bar__label">Что ищем</span>
+				{/* <span className="search-type-search-bar__label">Что ищем</span> */}
 				<input
 					type="search"
 					value={query}
@@ -113,8 +111,8 @@ export default function SearchTypeSearchBar({
 				/>
 			</label>
 
-			<button type="submit" className="search-type-search-bar__submit btn btn-primary">
-				{submitLabel}
+			<button type="submit" className="search-type-search-bar__submit">
+				<i className="bi bi-search"></i>
 			</button>
 		</form>
 	)

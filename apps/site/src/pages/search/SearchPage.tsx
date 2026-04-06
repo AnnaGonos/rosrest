@@ -46,7 +46,6 @@ const FILTERS: Array<{ value: SearchScope; label: string }> = [
 	{ value: 'monitoring-zakon', label: 'Мониторинг законодательства' },
 	{ value: 'documents', label: 'Документы' },
 	{ value: 'library', label: 'Библиотека' },
-	{ value: 'pages', label: 'Страницы' },
 	{ value: 'for-journalist', label: 'Журналистам' },
 ]
 
@@ -59,7 +58,6 @@ const TYPE_LABELS: Record<string, string> = {
 	'monitoring-zakon': 'Мониторинг законодательства',
 	document: 'Документ',
 	library: 'Библиотека',
-	page: 'Страница',
 	'for-journalist': 'Журналистам',
 }
 
@@ -193,21 +191,17 @@ export default function SearchPage() {
 					<BackToSectionButton to="/" label="На главную" />
 					<div>
 						<h1 className="page-title">Поиск по сайту</h1>
-						<p className="body-text search-page__subtitle">
-							Ищите по новостям, событиям, проектам, документам, членам РАР и другим страницам сайта.
-						</p>
 					</div>
 				</div>
 
-				<SearchTypeSearchBar
+				<SearchTypeSearchBar<SearchScope>
 					query={queryInput}
 					onQueryChange={setQueryInput}
 					selectedType={scope}
 					onTypeChange={handleScopeChange}
 					options={FILTERS.filter((filter) => filter.value !== 'all')}
 					onSubmit={handleSubmit}
-					placeholder="Например: конференция"
-					submitLabel="Поиск"
+					placeholder="Поиск"
 					allLabel="Все"
 				/>
 

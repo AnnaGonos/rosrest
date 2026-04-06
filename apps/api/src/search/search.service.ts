@@ -344,7 +344,7 @@ export class SearchService {
 	private pagesSubquery(): string {
 		return `
 			SELECT
-				'page'::text AS type,
+				'content-page'::text AS type,
 				page.id::text AS id,
 				page.title AS title,
 				'/' || page.slug AS url,

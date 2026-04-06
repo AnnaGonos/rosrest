@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect, type FormEvent } from 'react'
 import './Layout.css'
 import { OutlineButtonLink } from '../components/LinkButtons'
+import SearchTypeSearchBar from '../components/SearchTypeSearchBar/SearchTypeSearchBar'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { isCookieConsentAccepted } from '../utils/cookieConsent'
 
@@ -38,13 +39,39 @@ interface DocumentCategory {
 }
 
 export default function Header() {
-    const [_searchOpen, setSearchOpen] = useState(false)
+    const [searchOpen, setSearchOpen] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchType, setSearchType] = useState<HeaderSearchScope | 'all'>('all')
     const [menuOpen, setMenuOpen] = useState(false)
     const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
     const [projects, setProjects] = useState<Project[]>([])
     const [services, setServices] = useState<Service[]>([])
     const [documentCategories, setDocumentCategories] = useState<DocumentCategory[]>([])
     const [menuItems, setMenuItems] = useState<any[] | null>(null)
+    const navigate = useNavigate()
+
+    type HeaderSearchScope =
+        | 'news'
+        | 'projects'
+        | 'events'
+        | 'services'
+        | 'members'
+        | 'monitoring-zakon'
+        | 'documents'
+        | 'library'
+        | 'for-journalist'
+
+    const SEARCH_OPTIONS: Array<{ value: HeaderSearchScope; label: string }> = [
+        { value: 'news', label: 'Новости' },
+        { value: 'projects', label: 'Проекты' },
+        { value: 'events', label: 'События' },
+        { value: 'services', label: 'Услуги' },
+        { value: 'members', label: 'Члены РАР' },
+        { value: 'monitoring-zakon', label: 'Мониторинг законодательства' },
+        { value: 'documents', label: 'Документы' },
+        { value: 'library', label: 'Библиотека' },
+        { value: 'for-journalist', label: 'Журналистам' },
+    ]
 
     useEffect(() => {
         fetchProjects()
@@ -52,6 +79,31 @@ export default function Header() {
         fetchDocumentCategories()
         fetchMenu()
     }, [])
+
+    useEffect(() => {
+        if (!searchOpen) return
+
+        const onEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSearchOpen(false)
+            }
+        }
+
+        document.addEventListener('keydown', onEscape)
+        return () => document.removeEventListener('keydown', onEscape)
+    }, [searchOpen])
+
+    const handleHeaderSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        const params = new URLSearchParams()
+        const trimmed = searchQuery.trim()
+
+        if (trimmed) params.set('q', trimmed)
+        if (searchType !== 'all') params.set('type', searchType)
+
+        navigate(params.toString() ? `/search?${params.toString()}` : '/search')
+        setSearchOpen(false)
+    }
 
     const fetchMenu = async () => {
         try {
@@ -234,30 +286,20 @@ export default function Header() {
 
                 <div className="header-actions">
                     <OutlineButtonLink href="/services/join">Вступить в РАР</OutlineButtonLink>
-                    {/* <div className="search-container">
+                    <div className="search-container">
                         <button
                             className="search-button"
-                            onClick={() => {
-                                setSearchOpen(!searchOpen);
-                                if (!searchOpen) setMenuOpen(false);
-                            }}
                             aria-label="Поиск"
+                            aria-expanded={searchOpen}
+                            onClick={() => {
+                                setSearchOpen((prev) => !prev)
+                                setMenuOpen(false)
+                                setActiveSubmenu(null)
+                            }}
                         >
                             <i className="bi bi-search icon icon--h"></i>
                         </button>
-                        {searchOpen && (
-                            <div className="search-input">
-                                <input
-                                    type="text"
-                                    placeholder="Поиск"
-                                    autoFocus
-                                />
-                            </div>
-                        )}
-                            {searchOpen && (
-                                <div className="search-backdrop" onClick={() => setSearchOpen(false)} />
-                            )}
-                    </div> */}
+                    </div>
                     <button
                         className="mobile-menu-button"
                         onClick={() => {
@@ -274,6 +316,32 @@ export default function Header() {
                     </button>
                 </div>
             </div>
+
+            {searchOpen && (
+                <>
+                    <div className="header-search-panel" role="search">
+                        <div className="header-search-panel__inner">
+                            <SearchTypeSearchBar<HeaderSearchScope>
+                                className="header-search-panel__bar"
+                                query={searchQuery}
+                                onQueryChange={setSearchQuery}
+                                selectedType={searchType}
+                                onTypeChange={setSearchType}
+                                options={SEARCH_OPTIONS}
+                                onSubmit={handleHeaderSearchSubmit}
+                                placeholder="Найти на сайте..."
+                                allLabel="Все"
+                            />
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        className="search-backdrop"
+                        aria-label="Закрыть поиск"
+                        onClick={() => setSearchOpen(false)}
+                    />
+                </>
+            )}
 
             {/* Mobile Menu */}
             {menuOpen && (

@@ -91,6 +91,32 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.45);
   z-index: 750;
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.header-search-panel {
+  position: fixed;
+  top: 120px;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  padding: 20px 0;
+  background: #fff;
+  border-bottom: 1px solid rgba(19, 33, 58, 0.08);
+}
+
+.header-search-panel__inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header-search-panel__bar {
+  width: 100%;
 }
 
 @media (max-width: 1199px) {
@@ -103,6 +129,15 @@
 
   .search-backdrop {
     top: 100px;
+  }
+
+  .header-search-panel {
+    top: 100px;
+    padding: 14px 0;
+  }
+
+  .header-search-panel__inner {
+    padding: 0 16px;
   }
 }
 
