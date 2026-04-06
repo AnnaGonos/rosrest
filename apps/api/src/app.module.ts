@@ -28,6 +28,7 @@ import { DigestModule } from './digest/digest.module';
 import { EmailModule } from './email/email.module';
 import { ForJournalistModule } from './for-journalist/for-journalist.module';
 import { NewsletterModule } from './newsletter/newsletter.module';
+import { SearchModule } from './search/search.module';
 import { redisStore } from 'cache-manager-redis-yet';
 
 const envCandidates = [
@@ -101,6 +102,7 @@ for (const envPath of envCandidates) {
     EmailModule,
     NewsletterModule,
     ForJournalistModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

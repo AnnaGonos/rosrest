@@ -34,6 +34,7 @@ import ForJournalistPage from './pages/for-journalist/ForJournalistPage'
 import SubscribePage from './pages/subscribe/SubscribePage'
 import UnsubscribePage from './pages/unsubscribe/UnsubscribePage'
 import PrivacyPage from './pages/privacy/PrivacyPage'
+import SearchPage from './pages/search/SearchPage'
 import ScrollToTop from './ScrollToTop'
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
           <Route path="subscribe" element={<SubscribePage />} />
           <Route path="unsubscribe" element={<UnsubscribePage />} />
           <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="search" element={<SearchPage />} />
 
           <Route path="404" element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />
