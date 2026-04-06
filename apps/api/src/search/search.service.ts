@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DataSource } from 'typeorm'
 import { SearchResultItem, SearchScope } from './search.types'
 
@@ -16,6 +16,8 @@ interface RawSearchRow {
 
 @Injectable()
 export class SearchService {
+	private readonly logger = new Logger(SearchService.name)
+
 	constructor(private readonly dataSource: DataSource) {}
 
 	async search(query: string, scope: SearchScope = 'all', limit = 50): Promise<{ query: string; scope: SearchScope; total: number; items: SearchResultItem[] }> {
@@ -59,7 +61,7 @@ export class SearchService {
 				GROUP BY page_id
 			),
 			search_q AS (
-				SELECT websearch_to_tsquery('russian', $1) AS query
+				SELECT plainto_tsquery('russian', $1) AS query
 			)
 			SELECT *
 			FROM (
@@ -69,7 +71,16 @@ export class SearchService {
 			LIMIT $2
 		`
 
-		const rows = await this.dataSource.query(sql, [normalizedQuery, safeLimit]) as RawSearchRow[]
+		let rows: RawSearchRow[] = []
+		try {
+			rows = await this.dataSource.query(sql, [normalizedQuery, safeLimit]) as RawSearchRow[]
+		} catch (error) {
+			this.logger.error(
+				`Search query failed. q="${normalizedQuery}", scope="${scope}", limit=${safeLimit}`,
+				error instanceof Error ? error.stack : String(error),
+			)
+			throw error
+		}
 
 		const items = rows.map((row) => ({
 			type: row.type,
