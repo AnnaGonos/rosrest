@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository, IsNull, In } from 'typeorm';
+import { Repository, TreeRepository, IsNull } from 'typeorm';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { CreateDocumentCategoryDto } from './dto/create-document-category.dto';
@@ -414,17 +414,37 @@ export class DocumentService {
 			return cached
 		}
 
-		const where: any = {}
-		if (type) where.type = type
-		if (categoryId) where.category = { id: categoryId }
-		if (subcategoryId) where.subcategory = { id: subcategoryId }
-		if (isPublished !== undefined) where.isPublished = isPublished
+		const qb = this.documentRepo
+			.createQueryBuilder('document')
+			.leftJoinAndSelect('document.category', 'category')
+			.leftJoinAndSelect('document.subcategory', 'subcategory')
 
-		const list = await this.documentRepo.find({
-			where,
-			relations: ['category', 'subcategory'],
-			order: { orderIndex: 'DESC', createdAt: 'DESC' },
-		})
+		if (type) {
+			qb.andWhere('document.type = :type', { type })
+		}
+
+		if (categoryId !== undefined) {
+			qb.andWhere(categoryId === null ? 'document.category_id IS NULL' : 'document.category_id = :categoryId', {
+				categoryId,
+			})
+		}
+
+		if (subcategoryId !== undefined) {
+			qb.andWhere(subcategoryId === null ? 'document.subcategory_id IS NULL' : 'document.subcategory_id = :subcategoryId', {
+				subcategoryId,
+			})
+		}
+
+		if (isPublished !== undefined) {
+			qb.andWhere('document.isPublished = :isPublished', { isPublished })
+		}
+
+		const list = await qb
+			.select('document')
+			.orderBy('document.orderIndex', 'DESC')
+			.addOrderBy('document.createdAt', 'DESC')
+			.addOrderBy('document.id', 'DESC')
+			.getMany()
 
 		await this.cacheManager.set(cacheKey, list)
 		this.documentCacheKeys.add(cacheKey)
@@ -688,23 +708,50 @@ export class DocumentService {
 			throw new NotFoundException(`Category with ID ${id} not found`)
 		}
 
-		const descendants = await this.categoryTreeRepo.findDescendants(category)
-		const categoryIds = descendants.map((item) => item.id)
+		await this.documentRepo.manager.transaction(async (manager) => {
+			const categoryRows = await manager.query(
+				`
+					WITH RECURSIVE category_tree AS (
+						SELECT id, "parentId", 0 AS depth
+						FROM document_categories
+						WHERE id = $1
 
-		const linkedDocumentsCount = await this.documentRepo.count({
-			where: [
-				{ category: { id: In(categoryIds) } },
-				{ subcategory: { id: In(categoryIds) } },
-			],
+						UNION ALL
+
+						SELECT c.id, c."parentId", ct.depth + 1 AS depth
+						FROM document_categories c
+						INNER JOIN category_tree ct ON c."parentId" = ct.id
+					)
+					SELECT id, depth
+					FROM category_tree
+					ORDER BY depth DESC, id DESC
+				`,
+				[id],
+			)
+
+			const categoryIds: number[] = categoryRows.map((row: { id: string | number }) => Number(row.id))
+
+			if (categoryIds.length === 0) {
+				throw new NotFoundException(`Category with ID ${id} not found`)
+			}
+
+			await manager.query(
+				`
+					DELETE FROM documents
+					WHERE category_id = ANY($1::int[])
+					   OR subcategory_id = ANY($1::int[])
+				`,
+				[categoryIds],
+			)
+
+			for (const categoryId of categoryIds) {
+				await manager.query(
+					`DELETE FROM document_categories WHERE id = $1`,
+					[categoryId],
+				)
+			}
 		})
 
-		if (linkedDocumentsCount > 0) {
-			throw new BadRequestException(
-				`Нельзя удалить категорию, пока в ней или её подкатегориях есть документы (${linkedDocumentsCount}). Сначала удалите или перенесите документы.`,
-			)
-		}
-
-		await this.categoryTreeRepo.delete(id)
 		await this.invalidateCache()
 		return { deleted: true }
 	}
