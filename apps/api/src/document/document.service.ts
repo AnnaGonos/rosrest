@@ -146,7 +146,9 @@ export class DocumentService {
 		subcategoryId: number | null,
 		movedDocumentId: string,
 		targetOrderIndex: number,
-	) {
+	): Promise<number> {
+		let updatedOrderIndex = targetOrderIndex
+
 		await this.documentRepo.manager.transaction(async (manager) => {
 			const queryBuilder = manager
 				.getRepository(Document)
@@ -176,16 +178,32 @@ export class DocumentService {
 				throw new NotFoundException(`Document with ID ${movedDocumentId} not found in target scope`)
 			}
 
-			const [movedDocument] = documents.splice(movedIndex, 1)
-			const boundedTargetIndex = Math.max(0, Math.min(targetOrderIndex, documents.length))
-			documents.splice(boundedTargetIndex, 0, movedDocument)
+			if (targetOrderIndex < 0 || targetOrderIndex >= documents.length) {
+				throw new BadRequestException(`Target order index ${targetOrderIndex} is out of range`)
+			}
 
-			await Promise.all(
-				documents.map((document, orderIndex) =>
-					manager.getRepository(Document).update(document.id, { orderIndex }),
-				),
-			)
+			const movedDocument = documents[movedIndex]
+			if (movedIndex === targetOrderIndex) {
+				updatedOrderIndex = movedDocument.orderIndex
+				return
+			}
+
+			const targetDocument = documents[targetOrderIndex]
+			const movedOrderIndex = movedDocument.orderIndex
+			const targetDocumentOrderIndex = targetDocument.orderIndex
+
+			await manager.getRepository(Document).update(movedDocument.id, {
+				orderIndex: targetDocumentOrderIndex,
+			})
+
+			await manager.getRepository(Document).update(targetDocument.id, {
+				orderIndex: movedOrderIndex,
+			})
+
+			updatedOrderIndex = targetDocumentOrderIndex
 		})
+
+		return updatedOrderIndex
 	}
 
 	private getCacheKey(
@@ -418,11 +436,24 @@ export class DocumentService {
 			oldSubcategoryId !== newSubcategoryId
 
 		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
-			document.orderIndex = dto.orderIndex
-		}
-
-		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
-			await this.reorderDocumentsInScope(newType, newCategoryId, newSubcategoryId, id, dto.orderIndex)
+			if (scopeChanged) {
+				document.orderIndex = dto.orderIndex
+				await this.shiftOrderIndexesForInsert(
+					newType,
+					newCategoryId,
+					newSubcategoryId,
+					dto.orderIndex,
+					id,
+				)
+			} else {
+				document.orderIndex = await this.reorderDocumentsInScope(
+					newType,
+					newCategoryId,
+					newSubcategoryId,
+					id,
+					dto.orderIndex,
+				)
+			}
 		} else if (scopeChanged) {
 			document.orderIndex = await this.getNextOrderIndex(newType, newCategoryId, newSubcategoryId)
 		}
