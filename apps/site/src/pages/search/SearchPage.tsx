@@ -5,6 +5,7 @@ import ContentSection from '../../components/ContentSection/ContentSection'
 import { BackToSectionButton } from '../../components/LinkButtons'
 import RequestState from '../../components/RequestState/RequestState'
 import Seo from '../../components/Seo/Seo'
+import { getFileUrl } from '../../utils/getFileUrl'
 import './SearchPage.css'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -16,6 +17,7 @@ type SearchResultItem = {
 	id: string
 	title: string
 	url: string
+	previewImage?: string | null
 	snippet: string
 	publishedAt?: string | null
 	rank?: number
@@ -227,8 +229,15 @@ export default function SearchPage() {
 						) : (
 							<div className="search-page__results">
 								{results.map((item) => {
+									const previewSrc = item.previewImage ? getFileUrl(item.previewImage) : ''
 									const content = (
 										<>
+											{previewSrc && (
+												<div className="search-page__thumb-wrap">
+													<img className="search-page__thumb" src={previewSrc} alt={item.title} loading="lazy" />
+												</div>
+											)}
+											<div className="search-page__content">
 											<div className="search-page__result-meta">
 												<span className="search-page__badge">{TYPE_LABELS[item.type] || item.type}</span>
 												{item.publishedAt && (
@@ -239,7 +248,9 @@ export default function SearchPage() {
 											</div>
 											<h3 className="search-page__result-title">{item.title}</h3>
 											{item.section && <p className="search-page__section">{item.section}</p>}
+											<p className="search-page__link">{item.url}</p>
 											<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: item.snippet }} />
+											</div>
 										</>
 									)
 

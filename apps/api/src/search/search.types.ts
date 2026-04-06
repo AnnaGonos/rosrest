@@ -26,6 +26,7 @@ export interface SearchResultItem {
 	id: string
 	title: string
 	url: string
+	previewImage?: string | null
 	snippet: string
 	publishedAt: string | null
 	rank: number

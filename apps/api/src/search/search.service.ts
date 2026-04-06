@@ -7,6 +7,7 @@ interface RawSearchRow {
 	id: string
 	title: string
 	url: string
+	preview_image?: string | null
 	snippet: string
 	published_at: string | null
 	rank: string | number | null
@@ -75,6 +76,7 @@ export class SearchService {
 			id: row.id,
 			title: row.title,
 			url: row.url,
+			previewImage: row.preview_image ?? null,
 			snippet: row.snippet,
 			publishedAt: row.published_at,
 			rank: Number(row.rank || 0),
@@ -133,11 +135,22 @@ export class SearchService {
 		entityAlias: string
 		joinPageCondition: string
 		urlExpression: string
+		previewImageExpression?: string
 		extraSelect?: string
 		extraWhere?: string[]
 		publishedAtExpression: string
 	}): string {
-		const { type, entityTable, entityAlias, joinPageCondition, urlExpression, extraSelect, extraWhere = [], publishedAtExpression } = options
+		const {
+			type,
+			entityTable,
+			entityAlias,
+			joinPageCondition,
+			urlExpression,
+			previewImageExpression = 'NULL',
+			extraSelect,
+			extraWhere = [],
+			publishedAtExpression,
+		} = options
 
 		return `
 			SELECT
@@ -145,6 +158,7 @@ export class SearchService {
 				${entityAlias}.id::text AS id,
 				page.title AS title,
 				${urlExpression} AS url,
+				${previewImageExpression}::text AS preview_image,
 				${publishedAtExpression} AS published_at,
 				${this.pageRankExpression('page')} AS rank,
 				${this.pageHeadlineExpression('page')} AS snippet${extraSelect ? `,
@@ -164,6 +178,7 @@ export class SearchService {
 			entityAlias: 'news',
 			joinPageCondition: 'page.id = news."pageId"',
 			urlExpression: `'/' || 'news/' || regexp_replace(page.slug, '^news/', '')`,
+			previewImageExpression: `news."previewImage"`,
 			publishedAtExpression: `page."publishedAt"`,
 			extraWhere: [
 				`page."isDraft" = false`,
@@ -180,6 +195,7 @@ export class SearchService {
 			entityAlias: 'project',
 			joinPageCondition: 'page.id = project."pageId"',
 			urlExpression: `'/' || 'projects/' || regexp_replace(page.slug, '^projects/', '')`,
+			previewImageExpression: `project."previewImage"`,
 			publishedAtExpression: `page."publishedAt"`,
 			extraWhere: [
 				`page."isDraft" = false`,
@@ -212,6 +228,7 @@ export class SearchService {
 			entityAlias: 'member',
 			joinPageCondition: 'page.id = member."pageId"',
 			urlExpression: `'/' || 'portfolio/' || regexp_replace(page.slug, '^portfolio/', '')`,
+			previewImageExpression: `member."previewImage"`,
 			publishedAtExpression: `page."publishedAt"`,
 			extraWhere: [
 				`page."isDraft" = false`,
@@ -228,6 +245,7 @@ export class SearchService {
 			entityAlias: 'fj',
 			joinPageCondition: 'page.id = fj."pageId"',
 			urlExpression: `'/' || 'for-journalist'`,
+			previewImageExpression: `fj."previewImage"`,
 			publishedAtExpression: `page."publishedAt"`,
 			extraWhere: [
 				`page."isDraft" = false`,
@@ -244,6 +262,7 @@ export class SearchService {
 				page.id::text AS id,
 				page.title AS title,
 				'/' || page.slug AS url,
+				NULL::text AS preview_image,
 				page."publishedAt" AS published_at,
 				ts_rank_cd(to_tsvector('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, '')), search_q.query) AS rank,
 				ts_headline('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet
@@ -271,6 +290,7 @@ export class SearchService {
 				doc.id::text AS id,
 				doc.title AS title,
 				doc."fileUrl" AS url,
+				doc."previewUrl" AS preview_image,
 				doc."createdAt" AS published_at,
 				ts_rank_cd(
 					to_tsvector('russian', COALESCE(doc.title, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(subcat.name, '')),
@@ -297,6 +317,7 @@ export class SearchService {
 					WHEN item.type = 'article' THEN '/' || 'articles/' || regexp_replace(page.slug, '^library/', '')
 					ELSE '/' || 'library/' || item.id::text
 				END AS url,
+				item."previewImage" AS preview_image,
 				COALESCE(page."publishedAt", item."createdAt") AS published_at,
 				ts_rank_cd(
 					to_tsvector('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, '')),
@@ -324,12 +345,13 @@ export class SearchService {
 				event.id::text AS id,
 				event.title AS title,
 				'/' || 'events/' || event.id::text AS url,
+				event."previewImageUrl" AS preview_image,
 				event."createdAt" AS published_at,
 				ts_rank_cd(
 					to_tsvector('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event."registrationUrl", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, '')),
 					search_q.query
 				) AS rank,
-				ts_headline('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
+				ts_headline('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet
 			FROM events event
 			CROSS JOIN search_q
 			WHERE event."isPublished" = true
