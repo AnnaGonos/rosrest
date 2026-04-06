@@ -42,6 +42,7 @@ export class SearchService {
 					b."parentBlockId"
 				FROM "block" b
 				WHERE b."pageId" IS NOT NULL
+					AND b."parentBlockId" IS NULL
 
 				UNION ALL
 
@@ -172,7 +173,8 @@ export class SearchService {
 				${previewImageExpression}::text AS preview_image,
 				${publishedAtExpression} AS published_at,
 				${this.pageRankExpression('page')} AS rank,
-				${this.pageHeadlineExpression('page')} AS snippet${extraSelect ? `,
+				${this.pageHeadlineExpression('page')} AS snippet,
+				NULL::text AS section${extraSelect ? `,
 				${extraSelect}` : ''}
 			FROM ${entityTable} ${entityAlias}
 			INNER JOIN "page" page ON ${joinPageCondition}
@@ -276,7 +278,8 @@ export class SearchService {
 				NULL::text AS preview_image,
 				page."publishedAt" AS published_at,
 				ts_rank_cd(to_tsvector('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, '')), search_q.query) AS rank,
-				ts_headline('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet
+				ts_headline('russian', COALESCE(page.title, '') || ' ' || COALESCE(page.slug, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
+				NULL::text AS section
 			FROM "page" page
 			LEFT JOIN page_text pt ON pt.page_id = page.id
 			CROSS JOIN search_q
@@ -334,7 +337,8 @@ export class SearchService {
 					to_tsvector('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, '')),
 					search_q.query
 				) AS rank,
-				ts_headline('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet
+				ts_headline('russian', COALESCE(item.title, '') || ' ' || COALESCE(item.description, '') || ' ' || COALESCE(cat.name, '') || ' ' || COALESCE(page.title, '') || ' ' || COALESCE(pt.body, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
+				NULL::text AS section
 			FROM library_items item
 			LEFT JOIN library_categories cat ON cat.id = item."categoryId"
 			LEFT JOIN "page" page ON page.id = item."pageId"
@@ -362,7 +366,8 @@ export class SearchService {
 					to_tsvector('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event."registrationUrl", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, '')),
 					search_q.query
 				) AS rank,
-				ts_headline('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet
+				ts_headline('russian', COALESCE(event.title, '') || ' ' || COALESCE(event.description, '') || ' ' || COALESCE(event.address, '') || ' ' || COALESCE(event."detailedAddress", '') || ' ' || COALESCE(event.schedule::text, '') || ' ' || COALESCE(event.faq::text, ''), search_q.query, 'StartSel=<mark>, StopSel=</mark>, MinWords=5, MaxWords=18, MaxFragments=2') AS snippet,
+				NULL::text AS section
 			FROM events event
 			CROSS JOIN search_q
 			WHERE event."isPublished" = true
