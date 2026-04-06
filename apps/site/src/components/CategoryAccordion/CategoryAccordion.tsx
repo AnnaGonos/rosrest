@@ -29,7 +29,7 @@ export default function CategoryAccordion({ subcategories, getDocuments, loading
   const [expandedIds, setExpandedIds] = useState<number[]>([])
 
   useEffect(() => {
-    setExpandedIds(subcategories.map((subcategory) => subcategory.id))
+    setExpandedIds(subcategories.length > 0 ? [subcategories[0].id] : [])
   }, [subcategories])
 
   const toggleExpand = (categoryId: number) => {
