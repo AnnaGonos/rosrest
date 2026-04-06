@@ -252,7 +252,7 @@ export default function DocumentsPage() {
               <tbody>
                 {categories.map((c) => (
                   <tr key={c.id} style={{ cursor: 'pointer' }}>
-                    <td onClick={() => navigate(`/documents/${c.id}`)}>
+                    <td onClick={() => navigate(`/documents/${c.slug || c.id}`)}>
                       {c.icon ? (
                         (c.icon.startsWith('http') || c.icon.startsWith('/')) ? (
                           <img src={c.icon} alt="icon" style={{ width: 25, height: 25, objectFit: 'contain', marginRight: 8 }} />
@@ -268,8 +268,8 @@ export default function DocumentsPage() {
                       ) : null}
                       {c.name}
                     </td>
-                    <td onClick={() => navigate(`/documents/${c.id}`)}>{(c.children || []).length}</td>
-                    <td onClick={() => navigate(`/documents/${c.id}`)}>{new Date(c.createdAt).toLocaleDateString('ru-RU')}</td>
+                    <td onClick={() => navigate(`/documents/${c.slug || c.id}`)}>{(c.children || []).length}</td>
+                    <td onClick={() => navigate(`/documents/${c.slug || c.id}`)}>{new Date(c.createdAt).toLocaleDateString('ru-RU')}</td>
                     <td style={{ textAlign: 'right' }}>
                       <div className="d-flex justify-content-end gap-2">
                         <Button

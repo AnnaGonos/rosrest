@@ -42,7 +42,7 @@ type Document = {
 }
 
 export default function SubcategoriesPage() {
-  const { categoryId } = useParams<{ categoryId?: string }>()
+  const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
 
   const [parentCategory, setParentCategory] = useState<Category | null>(null)
@@ -246,10 +246,10 @@ export default function SubcategoriesPage() {
   }
 
   useEffect(() => {
-    if (categoryId) {
+    if (slug) {
       loadCategoryAndSubcategories()
     }
-  }, [categoryId])
+  }, [slug])
 
   const loadCategoryAndSubcategories = async () => {
     try {
@@ -269,9 +269,10 @@ export default function SubcategoriesPage() {
 
       const data = await res.json()
       const categories = Array.isArray(data) ? data : []
-      const numCategoryId = parseInt(categoryId || '', 10)
+      const parent =
+        categories.find((c: any) => c.slug === slug) ||
+        categories.find((c: any) => String(c.id) === String(slug))
 
-      const parent = categories.find((c: any) => c.id === numCategoryId)
       if (!parent) {
         throw new Error('Категория не найдена')
       }
@@ -280,7 +281,7 @@ export default function SubcategoriesPage() {
       setSubcategories(parent.children || [])
 
       const docRes = await fetch(
-        withCacheBust(`${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${numCategoryId}`),
+        withCacheBust(`${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${parent.id}`),
         {
           cache: 'no-store',
           headers: {
@@ -335,6 +336,11 @@ export default function SubcategoriesPage() {
       return
     }
 
+    if (!parentCategory) {
+      setFormError('Категория не найдена')
+      return
+    }
+
     try {
       setIsCreating(true)
       const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_CREATE, {
@@ -345,7 +351,7 @@ export default function SubcategoriesPage() {
         },
         body: JSON.stringify({
           name: subcategoryName.trim(),
-          parentId: categoryId,
+          parentId: parentCategory.id,
         }),
       })
 

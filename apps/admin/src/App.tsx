@@ -55,7 +55,7 @@ function App() {
           {/* Защищённые маршруты */}
           <Route path="/" element={<ProtectedRoute element={<OverviewPage />} />} />
           <Route path="/documents" element={<ProtectedRoute element={<DocumentsPage />} />} />
-          <Route path="/documents/:categoryId" element={<ProtectedRoute element={<SubcategoriesPage />} />} />
+          <Route path="/documents/:slug" element={<ProtectedRoute element={<SubcategoriesPage />} />} />
           
           <Route path="/charter" element={<ProtectedRoute element={<CharterPage />} />} />
           <Route path="/contracts" element={<ProtectedRoute element={<ContractsPage />} />} />
