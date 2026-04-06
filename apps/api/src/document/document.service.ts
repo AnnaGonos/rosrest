@@ -140,6 +140,54 @@ export class DocumentService {
 		)
 	}
 
+	private async reorderDocumentsInScope(
+		type: DocumentTypeEnum,
+		categoryId: number | null,
+		subcategoryId: number | null,
+		movedDocumentId: string,
+		targetOrderIndex: number,
+	) {
+		await this.documentRepo.manager.transaction(async (manager) => {
+			const queryBuilder = manager
+				.getRepository(Document)
+				.createQueryBuilder('document')
+				.where('document.type = :type', { type })
+
+			if (categoryId === null) {
+				queryBuilder.andWhere('document.category_id IS NULL')
+			} else {
+				queryBuilder.andWhere('document.category_id = :categoryId', { categoryId })
+			}
+
+			if (subcategoryId === null) {
+				queryBuilder.andWhere('document.subcategory_id IS NULL')
+			} else {
+				queryBuilder.andWhere('document.subcategory_id = :subcategoryId', { subcategoryId })
+			}
+
+			const documents = await queryBuilder
+				.orderBy('COALESCE(document.orderIndex, 2147483647)', 'ASC')
+				.addOrderBy('document.createdAt', 'ASC')
+				.addOrderBy('document.id', 'ASC')
+				.getMany()
+
+			const movedIndex = documents.findIndex((document) => document.id === movedDocumentId)
+			if (movedIndex === -1) {
+				throw new NotFoundException(`Document with ID ${movedDocumentId} not found in target scope`)
+			}
+
+			const [movedDocument] = documents.splice(movedIndex, 1)
+			const boundedTargetIndex = Math.max(0, Math.min(targetOrderIndex, documents.length))
+			documents.splice(boundedTargetIndex, 0, movedDocument)
+
+			await Promise.all(
+				documents.map((document, orderIndex) =>
+					manager.getRepository(Document).update(document.id, { orderIndex }),
+				),
+			)
+		})
+	}
+
 	private getCacheKey(
 		type?: DocumentTypeEnum,
 		categoryId?: number,
@@ -370,65 +418,13 @@ export class DocumentService {
 			oldSubcategoryId !== newSubcategoryId
 
 		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
-			await this.normalizeOrderIndexesForScope(newType, newCategoryId, newSubcategoryId)
-
-			if (!scopeChanged) {
-				const refreshed = await this.documentRepo
-					.createQueryBuilder('document')
-					.select('document.orderIndex', 'orderIndex')
-					.where('document.id = :id', { id })
-					.getRawOne<{ orderIndex: string }>()
-
-				if (refreshed?.orderIndex !== undefined) {
-					document.orderIndex = Number(refreshed.orderIndex)
-				}
-			}
+			document.orderIndex = dto.orderIndex
 		}
 
-		if (scopeChanged) {
-			if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
-				document.orderIndex = dto.orderIndex
-				await this.shiftOrderIndexesForInsert(
-					newType,
-					newCategoryId,
-					newSubcategoryId,
-					dto.orderIndex,
-					document.id,
-				)
-			} else {
-				document.orderIndex = await this.getNextOrderIndex(newType, newCategoryId, newSubcategoryId)
-			}
-		} else if (dto.orderIndex !== undefined && dto.orderIndex >= 0 && dto.orderIndex !== document.orderIndex) {
-			const targetOrder = dto.orderIndex
-			const previousOrder = document.orderIndex
-
-			if (targetOrder > previousOrder) {
-				await this.documentRepo
-					.createQueryBuilder()
-					.update(Document)
-					.set({ orderIndex: () => '"orderIndex" - 1' })
-					.where('type = :type', { type: newType })
-					.andWhere('id != :id', { id: document.id })
-					.andWhere('"orderIndex" > :previousOrder', { previousOrder })
-					.andWhere('"orderIndex" <= :targetOrder', { targetOrder })
-					.andWhere(newCategoryId === null ? 'category_id IS NULL' : 'category_id = :categoryId', { categoryId: newCategoryId ?? undefined })
-					.andWhere(newSubcategoryId === null ? 'subcategory_id IS NULL' : 'subcategory_id = :subcategoryId', { subcategoryId: newSubcategoryId ?? undefined })
-					.execute()
-			} else {
-				await this.documentRepo
-					.createQueryBuilder()
-					.update(Document)
-					.set({ orderIndex: () => '"orderIndex" + 1' })
-					.where('type = :type', { type: newType })
-					.andWhere('id != :id', { id: document.id })
-					.andWhere('"orderIndex" >= :targetOrder', { targetOrder })
-					.andWhere('"orderIndex" < :previousOrder', { previousOrder })
-					.andWhere(newCategoryId === null ? 'category_id IS NULL' : 'category_id = :categoryId', { categoryId: newCategoryId ?? undefined })
-					.andWhere(newSubcategoryId === null ? 'subcategory_id IS NULL' : 'subcategory_id = :subcategoryId', { subcategoryId: newSubcategoryId ?? undefined })
-					.execute()
-			}
-
-			document.orderIndex = targetOrder
+		if (dto.orderIndex !== undefined && dto.orderIndex >= 0) {
+			await this.reorderDocumentsInScope(newType, newCategoryId, newSubcategoryId, id, dto.orderIndex)
+		} else if (scopeChanged) {
+			document.orderIndex = await this.getNextOrderIndex(newType, newCategoryId, newSubcategoryId)
 		}
 
 		const saved = await this.documentRepo.save(document)

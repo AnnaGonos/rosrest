@@ -109,30 +109,6 @@ export default function SubcategoriesPage() {
     return `${url}${separator}_ts=${Date.now()}`
   }
 
-  const persistDocumentOrder = async (orderedDocuments: Document[]) => {
-    const tokenValue = localStorage.getItem('admin_token')
-    if (!tokenValue) {
-      throw new Error('Нет токена администратора')
-    }
-
-    for (let i = 0; i < orderedDocuments.length; i += 1) {
-      const document = orderedDocuments[i]
-      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(document.id), {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${tokenValue}`,
-        },
-        body: JSON.stringify({ orderIndex: i }),
-      })
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => '')
-        throw new Error(`Ошибка обновления порядка документа ${document.id}: ${res.status} ${text}`)
-      }
-    }
-  }
-
   const moveParentDocument = async (docId: string, direction: 'up' | 'down') => {
     const current = [...parentDocuments]
     const index = current.findIndex((doc) => doc.id === docId)
@@ -141,19 +117,31 @@ export default function SubcategoriesPage() {
     const targetIndex = direction === 'up' ? index - 1 : index + 1
     if (targetIndex < 0 || targetIndex >= current.length) return
 
+    const tokenValue = localStorage.getItem('admin_token')
+    if (!tokenValue) {
+      setError('Нет токена администратора')
+      return
+    }
+
     const next = [...current]
     const [moved] = next.splice(index, 1)
     next.splice(targetIndex, 0, moved)
-
-    next.forEach((document, orderIndex) => {
-      document.orderIndex = orderIndex
-    })
 
     setParentDocuments(next)
     setMovingDocumentId(docId)
 
     try {
-      await persistDocumentOrder(next)
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tokenValue}`,
+        },
+        body: JSON.stringify({ orderIndex: targetIndex }),
+      })
+
+      if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+
       await loadCategoryAndSubcategories()
     } catch (err: any) {
       setParentDocuments(current)
@@ -175,13 +163,15 @@ export default function SubcategoriesPage() {
     const targetIndex = direction === 'up' ? index - 1 : index + 1
     if (targetIndex < 0 || targetIndex >= current.length) return
 
+    const tokenValue = localStorage.getItem('admin_token')
+    if (!tokenValue) {
+      setError('Нет токена администратора')
+      return
+    }
+
     const reordered = [...current]
     const [moved] = reordered.splice(index, 1)
     reordered.splice(targetIndex, 0, moved)
-
-    reordered.forEach((document, orderIndex) => {
-      document.orderIndex = orderIndex
-    })
 
     setSubcategoryDocuments((prev) => ({
       ...prev,
@@ -190,7 +180,17 @@ export default function SubcategoriesPage() {
     setMovingDocumentId(docId)
 
     try {
-      await persistDocumentOrder(reordered)
+      const res = await fetch(API_ENDPOINTS.DOCUMENTS_UPDATE(docId), {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tokenValue}`,
+        },
+        body: JSON.stringify({ orderIndex: targetIndex }),
+      })
+
+      if (!res.ok) throw new Error(`Ошибка обновления порядка: ${res.status}`)
+
       await loadCategoryAndSubcategories()
     } catch (err: any) {
       setSubcategoryDocuments((prev) => ({
