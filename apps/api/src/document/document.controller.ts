@@ -61,6 +61,7 @@ export class DocumentController {
 	@ApiQuery({ name: 'categoryId', required: false, type: Number })
 	@ApiQuery({ name: 'subcategoryId', required: false, type: Number })
 	@ApiQuery({ name: 'isPublished', required: false, type: Boolean, description: 'Filter by publication status. If not provided, returns all documents' })
+	@ApiQuery({ name: 'noCache', required: false, type: Boolean, description: 'Bypass cache for fresh read' })
 	@Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
 	@Header('Pragma', 'no-cache')
 	@Header('Expires', '0')
@@ -69,11 +70,13 @@ export class DocumentController {
 		@Query('categoryId') categoryId?: string,
 		@Query('subcategoryId') subcategoryId?: string,
 		@Query('isPublished') isPublished?: string,
+		@Query('noCache') noCache?: string,
 	) {
 		const parsedCategoryId = categoryId ? parseInt(categoryId, 10) : undefined;
 		const parsedSubcategoryId = subcategoryId ? parseInt(subcategoryId, 10) : undefined;
 		const parsedIsPublished = isPublished !== undefined ? isPublished === 'true' : undefined;
-		return await this.documentService.findAllDocuments(type, parsedCategoryId, parsedSubcategoryId, parsedIsPublished);
+		const bypassCache = noCache === '1' || noCache === 'true';
+		return await this.documentService.findAllDocuments(type, parsedCategoryId, parsedSubcategoryId, parsedIsPublished, !bypassCache);
 	}
 
 	@Get(':id')

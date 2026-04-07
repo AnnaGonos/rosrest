@@ -280,7 +280,7 @@ export default function SubcategoriesPage() {
       setSubcategories(parent.children || [])
 
       const docRes = await fetch(
-        withCacheBust(`${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${parent.id}`),
+        withCacheBust(`${API_ENDPOINTS.DOCUMENTS_LIST}?type=documents&categoryId=${parent.id}&noCache=1`),
         {
           cache: 'no-store',
           headers: {

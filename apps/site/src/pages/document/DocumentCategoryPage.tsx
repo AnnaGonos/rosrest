@@ -71,7 +71,7 @@ export default function DocumentCategoryPage() {
     if (!category) return
     let mounted = true
     setDocsLoading(true)
-    fetch(`${API_BASE}/documents?type=documents&categoryId=${category.id}&isPublished=true`, { cache: 'no-store' })
+    fetch(`${API_BASE}/documents?type=documents&categoryId=${category.id}&isPublished=true&noCache=1`, { cache: 'no-store' })
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((data: DocumentItem[]) => {
         if (mounted) {

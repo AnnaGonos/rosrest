@@ -409,11 +409,14 @@ export class DocumentService {
 		categoryId?: number,
 		subcategoryId?: number,
 		isPublished?: boolean,
+		useCache = true,
 	) {
 		const cacheKey = this.getCacheKey(type, categoryId, subcategoryId, isPublished)
-		const cached = await this.cacheManager.get<Document[]>(cacheKey)
-		if (cached && Array.isArray(cached)) {
-			return cached
+		if (useCache) {
+			const cached = await this.cacheManager.get<Document[]>(cacheKey)
+			if (cached && Array.isArray(cached)) {
+				return cached
+			}
 		}
 
 		const qb = this.documentRepo
@@ -447,8 +450,10 @@ export class DocumentService {
 			.addOrderBy('document.id', 'DESC')
 			.getMany()
 
-		await this.cacheManager.set(cacheKey, list)
-		this.documentCacheKeys.add(cacheKey)
+		if (useCache) {
+			await this.cacheManager.set(cacheKey, list)
+			this.documentCacheKeys.add(cacheKey)
+		}
 		return list
 	}
 

@@ -25,7 +25,7 @@ export default function CharterPage() {
         let mounted = true
         setLoading(true)
         setError(null)
-        fetch(`${API_BASE}/documents?type=charter&isPublished=true`)
+        fetch(`${API_BASE}/documents?type=charter&isPublished=true&noCache=1`)
             .then((r) => {
                 if (r.status === 404) {
                     return []

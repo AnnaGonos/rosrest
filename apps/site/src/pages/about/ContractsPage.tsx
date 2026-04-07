@@ -25,7 +25,7 @@ export default function ContractsPage() {
     let mounted = true
     setLoading(true)
     setError(null)
-    fetch(`${API_BASE}/documents?type=contracts&isPublished=true`)
+    fetch(`${API_BASE}/documents?type=contracts&isPublished=true&noCache=1`)
       .then((r) => {
         if (r.status === 404) {
           return []
