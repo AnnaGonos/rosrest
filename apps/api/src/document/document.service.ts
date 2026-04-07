@@ -440,7 +440,6 @@ export class DocumentService {
 		}
 
 		const list = await qb
-			.select('document')
 			.orderBy('document.orderIndex', 'DESC')
 			.addOrderBy('document.createdAt', 'DESC')
 			.addOrderBy('document.id', 'DESC')
