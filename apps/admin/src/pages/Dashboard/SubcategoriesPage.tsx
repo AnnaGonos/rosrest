@@ -118,7 +118,7 @@ export default function SubcategoriesPage() {
       const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0
       if (aTime !== bTime) return bTime - aTime
 
-      return b.id.localeCompare(a.id)
+      return String(b.id).localeCompare(String(a.id))
     })
   }
 
