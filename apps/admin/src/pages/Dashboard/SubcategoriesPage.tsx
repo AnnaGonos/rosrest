@@ -76,7 +76,6 @@ export default function SubcategoriesPage() {
     file: null,
     url: '',
   })
-  const [docPlacement, setDocPlacement] = useState<'category' | 'subcategory'>('category')
   const [docIsPublished, setDocIsPublished] = useState(true)
   const [docFormError, setDocFormError] = useState('')
   const [isAddingDocument, setIsAddingDocument] = useState(false)
@@ -445,10 +444,7 @@ export default function SubcategoriesPage() {
       return
     }
 
-    if (docPlacement === 'subcategory' && !selectedSubcategoryForDoc) {
-      setDocFormError('Подкатегория не выбрана')
-      return
-    }
+    const targetSubcategoryId = selectedSubcategoryForDoc?.id
 
     if (!docTitle.trim()) {
       setDocFormError('Введите название документа')
@@ -469,9 +465,11 @@ export default function SubcategoriesPage() {
 
       const formData = new FormData()
       formData.append('title', docTitle.trim())
-      formData.append('categoryId', String(parentCategory.id))
-      if (docPlacement === 'subcategory' && selectedSubcategoryForDoc) {
-        formData.append('subcategoryId', String(selectedSubcategoryForDoc.id))
+      if (targetSubcategoryId) {
+        // For subcategory documents send only subcategoryId; backend resolves parent category.
+        formData.append('subcategoryId', String(targetSubcategoryId))
+      } else {
+        formData.append('categoryId', String(parentCategory.id))
       }
       formData.append('type', 'documents')
       formData.append('isPublished', String(docIsPublished))
@@ -500,7 +498,6 @@ export default function SubcategoriesPage() {
 
       setDocTitle('')
       setDocSource({ mode: 'file', file: null, url: '' })
-      setDocPlacement('category')
       setDocIsPublished(true)
       setAddDocumentModalOpened(false)
       setSelectedSubcategoryForDoc(null)
@@ -717,7 +714,6 @@ export default function SubcategoriesPage() {
               <Button
                 variant="outline-primary"
                 onClick={() => {
-                  setDocPlacement('category')
                   setSelectedSubcategoryForDoc(null)
                   setDocTitle('')
                   setDocSource({ mode: 'file', file: null, url: '' })
@@ -869,7 +865,6 @@ export default function SubcategoriesPage() {
                                 variant="outline-success"
                                 size="sm"
                                 onClick={() => {
-                                  setDocPlacement('subcategory')
                                   setSelectedSubcategoryForDoc(subcategory)
                                   setDocTitle('')
                                   setDocSource({ mode: 'file', file: null, url: '' })
@@ -1204,7 +1199,6 @@ export default function SubcategoriesPage() {
               setSelectedSubcategoryForDoc(null)
               setDocTitle('')
               setDocSource({ mode: 'file', file: null, url: '' })
-              setDocPlacement('category')
               setDocIsPublished(true)
               setDocFormError('')
             }}
@@ -1213,7 +1207,7 @@ export default function SubcategoriesPage() {
           >
             <Modal.Header closeButton>
               <Modal.Title>
-                {docPlacement === 'subcategory'
+                {selectedSubcategoryForDoc
                   ? `Добавить документ в "${selectedSubcategoryForDoc?.name ?? 'подкатегорию'}"`
                   : `Добавить документ в "${parentCategory.name}"`}
               </Modal.Title>
@@ -1227,7 +1221,7 @@ export default function SubcategoriesPage() {
               )}
 
               <p className="text-muted small">
-                {docPlacement === 'subcategory'
+                {selectedSubcategoryForDoc
                   ? 'Документ будет доступен внутри выбранной подкатегории.'
                   : 'Документ будет доступен на уровне родительской категории.'}
               </p>
@@ -1272,7 +1266,6 @@ export default function SubcategoriesPage() {
                   setSelectedSubcategoryForDoc(null)
                   setDocTitle('')
                   setDocSource({ mode: 'file', file: null, url: '' })
-                  setDocPlacement('category')
                   setDocIsPublished(true)
                   setDocFormError('')
                 }}
