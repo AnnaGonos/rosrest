@@ -227,6 +227,8 @@ export class DocumentService {
 		const categoryId = document.category?.id ?? null
 		const subcategoryId = document.subcategory?.id ?? null
 
+		await this.normalizeOrderIndexesForScope(type, categoryId, subcategoryId)
+
 		const scopeQuery = this.documentRepo
 			.createQueryBuilder('document')
 			.where('document.type = :type', { type })
