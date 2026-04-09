@@ -19,6 +19,15 @@ export default function RarMembersPage() {
     const [error, setError] = useState<string | null>(null)
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+    const ruCollator = new Intl.Collator('ru', { sensitivity: 'base', ignorePunctuation: true, numeric: true })
+
+    const normalizeSortText = (value: string): string =>
+        value
+            .normalize('NFKC')
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/ё/gi, match => (match === 'Ё' ? 'Е' : 'е'))
 
     useEffect(() => {
         fetchSections()
@@ -40,7 +49,7 @@ export default function RarMembersPage() {
     }
 
     const items = [...sections]
-        .sort((a, b) => a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' }))
+        .sort((a, b) => ruCollator.compare(normalizeSortText(a.title), normalizeSortText(b.title)))
         .map(section => ({
             title: section.title,
             href: `/members/${section.slug}`,

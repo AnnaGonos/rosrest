@@ -40,6 +40,15 @@ export default function RarSectionPage() {
     const [notFound, setNotFound] = useState(false)
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
+    const ruCollator = new Intl.Collator('ru', { sensitivity: 'base', ignorePunctuation: true, numeric: true })
+
+    const normalizeSortText = (value: string): string =>
+        value
+            .normalize('NFKC')
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/ё/gi, match => (match === 'Ё' ? 'Е' : 'е'))
 
     const resolveImageUrl = (url: string): string => {
         if (!url) return ''
@@ -102,7 +111,7 @@ export default function RarSectionPage() {
     if (!section) return null
 
     const items = [...members]
-        .sort((a, b) => a.page.title.localeCompare(b.page.title, 'ru', { sensitivity: 'base' }))
+        .sort((a, b) => ruCollator.compare(normalizeSortText(a.page.title), normalizeSortText(b.page.title)))
         .map(member => ({
             title: member.page.title,
             href: `/portfolio/${member.page.slug.replace(/^portfolio\//, '')}`,
