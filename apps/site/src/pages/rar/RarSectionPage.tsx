@@ -101,12 +101,13 @@ export default function RarSectionPage() {
     }
     if (!section) return null
 
-    const items = members.map(member => ({
-        title: member.page.title,
-        href: `/portfolio/${member.page.slug.replace(/^portfolio\//, '')}`,
-        image: member.previewImage ? resolveImageUrl(member.previewImage) : undefined,
-        
-    }))
+    const items = [...members]
+        .sort((a, b) => a.page.title.localeCompare(b.page.title, 'ru', { sensitivity: 'base' }))
+        .map(member => ({
+            title: member.page.title,
+            href: `/portfolio/${member.page.slug.replace(/^portfolio\//, '')}`,
+            image: member.previewImage ? resolveImageUrl(member.previewImage) : undefined,
+        }))
 
     return (
         <div className="page-main">
