@@ -91,23 +91,23 @@ export default function OverviewPage() {
       subsections: [
         {
           title: 'Устав и ежегодные отчеты',
-          to: '/documents',
+          to: '/charter',
           iconClass: 'bi bi-file-earmark-text',
           col: { xs: 12, md: 12, lg: 12 }
         },
         {
           title: 'Члены РАР',
-          to: '',
+          to: '/rar-members',
           iconClass: 'bi bi-person-circle',
         },
         {
           title: 'Соглашения РАР',
-          to: '',
+          to: '/contracts',
           iconClass: 'bi bi-file-richtext',
         },
         {
           title: 'Награды, дипломы',
-          to: '',
+          to: '/awards',
           iconClass: 'bi bi-award',
         },
         {
@@ -119,7 +119,7 @@ export default function OverviewPage() {
         },
         {
           title: 'Аппарат Ассоциации и Контакты',
-          to: '',
+          to: '/employees',
           iconClass: 'bi bi-person-lines-fill',
           col: { xs: 12, md: 6, lg: 6 }
         },
