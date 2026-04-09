@@ -41,6 +41,27 @@ export default function RarSectionPage() {
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3002'
     const ruCollator = new Intl.Collator('ru', { sensitivity: 'base', ignorePunctuation: true, numeric: true })
+    const latinToCyrillicMap: Record<string, string> = {
+        A: 'А',
+        B: 'В',
+        C: 'С',
+        E: 'Е',
+        H: 'Н',
+        K: 'К',
+        M: 'М',
+        O: 'О',
+        P: 'Р',
+        T: 'Т',
+        X: 'Х',
+        Y: 'У',
+        a: 'а',
+        c: 'с',
+        e: 'е',
+        o: 'о',
+        p: 'р',
+        x: 'х',
+        y: 'у'
+    }
 
     const normalizeSortText = (value: string): string =>
         value
@@ -48,6 +69,7 @@ export default function RarSectionPage() {
             .replace(/[\u200B-\u200D\uFEFF]/g, '')
             .replace(/\s+/g, ' ')
             .trim()
+            .replace(/[ABCEHKMOPTXYaceopxy]/g, char => latinToCyrillicMap[char] || char)
             .replace(/ё/gi, match => (match === 'Ё' ? 'Е' : 'е'))
 
     const resolveImageUrl = (url: string): string => {
