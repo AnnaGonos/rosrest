@@ -39,11 +39,13 @@ export default function RarMembersPage() {
         }
     }
 
-    const items = sections.map(section => ({
-        title: section.title,
-        href: `/members/${section.slug}`,
-        icon: section.icon || undefined
-    }))
+    const items = [...sections]
+        .sort((a, b) => a.title.localeCompare(b.title, 'ru', { sensitivity: 'base' }))
+        .map(section => ({
+            title: section.title,
+            href: `/members/${section.slug}`,
+            icon: section.icon || undefined
+        }))
 
     return (
         <div className="page-main">
