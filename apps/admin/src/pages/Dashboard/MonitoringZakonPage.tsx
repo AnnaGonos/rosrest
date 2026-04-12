@@ -539,22 +539,24 @@ export default function MonitoringZakonPage() {
                             {items.map((item) => (
                                 <Col key={item.id}>
                                     <Card className="h-100">
-                                        <Card.Body>
-                                            <Card.Title className="fw-bold" style={{ minHeight: '48px' }}>
-                                                {item.page.title}
-                                            </Card.Title>
+                                        <Card.Body className="d-flex flex-column justify-content-between">
+                                            <div>
+                                                <Card.Title className="fw-bold" style={{ minHeight: '48px' }}>
+                                                    {item.page.title}
+                                                </Card.Title>
 
-                                            <div className="mb-3">
-                                                <small className="text-muted d-block mb-1">
-                                                    <strong>Дата:</strong> {formatDate(item.page.publishedAt)}
-                                                </small>
-                                                <small className="text-muted">
-                                                    /{item.page.slug}
-                                                </small>
+                                                <div className="mb-3">
+                                                    <small className="text-muted d-block mb-1">
+                                                        <strong>Дата:</strong> {formatDate(item.page.publishedAt)}
+                                                    </small>
+                                                    <small className="text-muted">
+                                                        /{item.page.slug}
+                                                    </small>
+                                                </div>
                                             </div>
 
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <div className="d-flex align-items-center justify-content-between gap-2">
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
+                                                <div className="d-flex align-items-center gap-2">
                                                     <Badge bg={item.page.isDraft ? 'secondary' : 'success'}>
                                                         {item.page.isDraft ? 'Черновик' : 'Опубликовано'}
                                                     </Badge>
@@ -564,35 +566,36 @@ export default function MonitoringZakonPage() {
                                                             {commentsCountMap[item.id]}
                                                         </span>
                                                     )}
-                                                    <div className="btn-group">
-                                                        {item.page?.slug && (
-                                                            <Button
-                                                                as="a"
-                                                                href={`https://rosrest.com/monitoring-zakon/${item.page.slug.replace(/^monitoring-zakon\//, '')}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                variant="outline-secondary"
-                                                                size="sm"
-                                                                title="Открыть материал на сайте"
-                                                            >
-                                                                <i className="bi bi-box-arrow-up-right"></i>
-                                                            </Button>
-                                                        )}
+                                                </div>
+
+                                                <div className="btn-group">
+                                                    {item.page?.slug && (
                                                         <Button
-                                                            variant="outline-primary"
+                                                            as="a"
+                                                            href={`https://rosrest.com/monitoring-zakon/${item.page.slug.replace(/^monitoring-zakon\//, '')}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            variant="outline-secondary"
                                                             size="sm"
-                                                            onClick={() => openEditModal(item)}
+                                                            title="Открыть материал на сайте"
                                                         >
-                                                            <i className="bi bi-pencil"></i>
+                                                            <i className="bi bi-box-arrow-up-right"></i>
                                                         </Button>
-                                                        <Button
-                                                            variant="outline-danger"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(item.id)}
-                                                        >
-                                                            <i className="bi bi-trash"></i>
-                                                        </Button>
-                                                    </div>
+                                                    )}
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        onClick={() => openEditModal(item)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(item.id)}
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </Card.Body>

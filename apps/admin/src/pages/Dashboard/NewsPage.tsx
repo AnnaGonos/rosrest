@@ -864,36 +864,38 @@ export default function NewsPage() {
                                             />
                                         )}
 
-                                        <Card.Body>
-                                            <Card.Title className="fw-bold" style={{ minHeight: '48px' }}>
-                                                {newsItem.page.title}
-                                            </Card.Title>
+                                        <Card.Body className="d-flex flex-column justify-content-between">
+                                            <div>
+                                                <Card.Title className="fw-bold" style={{ minHeight: '48px' }}>
+                                                    {newsItem.page.title}
+                                                </Card.Title>
 
-                                            <div className="mb-3">
-                                                <small className="text-muted d-block mb-1">
-                                                    <strong>Дата:</strong> {formatDate(newsItem.page.publishedAt)}
-                                                </small>
-                                                <small className="text-muted">
-                                                    /{newsItem.page.slug}
-                                                </small>
-                                                {newsItem.lastIncludedInNewsletterAt && (
-                                                    <div>
-                                                        <small className="text-muted">Последняя в рассылке: {new Date(newsItem.lastIncludedInNewsletterAt).toLocaleString('ru-RU')}</small>
+                                                <div className="mb-3">
+                                                    <small className="text-muted d-block mb-1">
+                                                        <strong>Дата:</strong> {formatDate(newsItem.page.publishedAt)}
+                                                    </small>
+                                                    <small className="text-muted">
+                                                        /{newsItem.page.slug}
+                                                    </small>
+                                                    {newsItem.lastIncludedInNewsletterAt && (
+                                                        <div>
+                                                            <small className="text-muted">Последняя в рассылке: {new Date(newsItem.lastIncludedInNewsletterAt).toLocaleString('ru-RU')}</small>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {newsItem.tags.length > 0 && (
+                                                    <div className="mb-2">
+                                                        {newsItem.tags.map(tag => (
+                                                            <div key={tag.id} className="me-1" style={{ display: 'inline-block', padding: '2px 6px', borderRadius: '4px', border: '1px solid #000', fontSize: '12px' }}>
+                                                                {tag.name}
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
 
-                                            {newsItem.tags.length > 0 && (
-                                                <div className="mb-2">
-                                                    {newsItem.tags.map(tag => (
-                                                        <div key={tag.id} className="me-1" style={{ display: 'inline-block', padding: '2px 6px', borderRadius: '4px', border: '1px solid #000', fontSize: '12px' }}>
-                                                            {tag.name}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className="d-flex justify-content-between align-items-center">
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
                                                 <div className="d-flex align-items-center gap-2">
                                                     <Badge bg={newsItem.page.isDraft ? 'secondary' : 'success'}>
                                                         {newsItem.page.isDraft ? 'Черновик' : 'Опубликовано'}
@@ -911,7 +913,7 @@ export default function NewsPage() {
                                                         size="sm"
                                                         onClick={() => {
                                                             const status = newsletterStatusMap[newsItem.id] || 'none'
-                                                            // if draft, show a warning modal that allows editing
+                                                            
                                                             if (newsItem.page?.isDraft) {
                                                                 draftWarningNewsIdRef.current = newsItem.id
                                                                 setShowDraftWarningModal(true)
