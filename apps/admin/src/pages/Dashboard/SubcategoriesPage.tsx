@@ -782,6 +782,19 @@ export default function SubcategoriesPage() {
                           >
                             <i className="bi bi-chevron-down" />
                           </Button>
+                          {(doc.fileUrl || doc.pdfUrl) && (
+                            <Button
+                              as="a"
+                              href={getFileUrl(doc.fileUrl || doc.pdfUrl || '')}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              variant="outline-secondary"
+                              size="sm"
+                              title="Открыть документ на сайте"
+                            >
+                              <i className="bi bi-box-arrow-up-right" />
+                            </Button>
+                          )}
                           <Button
                             variant="outline-secondary"
                             size="sm"
@@ -957,6 +970,19 @@ export default function SubcategoriesPage() {
                                         >
                                           <i className="bi bi-chevron-down" />
                                         </Button>
+                                        {(doc.fileUrl || doc.pdfUrl) && (
+                                          <Button
+                                            as="a"
+                                            href={getFileUrl(doc.fileUrl || doc.pdfUrl || '')}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            variant="outline-secondary"
+                                            size="sm"
+                                            title="Открыть документ на сайте"
+                                          >
+                                            <i className="bi bi-box-arrow-up-right" />
+                                          </Button>
+                                        )}
                                         <Button
                                           variant="outline-secondary"
                                           size="sm"
