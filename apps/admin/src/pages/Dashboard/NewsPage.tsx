@@ -59,7 +59,7 @@ export default function NewsPage() {
     const [newsFormSuccessVariant, setNewsFormSuccessVariant] = useState<'success' | 'info'>('success')
     const [showAddToNewsletterConfirm, setShowAddToNewsletterConfirm] = useState(false)
     const [selectedNewsIdForNewsletter, setSelectedNewsIdForNewsletter] = useState<string | null>(null)
-    
+
     const [savingNewsletter, setSavingNewsletter] = useState(false)
     type NewsletterStatus = 'none' | 'queued' | 'sent'
     const [newsletterStatusMap, setNewsletterStatusMap] = useState<Record<string, NewsletterStatus>>({})
@@ -83,7 +83,7 @@ export default function NewsPage() {
     const [newsSlug, setNewsSlug] = useState('')
     const [newsPublishedAt, setNewsPublishedAt] = useState<Date | null>(() => new Date())
     const [newsIsDraft, setNewsIsDraft] = useState(true)
-    
+
     const [newsPreviewImage, setNewsPreviewImage] = useState<ImageUploadValue>({ mode: 'file', file: null, url: '' })
     const [newsBlocks, setNewsBlocks] = useState<Block[]>([])
     const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
@@ -178,7 +178,7 @@ export default function NewsPage() {
             setLoading(true)
             setError(null)
             const token = localStorage.getItem('admin_token')
-            
+
             const url = API_ENDPOINTS.NEWS.list().includes('?')
                 ? API_ENDPOINTS.NEWS.list() + '&pageSize=100000'
                 : API_ENDPOINTS.NEWS.list() + '?pageSize=100000';
@@ -436,18 +436,18 @@ export default function NewsPage() {
                 const respNewsId = data?.item?.newsId || data?.newsId || null
                 setLastAddDebug(`sent: ${idToSend} → resp: ${respNewsId} (existed=${!!data?.existed})`)
                 setTimeout(() => setLastAddDebug(null), 8000)
-            } catch (e) {}
-            
+            } catch (e) { }
+
             try {
                 // API may return { item, existed } or item directly
                 const item = data?.item || data
                 const isSent = !!item?.isSent
                 const status: NewsletterStatus = isSent ? 'sent' : 'queued'
                 setNewsletterStatusMap(prev => ({ ...prev, [String(item?.newsId || idToSend)]: status }))
-            } catch (e) {}
+            } catch (e) { }
 
             // notify other UI (newsletter page) to reload queue
-            try { window.dispatchEvent(new CustomEvent('newsletter:queue:changed')) } catch (e) {}
+            try { window.dispatchEvent(new CustomEvent('newsletter:queue:changed')) } catch (e) { }
             setShowAddToNewsletterConfirm(false)
             confirmNewsIdRef.current = null
             setSelectedNewsIdForNewsletter(null)
@@ -661,17 +661,32 @@ export default function NewsPage() {
     return (
         <DashboardLayout title="Новости">
             <Container>
-                <div className="mb-4">
-                    <h1 className="mb-2">Новости</h1>
-                    <p className="text-muted">Управление новостями и тегами</p>
-                    <a href="https://disk.yandex.ru/d/D6-aOxePBPQsDw"
+                <div className="mb-4 d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h1 className="mb-2">Новости</h1>
+                        <p className="text-muted">Управление новостями и тегами</p>
+
+                        <a href="https://docs.google.com/document/d/1n3v9BSDtbP3G8-KG8HrFI5ky5RY1lsnlV8Rs9R78YSI/edit?tab=t.0#heading=h.ys2x9duv7xdn"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-outline-dark  d-flex align-items-center"
+                            style={{ width: 'fit-content', margin: '20px 0' }}
+                        >
+                            <i className="bi bi-info-lg me-2"></i>
+                            Советы по публикации
+                        </a>
+                    </div>
+
+                    <a
+                        href="https://rosrest.com/news"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-outline-dark  d-flex align-items-center"
-                        style={{ width: 'fit-content', margin: '20px 0' }}
+                        className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                        style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }}
+                        title="Открыть страницу на сайте"
+                        aria-label="Открыть страницу на сайте"
                     >
-                        <i className="bi bi-info-lg me-2"></i>
-                        Советы по публикации
+                        <i className="bi bi-box-arrow-up-right"></i>
                     </a>
                 </div>
 
@@ -749,7 +764,7 @@ export default function NewsPage() {
                                     />
                                 </Form.Group>
 
-                                
+
                             </Col>
                             <Col md={3}>
                                 <Form.Group>
@@ -858,14 +873,14 @@ export default function NewsPage() {
                                                 <small className="text-muted d-block mb-1">
                                                     <strong>Дата:</strong> {formatDate(newsItem.page.publishedAt)}
                                                 </small>
-                                                    <small className="text-muted">
-                                                        /{newsItem.page.slug}
-                                                    </small>
-                                                    {newsItem.lastIncludedInNewsletterAt && (
-                                                        <div>
-                                                            <small className="text-muted">Последняя в рассылке: {new Date(newsItem.lastIncludedInNewsletterAt).toLocaleString('ru-RU')}</small>
-                                                        </div>
-                                                    )}
+                                                <small className="text-muted">
+                                                    /{newsItem.page.slug}
+                                                </small>
+                                                {newsItem.lastIncludedInNewsletterAt && (
+                                                    <div>
+                                                        <small className="text-muted">Последняя в рассылке: {new Date(newsItem.lastIncludedInNewsletterAt).toLocaleString('ru-RU')}</small>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {newsItem.tags.length > 0 && (
@@ -918,6 +933,19 @@ export default function NewsPage() {
                                                     >
                                                         <i className={newsletterStatusMap[newsItem.id] === 'sent' ? 'bi bi-inbox' : (newsletterStatusMap[newsItem.id] === 'queued' ? 'bi bi-mailbox-flag' : 'bi bi-envelope-check')}></i>
                                                     </Button>
+                                                    {newsItem.page?.slug && (
+                                                        <Button
+                                                            as="a"
+                                                            href={`https://rosrest.com/news/${newsItem.page.slug.replace(/^news\//, '')}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            variant="outline-secondary"
+                                                            size="sm"
+                                                            title="Открыть новость на сайте"
+                                                        >
+                                                            <i className="bi bi-box-arrow-up-right"></i>
+                                                        </Button>
+                                                    )}
                                                     <Button
                                                         variant="outline-primary"
                                                         size="sm"
@@ -1204,7 +1232,7 @@ export default function NewsPage() {
                             <i className="bi bi-floppy me-2"></i>
                             Сохранить
                         </Button>
-                        
+
                         <Button
                             variant="secondary"
                             onClick={handleRequestCloseModal}
@@ -1249,9 +1277,9 @@ export default function NewsPage() {
                 onHide={() => setShowAddToNewsletterConfirm(false)}
                 centered
             >
-                    <Modal.Body className="text-center py-4">
-                        <p>Добавить письмо в рассылку?</p>
-                    </Modal.Body>
+                <Modal.Body className="text-center py-4">
+                    <p>Добавить письмо в рассылку?</p>
+                </Modal.Body>
                 <Modal.Footer className="d-flex justify-content-end gap-2">
                     <Button variant="secondary" onClick={() => { setShowAddToNewsletterConfirm(false); setSelectedNewsIdForNewsletter(null) }}>
                         Отмена
