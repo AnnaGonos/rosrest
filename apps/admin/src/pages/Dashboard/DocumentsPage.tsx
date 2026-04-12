@@ -289,6 +289,17 @@ export default function DocumentsPage() {
                     <td style={{ textAlign: 'right' }}>
                       <div className="d-flex justify-content-end gap-2">
                         <Button
+                          as="a"
+                          href={`https://rosrest.com/documents/${c.slug || c.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          variant="outline-secondary"
+                          size="sm"
+                          title="Открыть категорию на сайте"
+                        >
+                          <i className="bi bi-box-arrow-up-right" />
+                        </Button>
+                        <Button
                           variant="outline-secondary"
                           size="sm"
                           onClick={() => openEdit(c)}
