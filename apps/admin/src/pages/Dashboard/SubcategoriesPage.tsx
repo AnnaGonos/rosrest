@@ -863,18 +863,6 @@ export default function SubcategoriesPage() {
                             </div>
                             <div className="d-flex gap-2">
                               <Button
-                                variant="outline-primary"
-                                size="sm"
-                                onClick={() => {
-                                  setEditingCategoryForBlocks(subcategory)
-                                  setEditingBlocks((subcategory as any)?.blocks || [])
-                                  setPageEditorOpened(true)
-                                }}
-                                title="Редактировать страницу подкатегории"
-                              >
-                                <i className="bi bi-layout-text-sidebar-reverse" />
-                              </Button>
-                              <Button
                                 variant="outline-success"
                                 size="sm"
                                 onClick={() => {
