@@ -68,10 +68,13 @@ interface GroupedItems {
 }
 
 export default function LibraryPage() {
+  const CATEGORY_PREVIEW_LIMIT = 4
+
   const [categories, setCategories] = useState<LibraryCategory[]>([])
   const [groupedItems, setGroupedItems] = useState<GroupedItems[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [expandedCategoryIds, setExpandedCategoryIds] = useState<number[]>([])
 
   const [addCategoryModalOpened, setAddCategoryModalOpened] = useState(false)
   const [creatingCategory, setCreatingCategory] = useState(false)
@@ -156,6 +159,14 @@ export default function LibraryPage() {
     if (newItemTitle.trim()) {
       setArticleSlug(generateSlug(newItemTitle))
     }
+  }
+
+  const toggleCategoryExpanded = (categoryId: number) => {
+    setExpandedCategoryIds((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    )
   }
 
   useEffect(() => {
@@ -794,29 +805,29 @@ export default function LibraryPage() {
                       const isArticlesCategory = group.category.name.toLowerCase().includes('стат')
 
                       return (
-                    <div className="d-flex gap-2">
-                        {isArticlesCategory ? (
-                          <Button
-                            variant="outline-success"
-                            size="sm"
-                            className="d-inline-flex align-items-center gap-2"
-                            onClick={() => openAddArticleModal(group.category.id)}
-                          >
-                            <i className="bi bi-plus-lg" />
-                            Добавить статью
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                            className="d-inline-flex align-items-center gap-2"
-                            onClick={() => openAddItemModal(group.category.id)}
-                          >
-                            <i className="bi bi-plus-lg" />
-                            Добавить книгу
-                          </Button>
-                        )}
-                    </div>
+                        <div className="d-flex gap-2">
+                          {isArticlesCategory ? (
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                              className="d-inline-flex align-items-center gap-2"
+                              onClick={() => openAddArticleModal(group.category.id)}
+                            >
+                              <i className="bi bi-plus-lg" />
+                              Добавить статью
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              className="d-inline-flex align-items-center gap-2"
+                              onClick={() => openAddItemModal(group.category.id)}
+                            >
+                              <i className="bi bi-plus-lg" />
+                              Добавить книгу
+                            </Button>
+                          )}
+                        </div>
                       )
                     })()}
                   </div>
@@ -826,107 +837,137 @@ export default function LibraryPage() {
                       В этой категории нет материалов
                     </p>
                   ) : (
-                    <Row className="g-3">
-                      {group.items.map((item) => {
-                        const imgSrc = getFileUrl(item.previewImage ?? '')
+                    <>
+                      {(() => {
+                        const isExpanded = expandedCategoryIds.includes(group.category.id)
+                        const visibleItems = isExpanded
+                          ? group.items
+                          : group.items.slice(0, CATEGORY_PREVIEW_LIMIT)
+                        const hiddenItemsCount = Math.max(0, group.items.length - CATEGORY_PREVIEW_LIMIT)
+
                         return (
-                          <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
-                            <Card className="h-100" style={{ border: '1px solid #dee2e0', borderRadius: '8px' }}>
-                              <div className="position-relative">
-                                <div className="top-0 d-flex start-0 mb-1 justify-content-between" style={{ paddingLeft: '10px' }}>
-                                  <Badge bg={item.type === 'book' ? 'primary' : 'success'} style={{ height: 'fit-content', width: 'fit-content', padding: '8px 10px' }}>
-                                    <i className={`bi ${item.type === 'book' ? 'bi-book' : 'bi-file-text'} me-1`} />
-                                    {item.type === 'book' ? 'Книга' : 'Статья'}
-                                  </Badge>
-                                  <div className="d-flex gap-2 mt-auto justify-content-end me-2">
-                                    {item.type === 'book' && (
-                                      <Button
-                                        as="a"
-                                        href={`https://rosrest.com/library/${item.id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        variant="outline-secondary"
-                                        size="sm"
-                                        title="Открыть публичную страницу"
-                                      >
-                                        <i className="bi bi-box-arrow-up-right" />
-                                      </Button>
-                                    )}
-                                    {item.type === 'article' && item.page?.slug && (
-                                      <Button
-                                        as="a"
-                                        href={`https://rosrest.com/articles/${item.page.slug.replace(/^library\//, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        variant="outline-secondary"
-                                        size="sm"
-                                        title="Открыть публичную статью"
-                                      >
-                                        <i className="bi bi-box-arrow-up-right" />
-                                      </Button>
-                                    )}
-                                    <Button
-                                      variant="outline-primary"
-                                      size="sm"
-                                      onClick={() => openEditItemModal(item)}
-                                      title="Редактировать"
-                                    >
-                                      <i className="bi bi-pencil" />
-                                    </Button>
-                                    <Button
-                                      variant="outline-danger"
-                                      size="sm"
-                                      onClick={() => openDeleteConfirm(item)}
-                                      title="Удалить"
-                                    >
-                                      <i className="bi bi-trash" />
-                                    </Button>
-                                  </div>
-                                </div>
-                                {imgSrc && (
-                                  <Card.Img
-                                    variant="top"
-                                    src={imgSrc}
-                                    alt={item.title}
-                                    style={{ objectFit: 'contain', height: 250 }}
-                                  />
-                                )}
+                          <>
+                            <Row className="g-3">
+                              {visibleItems.map((item) => {
+                                const imgSrc = getFileUrl(item.previewImage ?? '')
+                                return (
+                                  <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
+                                    <Card className="h-100" style={{ border: '1px solid #dee2e0', borderRadius: '8px' }}>
+                                      <div className="position-relative">
+                                        <div className="top-0 d-flex start-0 mb-1 justify-content-between" style={{ paddingLeft: '10px' }}>
+                                          <Badge bg={item.type === 'book' ? 'primary' : 'success'} style={{ height: 'fit-content', width: 'fit-content', padding: '8px 10px' }}>
+                                            <i className={`bi ${item.type === 'book' ? 'bi-book' : 'bi-file-text'} me-1`} />
+                                            {item.type === 'book' ? 'Книга' : 'Статья'}
+                                          </Badge>
+                                          <div className="d-flex gap-2 mt-auto justify-content-end me-2">
+                                            {item.type === 'book' && (
+                                              <Button
+                                                as="a"
+                                                href={`https://rosrest.com/library/${item.id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                title="Открыть публичную страницу"
+                                              >
+                                                <i className="bi bi-box-arrow-up-right" />
+                                              </Button>
+                                            )}
+                                            {item.type === 'article' && item.page?.slug && (
+                                              <Button
+                                                as="a"
+                                                href={`https://rosrest.com/articles/${item.page.slug.replace(/^library\//, '')}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                title="Открыть публичную статью"
+                                              >
+                                                <i className="bi bi-box-arrow-up-right" />
+                                              </Button>
+                                            )}
+                                            <Button
+                                              variant="outline-primary"
+                                              size="sm"
+                                              onClick={() => openEditItemModal(item)}
+                                              title="Редактировать"
+                                            >
+                                              <i className="bi bi-pencil" />
+                                            </Button>
+                                            <Button
+                                              variant="outline-danger"
+                                              size="sm"
+                                              onClick={() => openDeleteConfirm(item)}
+                                              title="Удалить"
+                                            >
+                                              <i className="bi bi-trash" />
+                                            </Button>
+                                          </div>
+                                        </div>
+                                        {imgSrc && (
+                                          <Card.Img
+                                            variant="top"
+                                            src={imgSrc}
+                                            alt={item.title}
+                                            style={{ objectFit: 'contain', height: 250 }}
+                                          />
+                                        )}
 
+                                      </div>
+                                      <Card.Body className="d-flex flex-column gap-2" style={{ padding: '15px 10px 10px 10px' }}>
+                                        <h6 className="card-title mb-0" style={{
+                                          display: '-webkit-box',
+                                          WebkitLineClamp: 2,
+                                          WebkitBoxOrient: 'vertical',
+                                          overflow: 'hidden',
+                                        }}>
+                                          {item.title}
+                                        </h6>
+
+                                        {item.description && (
+                                          <div
+                                            className="text-muted small"
+                                            style={{
+                                              display: '-webkit-box',
+                                              WebkitLineClamp: 3,
+                                              WebkitBoxOrient: 'vertical',
+                                              overflow: 'hidden',
+                                            }}
+                                            dangerouslySetInnerHTML={{ __html: item.description }}
+                                          />
+                                        )}
+
+                                        <Badge bg={item.isPublished ? 'success' : 'secondary'} style={{ width: 'fit-content' }}>
+                                          {item.isPublished ? 'Опубликовано' : 'Черновик'}
+                                        </Badge>
+
+
+                                      </Card.Body>
+                                    </Card>
+                                  </Col>
+                                )
+                              })}
+                            </Row>
+
+                            {hiddenItemsCount > 0 && (
+                              <div className="d-flex justify-content-center mt-3">
+                                <Button
+                                  variant="outline-secondary"
+                                  size="sm"
+                                  onClick={() => toggleCategoryExpanded(group.category.id)}
+                                  className="d-inline-flex align-items-center gap-2"
+                                >
+                                  <i className={`bi ${isExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`} />
+                                  {isExpanded
+                                    ? 'Свернуть'
+                                    : `Показать еще ${hiddenItemsCount}`}
+                                </Button>
                               </div>
-                              <Card.Body className="d-flex flex-column gap-2" style={{ padding: '15px 10px 10px 10px' }}>
-                                <h6 className="card-title mb-0" style={{
-                                  display: '-webkit-box',
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: 'vertical',
-                                  overflow: 'hidden',
-                                }}>
-                                  {item.title}
-                                </h6>
-
-                                {item.description && (
-                                  <div
-                                    className="text-muted small"
-                                    style={{
-                                      display: '-webkit-box',
-                                      WebkitLineClamp: 3,
-                                      WebkitBoxOrient: 'vertical',
-                                      overflow: 'hidden',
-                                    }}
-                                    dangerouslySetInnerHTML={{ __html: item.description }}
-                                  />
-                                )}
-
-                                <Badge bg={item.isPublished ? 'success' : 'secondary'} style={{ width: 'fit-content' }}>
-                                  {item.isPublished ? 'Опубликовано' : 'Черновик'}
-                                </Badge>
-
-
-                              </Card.Body>
-                            </Card>
-                          </Col>
+                            )}
+                          </>
                         )
-                      })}
-                    </Row>
+                      })()}
+                    </>
                   )}
                 </div>
               ))}
