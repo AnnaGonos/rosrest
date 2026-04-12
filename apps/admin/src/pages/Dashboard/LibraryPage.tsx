@@ -790,26 +790,35 @@ export default function LibraryPage() {
                 <div key={group.category.id} className="bg-white border rounded p-3">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <h3 className="h4 mb-0">{group.category.name}</h3>
+                    {(() => {
+                      const isArticlesCategory = group.category.name.toLowerCase().includes('стат')
+
+                      return (
                     <div className="d-flex gap-2">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="d-inline-flex align-items-center gap-2"
-                        onClick={() => openAddItemModal(group.category.id)}
-                      >
-                        <i className="bi bi-plus-lg" />
-                        Добавить книгу
-                      </Button>
-                      <Button
-                        variant="outline-success"
-                        size="sm"
-                        className="d-inline-flex align-items-center gap-2"
-                        onClick={() => openAddArticleModal(group.category.id)}
-                      >
-                        <i className="bi bi-plus-lg" />
-                        Добавить статью
-                      </Button>
+                        {isArticlesCategory ? (
+                          <Button
+                            variant="outline-success"
+                            size="sm"
+                            className="d-inline-flex align-items-center gap-2"
+                            onClick={() => openAddArticleModal(group.category.id)}
+                          >
+                            <i className="bi bi-plus-lg" />
+                            Добавить статью
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            className="d-inline-flex align-items-center gap-2"
+                            onClick={() => openAddItemModal(group.category.id)}
+                          >
+                            <i className="bi bi-plus-lg" />
+                            Добавить книгу
+                          </Button>
+                        )}
                     </div>
+                      )
+                    })()}
                   </div>
 
                   {group.items.length === 0 ? (
@@ -830,6 +839,32 @@ export default function LibraryPage() {
                                     {item.type === 'book' ? 'Книга' : 'Статья'}
                                   </Badge>
                                   <div className="d-flex gap-2 mt-auto justify-content-end me-2">
+                                    {item.type === 'book' && (
+                                      <Button
+                                        as="a"
+                                        href={`https://rosrest.com/library/${item.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        variant="outline-secondary"
+                                        size="sm"
+                                        title="Открыть публичную страницу"
+                                      >
+                                        <i className="bi bi-box-arrow-up-right" />
+                                      </Button>
+                                    )}
+                                    {item.type === 'article' && item.page?.slug && (
+                                      <Button
+                                        as="a"
+                                        href={`https://rosrest.com/articles/${item.page.slug.replace(/^library\//, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        variant="outline-secondary"
+                                        size="sm"
+                                        title="Открыть публичную статью"
+                                      >
+                                        <i className="bi bi-box-arrow-up-right" />
+                                      </Button>
+                                    )}
                                     <Button
                                       variant="outline-primary"
                                       size="sm"
