@@ -95,7 +95,7 @@ services:
       - "${NGINX_DOCUMENT_HTTPS_PORT:-8443}:443"
       - "${NGINX_DOCUMENT_HTTP_PORT:-8080}:80"
     volumes:
-      - /etc/nginx/sites-available/document.rosrest.com:/etc/nginx/conf.d/document.conf:ro
+      - ./deploy/document.rosrest.com.conf:/etc/nginx/conf.d/document.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/admin.rosrest.com/dist:/var/www/admin.rosrest.com/dist:ro
       - /var/www/test.rosrest.com/dist:/var/www/test.rosrest.com/dist:ro
