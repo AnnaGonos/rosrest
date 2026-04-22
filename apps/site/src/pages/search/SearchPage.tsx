@@ -8,6 +8,7 @@ import RequestState from '../../components/RequestState/RequestState'
 import SearchTypeSearchBar from '../../components/SearchTypeSearchBar/SearchTypeSearchBar'
 import Seo from '../../components/Seo/Seo'
 import { getFileUrl } from '../../utils/getFileUrl'
+import { sanitizeHtmlRemoveStyles } from '../../utils/sanitizeHtml'
 import './SearchPage.css'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -332,7 +333,7 @@ export default function SearchPage() {
 												<h3 className="search-page__result-title">{item.title}</h3>
 												{item.section && <p className="search-page__section">{item.section}</p>}
 												{/* <p className="search-page__link">{item.url}</p> */}
-												<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: item.snippet }} />
+												<p className="search-page__snippet" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(item.snippet) }} />
 											</div>
 										</>
 									)
