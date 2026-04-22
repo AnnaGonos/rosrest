@@ -35,10 +35,11 @@ export function ImageUploadInput({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [filePickerOpen, setFilePickerOpen] = useState(false)
 
-    const filesBaseUrl = (import.meta as any).env.VITE_FILES_BASE_URL || window.location.origin
+    const filesBaseUrl = 'https://document.rosrest.com'
 
     const resolveImageUrl = (url: string): string => {
         if (!url) return ''
+        if (url.startsWith('/uploads')) return getFileUrl(url)
         if (url.startsWith('http://') || url.startsWith('https://')) return url
         if (url.startsWith('//')) return `${window.location.protocol}${url}`
         const base = filesBaseUrl.replace(/\/$/, '')
