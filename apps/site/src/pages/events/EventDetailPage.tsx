@@ -12,6 +12,7 @@ import { isCookieConsentAccepted, saveCookieConsent } from '../../utils/cookieCo
 import RequestState from '../../components/RequestState/RequestState'
 import NotFoundPage from '../not-found/NotFoundPage'
 import Seo from '../../components/Seo/Seo'
+import { sanitizeHtmlRemoveStyles } from '../../utils/sanitizeHtml'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
 
@@ -147,7 +148,7 @@ export default function EventDetailPage() {
                             <div>
                                 <h2 className="section-title--lg" style={{ marginBottom: '50px' }}>О событии</h2>
                                 <p className="body-text article-text"
-                                    dangerouslySetInnerHTML={{ __html: event.description }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(event.description) }}
                                 />
                             </div>
 

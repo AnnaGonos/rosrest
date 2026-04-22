@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { getFileUrl } from '../utils/getFileUrl'
 import { PrimaryButtonLink } from './LinkButtons'
 import ShareModal from './shared/ShareModal/ShareModal'
+import { sanitizeHtmlRemoveStyles } from '../utils/sanitizeHtml'
 import './LibraryItemModal.css'
 
 interface LibraryItem {
@@ -68,7 +69,7 @@ export default function LibraryItemModal({ item, isOpen, onClose }: LibraryItemM
                         {item.description && (
                             <div
                                 className="library-modal__description body-text article-text"
-                                dangerouslySetInnerHTML={{ __html: item.description }}
+                                dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(item.description) }}
                             />
                         )}
 
