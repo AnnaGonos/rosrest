@@ -1,5 +1,6 @@
 import { Button } from 'react-bootstrap';
 import { getFileUrl } from '../utils/getFileUrl';
+import { prepareHtmlForRender } from '../utils/sanitizeHtml';
 import { useState } from 'react';
 import EditModal from './EditModal';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -468,7 +469,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                                     ></i>
                                 </div>
                                 {isOpen && (
-                                    <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: item.answer?.html || '' }} />
+                                    <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: cleanHtml(item.answer?.html || '') }} />
                                 )}
                                 <Button size="sm" variant="outline-primary" className="mt-2" onClick={() => setEditIdx(idx)}>Редактировать</Button>
                             </div>
@@ -799,7 +800,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
 
     function cleanHtml(html: string) {
         if (!html) return '';
-        return html.replace(/^<p style="text-align: left;">([\s\S]*)<\/p>$/i, '$1');
+        return prepareHtmlForRender(html).replace(/^<p style="text-align: left;">([\s\S]*)<\/p>$/i, '$1');
     }
 
     if (block.type === 'note' || block.type.startsWith('NT')) {
@@ -823,7 +824,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
             { value: 'lighting', label: 'Lighting', style: { background: '#FFA500' } },
         ];
         const icon = block.content.icon || iconList[0].value;
-        const html = block.content.html || '';
+        const html = cleanHtml(block.content.html || '');
         const noteType = block.content.noteType || colorList[0].value;
 
         const noteBlockMod = block.type.toLowerCase(); // nt01, nt02
@@ -847,7 +848,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                 <div className={`note-block note-block--${noteBlockMod} note-block--${noteType} mb-40`} style={{ cursor: 'pointer' }} onClick={() => setEditOpen(true)}>
                     <i className={icon}></i>
                     <div className="body-text article-text tx01 mb-40">
-                        <span dangerouslySetInnerHTML={{ __html: html || '<span style=\'color:#bbb\'>Пусто</span>' }} />
+                        <span dangerouslySetInnerHTML={{ __html: cleanHtml(html || '<span style=\'color:#bbb\'>Пусто</span>') }} />
                     </div>
                 </div>
                 <EditModal show={editOpen} onHide={() => setEditOpen(false)} title="Редактирование заметки">
@@ -967,7 +968,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                             <h2 className="section-title--sm">{columns[0]?.subtitle || ''}</h2>
                         </div>
                         <div className="body-text article-text tx01 mb-40">
-                            <div dangerouslySetInnerHTML={{ __html: columns[1]?.html || '' }} />
+                            <div dangerouslySetInnerHTML={{ __html: cleanHtml(columns[1]?.html || '') }} />
                         </div>
                     </div>
                     {editColIdx === 0 && (
@@ -1030,7 +1031,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                 <div className={`${variant}`}>
                     {columns.map((col, idx) => (
                         <div key={idx} className={`body-text article-text tx01 mb-40`}>
-                            <div dangerouslySetInnerHTML={{ __html: col.html || '' }} />
+                            <div dangerouslySetInnerHTML={{ __html: cleanHtml(col.html || '') }} />
                         </div>
                     ))}
                 </div>
@@ -1218,7 +1219,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                     <div className={`d-flex mb-40 ${reverse ? 'flex-row-reverse' : ''}`} style={{ gap: 32, alignItems: 'center', minHeight: 120 }}>
                         <div style={{ flex: 1 }}>
                             {title && <h2 className="section-title--sm mb-2">{title}</h2>}
-                            <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: text || '<span style="color:#bbb">Нет текста</span>' }} />
+                            <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: cleanHtml(text || '<span style="color:#bbb">Нет текста</span>') }} />
                         </div>
                         <div style={{ flex: 1, minWidth: 180, maxWidth: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             {src ? (
@@ -1328,7 +1329,7 @@ export function PageContentBlock({ block, onUpdate, onRemove, order, onMoveUp, o
                     )}
                     {(imageWithCaption) && (
                         <div className="image-caption" style={{ maxWidth: '70%', width: width ? `${width}px` : undefined}}>
-                            <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: caption || '<span style=\"color:#bbb\">Нет подписи</span>' }} />
+                            <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: cleanHtml(caption || '<span style=\"color:#bbb\">Нет подписи</span>') }} />
                         </div>
                     )}
                 </div>

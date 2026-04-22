@@ -23,6 +23,7 @@ import { PageBlocksEditor } from '../../components/PageBlocksEditor'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
 import RichTextEditorField from '../../components/RichTextEditorField'
+import { prepareHtmlForRender } from '../../utils/sanitizeHtml'
 
 interface Block {
   id: string
@@ -933,7 +934,7 @@ export default function LibraryPage() {
                                               WebkitBoxOrient: 'vertical',
                                               overflow: 'hidden',
                                             }}
-                                            dangerouslySetInnerHTML={{ __html: item.description }}
+                                            dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(item.description) }}
                                           />
                                         )}
 

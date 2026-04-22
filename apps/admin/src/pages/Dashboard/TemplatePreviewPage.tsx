@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { API_ENDPOINTS } from '../../config/api'
+import { prepareHtmlForRender } from '../../utils/sanitizeHtml'
 
 type TemplateType = 'welcome' | 'digest'
 
@@ -164,7 +165,7 @@ export default function TemplatePreviewPage() {
                 margin: '0 auto',
               }}
             >
-              <div dangerouslySetInnerHTML={{ __html: html }} />
+              <div dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(html) }} />
             </div>
           ) : null}
         </div>
