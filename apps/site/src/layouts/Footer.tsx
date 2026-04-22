@@ -42,8 +42,8 @@ export default function Footer() {
                     <Link to="/about" className="footer-nav__title">Ассоциация</Link>
                     <Link to="/about" className="footer-nav__link">Об Ассоциации</Link>
                     <Link to="/contacts" className="footer-nav__link">Аппарат Ассоциации и Контакты</Link>
-                    <Link to="/partners" className="footer-nav__link">Партнеры</Link>
-                    <Link to="/awards" className="footer-nav__link">Награды, дипломы</Link>
+                    <Link to="/about/partners" className="footer-nav__link">Партнеры</Link>
+                    <Link to="/about/awards" className="footer-nav__link">Награды, дипломы</Link>
                 </div>
                 <div className="footer-nav__section">
                     <Link to="/press-center" className="footer-nav__title">Пресс-центр</Link>
