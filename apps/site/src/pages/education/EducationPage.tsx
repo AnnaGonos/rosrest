@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import EducationCard from '../../components/EducationCard'
-import { getFileUrl } from '../../utils/getFileUrl';
 import './EducationPage.css'
 import Breadcrumbs from '../../components/Breadcrumbs/Breadcrumbs'
 import ContentSection from '../../components/ContentSection/ContentSection'
