@@ -85,9 +85,11 @@ export default function EducationPage() {
                             ))}
                         </div>
                     )}
+                    
                 </ContentSection>
 
                 <ContentSection columns={2}>
+                    <div style={{ marginTop: '40px' }}></div>
                     <a href="/education/srednee-professionalnoe-obrazovanie"
                         rel="nofollow"
                     >
@@ -96,7 +98,7 @@ export default function EducationPage() {
                     <a href="/education/vysshee-professionalnoe-obrazovanie"
                         rel="nofollow"  
                     >
-                        <img className="education-image-banner" src={getFileUrl('/education/vysshee-600x450.png') || ''} alt="Образование" />
+                        <img className="education-image-banner" src={getFileUrl('/images/education/vysshee-600x450.png') || ''} alt="Образование" />
                     </a>
                 </ContentSection>
 
