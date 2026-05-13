@@ -85,11 +85,10 @@ export default function EducationPage() {
                             ))}
                         </div>
                     )}
-                    
+                    <div style={{ marginTop: '40px' }}></div>
                 </ContentSection>
 
                 <ContentSection columns={2}>
-                    <div style={{ marginTop: '40px' }}></div>
                     <a href="/education/srednee-professionalnoe-obrazovanie"
                         rel="nofollow"
                     >
