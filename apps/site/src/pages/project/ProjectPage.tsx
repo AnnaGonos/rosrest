@@ -73,14 +73,14 @@ export default function ProjectPage() {
                 />
             </div>
 
-            <div className="page__container page__container--27">
+            <div className="page__container">
                 <div className='page__header-title'>
                     <h1 className="page-title">Проекты</h1>
                 </div>
 
                 <ContentSection columns={1}>
                     <LinkCardList
-                        columns={2}
+                        columns={3}
                         items={projects.map(project => ({
                             title: project.page.title,
                             href: `/projects/${project.page.slug.replace(/^projects\//, '')}`,
