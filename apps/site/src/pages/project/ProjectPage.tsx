@@ -80,7 +80,7 @@ export default function ProjectPage() {
 
                 <ContentSection columns={1}>
                     <LinkCardList
-                        columns={3}
+                        columns={4}
                         items={projects.map(project => ({
                             title: project.page.title,
                             href: `/projects/${project.page.slug.replace(/^projects\//, '')}`,
