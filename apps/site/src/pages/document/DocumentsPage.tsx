@@ -16,10 +16,38 @@ type Category = {
   children?: Category[]
 }
 
-const EXCLUDED_CATEGORY_URLS = new Set([
-  '/documents/proizvodstvo',
-  '/documents/proektirovanie',
-])
+const EXCLUDED_CATEGORY_SLUGS = new Set(['proizvodstvo', 'proektirovanie'])
+
+const DOCUMENTS_BASE_URL = 'https://rosrest.com/documents'
+
+function normalizeCategoryPath(value?: string | null) {
+  if (!value) return ''
+  return value.replace(/^https?:\/\/rosrest\.com/i, '').replace(/\/+$/, '')
+}
+
+function isExcludedCategory(category: Category) {
+  const slug = category.slug || ''
+  const relativePath = normalizeCategoryPath(slug.startsWith('/') ? slug : `/documents/${slug}`)
+  const absolutePath = normalizeCategoryPath(`${DOCUMENTS_BASE_URL}/${slug}`)
+
+  return (
+    EXCLUDED_CATEGORY_SLUGS.has(slug) ||
+    EXCLUDED_CATEGORY_SLUGS.has(relativePath.split('/').pop() || '') ||
+    relativePath === '/documents/proizvodstvo' ||
+    relativePath === '/documents/proektirovanie' ||
+    absolutePath === '/documents/proizvodstvo' ||
+    absolutePath === '/documents/proektirovanie'
+  )
+}
+
+function filterCategoriesTree(categories: Category[]): Category[] {
+  return (categories || [])
+    .filter(category => !isExcludedCategory(category))
+    .map(category => ({
+      ...category,
+      children: category.children?.length ? filterCategoriesTree(category.children) : category.children,
+    }))
+}
 
 export default function DocumentsPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -33,7 +61,8 @@ export default function DocumentsPage() {
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((data: Category[]) => {
         if (mounted) {
-          const sorted = (data || []).sort((a, b) => {
+          const filtered = filterCategoriesTree(data || [])
+          const sorted = filtered.sort((a, b) => {
             const dateA = new Date(a.createdAt || 0).getTime()
             const dateB = new Date(b.createdAt || 0).getTime()
             return dateA - dateB
@@ -53,7 +82,6 @@ export default function DocumentsPage() {
       icon: c.icon && !c.icon.startsWith('http') && !c.icon.startsWith('/') ? c.icon : undefined,
       image: c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/')) ? c.icon : undefined,
     }))
-    .filter(item => !EXCLUDED_CATEGORY_URLS.has(item.href))
 
   return (
     <div className="page-main documents-page">
