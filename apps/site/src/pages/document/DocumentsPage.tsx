@@ -16,6 +16,11 @@ type Category = {
   children?: Category[]
 }
 
+const EXCLUDED_CATEGORY_URLS = new Set([
+  '/documents/proizvodstvo',
+  '/documents/proektirovanie',
+])
+
 export default function DocumentsPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,12 +46,14 @@ export default function DocumentsPage() {
     return () => { mounted = false }
   }, [])
 
-  const items = categories.map(c => ({
-    title: c.name,
-    href: `/documents/${c.slug || c.id}`,
-    icon: c.icon && !c.icon.startsWith('http') && !c.icon.startsWith('/') ? c.icon : undefined,
-    image: c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/')) ? c.icon : undefined,
-  }))
+  const items = categories
+    .map(c => ({
+      title: c.name,
+      href: `/documents/${c.slug || c.id}`,
+      icon: c.icon && !c.icon.startsWith('http') && !c.icon.startsWith('/') ? c.icon : undefined,
+      image: c.icon && (c.icon.startsWith('http') || c.icon.startsWith('/')) ? c.icon : undefined,
+    }))
+    .filter(item => !EXCLUDED_CATEGORY_URLS.has(item.href))
 
   return (
     <div className="page-main documents-page">
