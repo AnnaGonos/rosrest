@@ -108,7 +108,7 @@ export default function Header() {
     const fetchMenu = async () => {
         try {
             const cacheKey = 'mainMenuCache';
-            const cacheTtl = 10 * 60 * 1000;
+            const cacheTtl = 5 * 60 * 1000;
             const canUseOptionalStorage = isCookieConsentAccepted();
             if (canUseOptionalStorage) {
                 const cached = sessionStorage.getItem(cacheKey);
