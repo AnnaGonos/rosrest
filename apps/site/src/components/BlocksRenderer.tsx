@@ -174,9 +174,9 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                     ref={setTs02ContentRef(tab.id)}
                                                     className="tabs-block__accordion-content"
                                                     style={{
+                                                        display: isOpen ? 'block' : 'none',
                                                         maxHeight: isOpen ? 'none' : '0px',
                                                         overflow: isOpen ? 'visible' : 'hidden',
-                                                        transition: 'max-height 0.35s ease, opacity 0.25s ease',
                                                         opacity: isOpen ? 1 : 0,
                                                     }}
                                                 >
