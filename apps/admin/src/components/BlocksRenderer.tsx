@@ -1,6 +1,6 @@
 import React from 'react'
 import { getFileUrl } from '../utils/getFileUrl';
-import { prepareHtmlForRender } from '../utils/sanitizeHtml';
+import { sanitizeHtmlRemoveStyles } from '../utils/sanitizeHtml';
 
 export interface Block {
     id: string
@@ -36,7 +36,40 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
+    const ts02ContentRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
+    const setTs02ContentRef = (id: string) => (el: HTMLDivElement | null) => { ts02ContentRefs.current[id] = el; };
 
+    React.useEffect(() => {
+        const ids = Object.keys(ts02ContentRefs.current);
+        ids.forEach(id => {
+            const el = ts02ContentRefs.current[id];
+            if (!el) return;
+            const isOpen = !!openTS02Tabs[id];
+            
+            el.style.overflow = 'hidden';
+            el.style.transition = 'max-height 0.35s ease, opacity 0.25s ease';
+            if (isOpen) {
+                const h = el.scrollHeight;
+                el.style.display = 'block';
+                el.style.maxHeight = h + 'px';
+                el.style.opacity = '1';
+            } else {
+                el.style.maxHeight = '0px';
+                el.style.opacity = '0';
+            }
+        });
+
+        const onResize = () => {
+            Object.keys(openTS02Tabs).forEach(id => {
+                if (!openTS02Tabs[id]) return;
+                const el = ts02ContentRefs.current[id];
+                if (!el) return;
+                el.style.maxHeight = el.scrollHeight + 'px';
+            });
+        };
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, [openTS02Tabs]);
 
     return (
         <>
@@ -49,7 +82,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                         <div
                             key={block.id}
                             className={`body-text article-text ${variant} mb-40`}
-                            dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(block.content?.html || '') }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(block.content?.html || '') }}
                         />
                     );
                 }
@@ -64,6 +97,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             <div key={block.id} className={`tabs-block tabs-block--${block.type.toLowerCase()} mb-40`}>
                                 {tabs.map((tab: any) => {
                                     const isOpen = openTS02Tabs[tab.id] || false;
+                                    const hasChildren = Array.isArray(tab.children) && tab.children.length > 0;
                                     return (
                                         <div key={tab.id} className="tabs-block__accordion-item">
                                             <button
@@ -76,8 +110,17 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                     style={{ marginLeft: '8px', transition: 'transform 0.3s' }}
                                                 ></i>
                                             </button>
-                                            {isOpen && Array.isArray(tab.children) && tab.children.length > 0 && (
-                                                <div className="tabs-block__accordion-content">
+                                            {hasChildren && (
+                                                <div
+                                                    ref={setTs02ContentRef(tab.id)}
+                                                    className="tabs-block__accordion-content"
+                                                    style={{
+                                                        maxHeight: isOpen ? undefined : '0px',
+                                                        overflow: 'hidden',
+                                                        transition: 'max-height 0.35s ease, opacity 0.25s ease',
+                                                        opacity: isOpen ? 1 : 0,
+                                                    }}
+                                                >
                                                     <BlocksRenderer blocks={tab.children} />
                                                 </div>
                                             )}
@@ -147,10 +190,10 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                             )}
                                         </div>
                                         {typeQA01 && isOpen && (
-                                            <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(item.answer?.html || '') }} />
+                                            <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(item.answer?.html || '') }} />
                                         )}
                                         {typeQA02 && (
-                                            <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(item.answer?.html || '') }} />
+                                            <div className="qa-block__answer body-text article-text tx01" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(item.answer?.html || '') }} />
                                         )}
                                     </div>
                                 );
@@ -209,7 +252,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                 <div className='body-text article-text tx01'>
                                     <h2 className='section-title--sm'>{columns[0]?.subtitle || ''}</h2>
                                 </div>
-                                <div className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(columns[1]?.html || '') }} />
+                                <div className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(columns[1]?.html || '') }} />
                             </div>
                         );
                     }
@@ -217,7 +260,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     return (
                         <div key={block.id} className={`${variant} mb-40`}>
                             {columns.map((col, idx) => (
-                                <div key={idx} className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(col.html || '') }} />
+                                <div key={idx} className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(col.html || '') }} />
                             ))}
                         </div>
                     );
@@ -228,7 +271,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     return (
                         <div key={block.id} className={`note-block note-block--${variant} note-block--${noteType} mb-40`}>
                             <i className={block.content.icon || 'bi bi-info-square'} ></i>
-                            <p className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(block.content?.html || '') }} />
+                            <p className='body-text article-text tx01' dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(block.content?.html || '') }} />
                         </div>
                     );
                 }
@@ -250,7 +293,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             <div key={block.id} className={`image-block image-block--${variant.toLowerCase()} ${reverse ? ' image-block--reverse' : ''} mb-40`}>
                                 <div className='image-block__description'>
                                     {safeTitle && <h2 className="section-title--sm">{safeTitle}</h2>}
-                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(safeText || '') }} />
+                                    <div className="body-text article-text tx01" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(safeText || '') }} />
                                 </div>
                                 <div className='image-block__image'>
                                     {safeSrc ? (
@@ -324,7 +367,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             )}
                             {(imageWithCaption) && (
                                 <div className="image-caption" >
-                                    <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(caption || '') }} />
+                                    <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(caption || '') }} />
                                 </div>
                             )}
                         </div>
@@ -353,7 +396,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                         </div>
                                         {img.caption && img.caption.trim() !== '' && (
                                             <div className="gallery-caption" >
-                                                <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(img.caption || '') }} />
+                                                <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(img.caption || '') }} />
                                             </div>
                                         )}
                                     </div>
@@ -361,7 +404,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             </div>
                             {galleryCaption && (
                                 <div className="gallery-caption" style={{ marginTop: 10 }}>
-                                    <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(galleryCaption || '') }} />
+                                    <div className="body-text article-text tx04" dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(galleryCaption || '') }} />
                                 </div>
                             )}
                         </div>
@@ -669,11 +712,10 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                     <div
                         key={block.id}
                         className={`body-text article-text ${block.type.toLowerCase()} mb-40`}
-                        dangerouslySetInnerHTML={{ __html: prepareHtmlForRender(block.content?.html || '') }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtmlRemoveStyles(block.content?.html || '') }}
                     />
                 );
             })}
         </>
     )
 }
-

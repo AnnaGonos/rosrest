@@ -36,6 +36,41 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
+    const ts02ContentRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
+    const setTs02ContentRef = (id: string) => (el: HTMLDivElement | null) => { ts02ContentRefs.current[id] = el; };
+
+    React.useEffect(() => {
+        const ids = Object.keys(ts02ContentRefs.current);
+        ids.forEach(id => {
+            const el = ts02ContentRefs.current[id];
+            if (!el) return;
+            const isOpen = !!openTS02Tabs[id];
+            
+            el.style.overflow = 'hidden';
+            el.style.transition = 'max-height 0.35s ease, opacity 0.25s ease';
+            if (isOpen) {
+                const h = el.scrollHeight;
+                el.style.display = 'block';
+                el.style.maxHeight = h + 'px';
+                el.style.opacity = '1';
+            } else {
+                el.style.maxHeight = '0px';
+                el.style.opacity = '0';
+            }
+        });
+
+        const onResize = () => {
+            Object.keys(openTS02Tabs).forEach(id => {
+                if (!openTS02Tabs[id]) return;
+                const el = ts02ContentRefs.current[id];
+                if (!el) return;
+                el.style.maxHeight = el.scrollHeight + 'px';
+            });
+        };
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, [openTS02Tabs]);
+
     return (
         <>
             {sortedBlocks.map(block => {
@@ -62,6 +97,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                             <div key={block.id} className={`tabs-block tabs-block--${block.type.toLowerCase()} mb-40`}>
                                 {tabs.map((tab: any) => {
                                     const isOpen = openTS02Tabs[tab.id] || false;
+                                    const hasChildren = Array.isArray(tab.children) && tab.children.length > 0;
                                     return (
                                         <div key={tab.id} className="tabs-block__accordion-item">
                                             <button
@@ -74,8 +110,17 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                     style={{ marginLeft: '8px', transition: 'transform 0.3s' }}
                                                 ></i>
                                             </button>
-                                            {isOpen && Array.isArray(tab.children) && tab.children.length > 0 && (
-                                                <div className="tabs-block__accordion-content">
+                                            {hasChildren && (
+                                                <div
+                                                    ref={setTs02ContentRef(tab.id)}
+                                                    className="tabs-block__accordion-content"
+                                                    style={{
+                                                        maxHeight: isOpen ? undefined : '0px',
+                                                        overflow: 'hidden',
+                                                        transition: 'max-height 0.35s ease, opacity 0.25s ease',
+                                                        opacity: isOpen ? 1 : 0,
+                                                    }}
+                                                >
                                                     <BlocksRenderer blocks={tab.children} />
                                                 </div>
                                             )}
