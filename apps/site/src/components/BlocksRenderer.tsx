@@ -39,21 +39,79 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
     const ts02ContentRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
     const setTs02ContentRef = (id: string) => (el: HTMLDivElement | null) => { ts02ContentRefs.current[id] = el; };
 
+    // Helpers to animate open/close with slide effect to natural height
+    const animateOpen = (el: HTMLDivElement | null) => {
+        if (!el) return;
+        el.style.display = 'block';
+        el.style.overflow = 'hidden';
+        el.style.opacity = '0';
+        el.style.transition = 'max-height 0.35s ease, opacity 0.25s ease';
+
+        // start from 0
+        el.style.maxHeight = '0px';
+        // force reflow
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        el.offsetHeight;
+        const h = el.scrollHeight;
+        el.style.maxHeight = h + 'px';
+        el.style.opacity = '1';
+
+        const onEnd = (ev: TransitionEvent) => {
+            if (ev.propertyName !== 'max-height') return;
+            el.style.maxHeight = 'none';
+            el.style.overflow = 'visible';
+            el.removeEventListener('transitionend', onEnd as any);
+        };
+        el.addEventListener('transitionend', onEnd as any);
+    };
+
+    const animateClose = (el: HTMLDivElement | null) => {
+        if (!el) return;
+        el.style.overflow = 'hidden';
+        el.style.transition = 'max-height 0.35s ease, opacity 0.25s ease';
+
+        // animate from current height to 0
+        const h = el.scrollHeight;
+        el.style.maxHeight = h + 'px';
+        // force reflow
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        el.offsetHeight;
+        el.style.maxHeight = '0px';
+        el.style.opacity = '0';
+
+        const onEnd = (ev: TransitionEvent) => {
+            if (ev.propertyName !== 'max-height') return;
+            el.style.display = 'none';
+            el.removeEventListener('transitionend', onEnd as any);
+        };
+        el.addEventListener('transitionend', onEnd as any);
+    };
+
+    const toggleTs02Tab = (id: string) => {
+        const isOpen = !!openTS02Tabs[id];
+        const nextOpen = !isOpen;
+        setOpenTS02Tabs(prev => ({ ...prev, [id]: nextOpen }));
+        const el = ts02ContentRefs.current[id];
+        if (nextOpen) animateOpen(el);
+        else animateClose(el);
+    };
+
+    // Initialize refs: closed by default. Keep resize handler minimal.
     React.useEffect(() => {
         const ids = Object.keys(ts02ContentRefs.current);
         ids.forEach(id => {
             const el = ts02ContentRefs.current[id];
             if (!el) return;
             const isOpen = !!openTS02Tabs[id];
-            
-            el.style.overflow = 'hidden';
             el.style.transition = 'max-height 0.35s ease, opacity 0.25s ease';
             if (isOpen) {
-                const h = el.scrollHeight;
                 el.style.display = 'block';
-                el.style.maxHeight = h + 'px';
+                el.style.maxHeight = 'none';
+                el.style.overflow = 'visible';
                 el.style.opacity = '1';
             } else {
+                el.style.display = 'none';
+                el.style.overflow = 'hidden';
                 el.style.maxHeight = '0px';
                 el.style.opacity = '0';
             }
@@ -64,7 +122,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                 if (!openTS02Tabs[id]) return;
                 const el = ts02ContentRefs.current[id];
                 if (!el) return;
-                el.style.maxHeight = el.scrollHeight + 'px';
+                // ensure open panels remain unbounded after resize
+                el.style.maxHeight = 'none';
             });
         };
         window.addEventListener('resize', onResize);
@@ -102,7 +161,7 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                         <div key={tab.id} className="tabs-block__accordion-item">
                                             <button
                                                 className={`tabs-block__accordion-header ${isOpen ? 'active' : ''}`}
-                                                onClick={() => setOpenTS02Tabs({ ...openTS02Tabs, [tab.id]: !isOpen })}
+                                                onClick={() => toggleTs02Tab(tab.id)}
                                             >
                                                 <span>{tab.title || ''}</span>
                                                 <i
@@ -115,8 +174,8 @@ export const BlocksRenderer: React.FC<BlocksRendererProps> = ({ blocks }) => {
                                                     ref={setTs02ContentRef(tab.id)}
                                                     className="tabs-block__accordion-content"
                                                     style={{
-                                                        maxHeight: isOpen ? undefined : '0px',
-                                                        overflow: 'hidden',
+                                                        maxHeight: isOpen ? 'none' : '0px',
+                                                        overflow: isOpen ? 'visible' : 'hidden',
                                                         transition: 'max-height 0.35s ease, opacity 0.25s ease',
                                                         opacity: isOpen ? 1 : 0,
                                                     }}
