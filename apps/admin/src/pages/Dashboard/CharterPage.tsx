@@ -115,7 +115,7 @@ export default function CharterPage() {
       if (uploadSource.mode === 'file' && uploadSource.file) {
         fd.append('file', uploadSource.file)
       } else if (uploadSource.mode === 'url') {
-        fd.append('fileUrl', uploadSource.url
+        fd.append('fileUrl', uploadSource.url)
       }
 
       const res = await fetch(API_ENDPOINTS.DOCUMENTS_CREATE, {
