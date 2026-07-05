@@ -27,6 +27,7 @@ interface Partner {
 export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
   const [addModalOpened, setAddModalOpened] = useState(false)
   const [creating, setCreating] = useState(false)
@@ -67,8 +68,14 @@ export default function PartnersPage() {
     loadPartners()
   }, [])
 
-  const loadPartners = async () => {
-    setLoading(true)
+  const loadPartners = async (options?: { silent?: boolean }) => {
+    const silent = options?.silent ?? false
+
+    if (silent) {
+      setRefreshing(true)
+    } else {
+      setLoading(true)
+    }
     setError('')
 
     try {
@@ -76,7 +83,7 @@ export default function PartnersPage() {
       const response = await fetch(withCacheBust(API_ENDPOINTS.PARTNERS_LIST), {
         cache: 'no-store',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       })
@@ -101,7 +108,11 @@ export default function PartnersPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
-      setLoading(false)
+      if (silent) {
+        setRefreshing(false)
+      } else {
+        setLoading(false)
+      }
     }
   }
 
@@ -161,7 +172,7 @@ export default function PartnersPage() {
 
       setAddModalOpened(false)
       setLogoSource({ mode: 'file', file: null, url: '' })
-      await loadPartners()
+      await loadPartners({ silent: true })
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
@@ -218,7 +229,7 @@ export default function PartnersPage() {
 
       setEditModalOpened(false)
       setEditingPartner(null)
-      await loadPartners()
+      await loadPartners({ silent: true })
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
@@ -251,7 +262,7 @@ export default function PartnersPage() {
 
       setDeleteModalOpened(false)
       setDeletingPartner(null)
-      await loadPartners()
+      await loadPartners({ silent: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
@@ -276,7 +287,7 @@ export default function PartnersPage() {
         throw new Error('Не удалось изменить порядок партнера')
       }
 
-      await loadPartners()
+      await loadPartners({ silent: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
@@ -306,7 +317,7 @@ export default function PartnersPage() {
               <span>{error}</span>
             </div>
           </Alert>
-          <Button variant="outline-primary" onClick={loadPartners}>
+          <Button variant="outline-primary" onClick={() => loadPartners()}>
             <i className="bi bi-arrow-repeat me-2"></i>
             Повторить
           </Button>
@@ -352,6 +363,12 @@ export default function PartnersPage() {
             <i className="bi bi-plus-lg me-2"></i>
             Добавить партнера
           </Button>
+          {refreshing && (
+            <div className="d-flex align-items-center text-muted small ms-2">
+              <Spinner animation="border" size="sm" className="me-2" />
+              Обновление списка...
+            </div>
+          )}
         </div>
 
         {partners.length === 0 ? (
