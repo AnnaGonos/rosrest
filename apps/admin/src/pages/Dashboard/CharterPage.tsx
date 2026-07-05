@@ -30,6 +30,7 @@ export default function CharterPage() {
 
   const [addModalOpened, setAddModalOpened] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [title, setTitle] = useState('')
   const [uploadSource, setUploadSource] = useState<ImageUploadValue>({
     mode: 'file',
@@ -52,6 +53,10 @@ export default function CharterPage() {
   const [editUploading, setEditUploading] = useState(false)
 
 
+  const withCacheBust = (url: string) => {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}noCache=1&_=${Date.now()}`
+  }
 
   useEffect(() => {
     loadDocuments()
@@ -61,7 +66,8 @@ export default function CharterPage() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(API_ENDPOINTS.DOCUMENTS_LIST_BY_TYPE('charter'), {
+      const res = await fetch(withCacheBust(API_ENDPOINTS.DOCUMENTS_LIST_BY_TYPE('charter')), {
+        cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
       })
       if (!res.ok) throw new Error('Ошибка загрузки документов')
@@ -84,7 +90,44 @@ export default function CharterPage() {
     setUploadSource({ mode: 'file', file: null, url: '' })
     setIsPublished(true)
     setFormError('')
+    setUploadProgress(0)
     setAddModalOpened(true)
+  }
+
+  const uploadDocumentWithProgress = (fd: FormData, token: string | null) => {
+    return new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', API_ENDPOINTS.DOCUMENTS_CREATE)
+      xhr.responseType = 'json'
+
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+      }
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) return
+        const percent = Math.round((event.loaded / event.total) * 100)
+        setUploadProgress(percent)
+      }
+
+      xhr.onload = () => {
+        const response = xhr.response ?? (xhr.responseText ? JSON.parse(xhr.responseText) : null)
+        if (xhr.status >= 200 && xhr.status < 300) {
+          setUploadProgress(100)
+          resolve(response)
+          return
+        }
+
+        const message = response?.message || 'Не удалось загрузить документ'
+        reject(new Error(Array.isArray(message) ? message.join(', ') : message))
+      }
+
+      xhr.onerror = () => {
+        reject(new Error('Не удалось загрузить документ'))
+      }
+
+      xhr.send(fd)
+    })
   }
 
   const handleUpload = async () => {
@@ -105,6 +148,7 @@ export default function CharterPage() {
 
     try {
       setUploading(true)
+      setUploadProgress(uploadSource.mode === 'file' ? 0 : 100)
       setFormError('')
       const token = localStorage.getItem('admin_token')
       const fd = new FormData()
@@ -114,19 +158,20 @@ export default function CharterPage() {
 
       if (uploadSource.mode === 'file' && uploadSource.file) {
         fd.append('file', uploadSource.file)
+        await uploadDocumentWithProgress(fd, token)
       } else if (uploadSource.mode === 'url') {
         fd.append('fileUrl', uploadSource.url)
+        const res = await fetch(API_ENDPOINTS.DOCUMENTS_CREATE, {
+          method: 'POST',
+          headers: {
+            Authorization: token ? `Bearer ${token}` : '',
+          },
+          body: fd,
+          cache: 'no-store',
+        })
+
+        if (!res.ok) throw new Error('Не удалось загрузить документ')
       }
-
-      const res = await fetch(API_ENDPOINTS.DOCUMENTS_CREATE, {
-        method: 'POST',
-        headers: {
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-        body: fd,
-      })
-
-      if (!res.ok) throw new Error('Не удалось загрузить документ')
 
       setAddModalOpened(false)
       setUploadSource({ mode: 'file', file: null, url: '' })
@@ -135,6 +180,7 @@ export default function CharterPage() {
       setFormError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
       setUploading(false)
+      setUploadProgress(0)
     }
   }
 
@@ -366,7 +412,11 @@ export default function CharterPage() {
       {/* Add Modal */}
       <Modal
         show={addModalOpened}
-        onHide={() => setAddModalOpened(false)}
+        onHide={() => {
+          if (!uploading) {
+            setAddModalOpened(false)
+          }
+        }}
         centered
         dialogClassName="modal-content-md"
       >
@@ -403,6 +453,25 @@ export default function CharterPage() {
               accept="application/pdf"
               onChange={setUploadSource}
             />
+
+            {uploading && uploadSource.mode === 'file' && (
+              <div className="d-flex flex-column gap-2">
+                <div className="d-flex justify-content-between small text-muted">
+                  <span>Загрузка файла</span>
+                  <span>{uploadProgress}%</span>
+                </div>
+                <div className="progress" style={{ height: 8 }}>
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    aria-valuenow={uploadProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             <Form.Group>
 
