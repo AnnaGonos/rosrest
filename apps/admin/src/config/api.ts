@@ -49,6 +49,7 @@ export const API_ENDPOINTS = {
   PARTNERS_CREATE: buildApiUrl('partners'),
   PARTNERS_UPDATE: (id: string) => buildApiUrl(`partners/${id}`),
   PARTNERS_DELETE: (id: string) => buildApiUrl(`partners/${id}`),
+  PARTNERS_MOVE_ORDER: (id: string) => buildApiUrl(`partners/${id}/move-order`),
 
   LIBRARY: buildApiUrl('library'),
   LIBRARY_LIST: buildApiUrl('library'),

@@ -51,8 +51,10 @@ export class PartnerController {
 	@Get()
 	@ApiOkResponse({ type: Partner, isArray: true })
 	@ApiQuery({ name: 'limit', type: Number, required: false, description: 'Лимит количества партнеров' })
-	findAll(@Query('limit') limit?: string) {
-		return this.partnerService.findAll(limit ? parseInt(limit, 10) : undefined);
+	@ApiQuery({ name: 'noCache', type: Boolean, required: false, description: 'Bypass cache for fresh read' })
+	findAll(@Query('limit') limit?: string, @Query('noCache') noCache?: string) {
+		const bypassCache = noCache === '1' || noCache === 'true';
+		return this.partnerService.findAll(limit ? parseInt(limit, 10) : undefined, !bypassCache);
 	}
 
 	@Post()
@@ -123,6 +125,28 @@ export class PartnerController {
 		@UploadedFile() file?: UploadFile,
 	) {
 		return this.partnerService.update(id, dto, file, this.fileUploadService);
+	}
+
+	@Post(':id/move-order')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@ApiBody({
+		description: 'Move partner up or down in the list',
+		schema: {
+			type: 'object',
+			properties: {
+				direction: { type: 'string', enum: ['up', 'down'], example: 'up' },
+			},
+			required: ['direction'],
+		},
+	})
+	@ApiOkResponse({ type: Partner, description: 'Partner order updated' })
+	@ApiResponse({ status: 404, description: 'Partner with ID not found' })
+	moveOrder(
+		@Param('id', new ParseUUIDPipe()) id: string,
+		@Body('direction') direction: 'up' | 'down',
+	) {
+		return this.partnerService.moveOrder(id, direction)
 	}
 
 	@Delete(':id')

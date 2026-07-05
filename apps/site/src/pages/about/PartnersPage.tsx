@@ -13,6 +13,8 @@ type Partner = {
     name: string
     imageUrl?: string | null
     link?: string | null
+    orderIndex: number
+    createdAt?: string
 }
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:3002'
@@ -26,14 +28,24 @@ export default function PartnersPage() {
         let mounted = true
         setLoading(true)
         setError(null)
-        fetch(`${API_BASE}/partners`)
+        fetch(`${API_BASE}/partners?noCache=1`, { cache: 'no-store' })
             .then((r) => {
                 if (r.status === 404) return []
                 if (!r.ok) throw new Error(`HTTP ${r.status}`)
                 return r.json()
             })
             .then((data: Partner[]) => {
-                if (mounted) setItems(data)
+                if (mounted) {
+                    const sorted = [...(Array.isArray(data) ? data : [])].sort((a: Partner, b: Partner) => {
+                        const orderA = Number.isFinite(Number(a.orderIndex)) ? Number(a.orderIndex) : 0
+                        const orderB = Number.isFinite(Number(b.orderIndex)) ? Number(b.orderIndex) : 0
+                        if (orderA !== orderB) return orderA - orderB
+                        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0
+                        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0
+                        return dateA - dateB
+                    })
+                    setItems(sorted)
+                }
             })
             .catch((err) => {
                 if (mounted) setError(String(err))

@@ -20,6 +20,7 @@ interface Partner {
   name: string
   imageUrl: string
   link?: string
+  orderIndex: number
   createdAt: string
 }
 
@@ -50,8 +51,15 @@ export default function PartnersPage() {
   const [deleteModalOpened, setDeleteModalOpened] = useState(false)
   const [deletingPartner, setDeletingPartner] = useState<Partner | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [movingPartnerId, setMovingPartnerId] = useState<string | null>(null)
 
 
+
+
+  const withCacheBust = (url: string) => {
+    const separator = url.includes('?') ? '&' : '?'
+    return `${url}${separator}noCache=1&_=${Date.now()}`
+  }
 
 
 
@@ -65,7 +73,8 @@ export default function PartnersPage() {
 
     try {
       const token = localStorage.getItem('admin_token')
-      const response = await fetch(API_ENDPOINTS.PARTNERS_LIST, {
+      const response = await fetch(withCacheBust(API_ENDPOINTS.PARTNERS_LIST), {
+        cache: 'no-store',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -77,7 +86,13 @@ export default function PartnersPage() {
       }
 
       const data = await response.json()
-      setPartners(data)
+      const sorted = [...(Array.isArray(data) ? data : [])].sort((a: Partner, b: Partner) => {
+        const orderA = Number.isFinite(Number(a.orderIndex)) ? Number(a.orderIndex) : 0
+        const orderB = Number.isFinite(Number(b.orderIndex)) ? Number(b.orderIndex) : 0
+        if (orderA !== orderB) return orderA - orderB
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      })
+      setPartners(sorted)
 
       const currentCount = data.length
       console.log('Saving partners count to cache:', currentCount)
@@ -244,6 +259,31 @@ export default function PartnersPage() {
     }
   }
 
+  const movePartner = async (partner: Partner, direction: 'up' | 'down') => {
+    try {
+      setMovingPartnerId(partner.id)
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch(API_ENDPOINTS.PARTNERS_MOVE_ORDER(partner.id), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ direction }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Не удалось изменить порядок партнера')
+      }
+
+      await loadPartners()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
+    } finally {
+      setMovingPartnerId(null)
+    }
+  }
+
   if (loading) {
     return (
       <DashboardLayout title="Партнеры">
@@ -320,11 +360,29 @@ export default function PartnersPage() {
           </div>
         ) : (
           <Row className="g-3">
-            {partners.map((partner) => (
+            {partners.map((partner, index) => (
               <Col key={partner.id} xs={12} sm={6} md={4}>
                 <Card className="h-100 position-relative">
                   <div className="position-absolute" style={{ top: 8, right: 8 }}>
                     <div className="btn-group">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => movePartner(partner, 'up')}
+                        disabled={movingPartnerId === partner.id || index === 0}
+                        title="Поднять выше"
+                      >
+                        <i className="bi bi-arrow-up"></i>
+                      </Button>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => movePartner(partner, 'down')}
+                        disabled={movingPartnerId === partner.id || index === partners.length - 1}
+                        title="Опустить ниже"
+                      >
+                        <i className="bi bi-arrow-down"></i>
+                      </Button>
                       <Button
                         variant="outline-primary"
                         size="sm"
@@ -342,6 +400,7 @@ export default function PartnersPage() {
                     </div>
                   </div>
                   <Card.Body className="d-flex flex-column align-items-center text-center gap-2">
+                    <span className="badge text-bg-light border">Порядок: {partner.orderIndex}</span>
                     <div className="mb-2" style={{ width: '100%' }}>
                       <img
                         src={getFileUrl(partner.imageUrl)}
@@ -409,6 +468,12 @@ export default function PartnersPage() {
               }}
               disabled={creating}
             />
+
+            <Form.Group controlId="partnerOrderPreview">
+              <Form.Label>Порядок</Form.Label>
+              <Form.Control type="number" value={partners.length} disabled readOnly />
+              <Form.Text className="text-muted">Новый партнер будет добавлен в конец списка.</Form.Text>
+            </Form.Group>
 
             <Form.Group controlId="partnerLink">
               <Form.Label>Ссылка на сайт (опционально)</Form.Label>
@@ -479,6 +544,12 @@ export default function PartnersPage() {
                 onChange={(e) => setNewPartnerLink(e.currentTarget.value)}
                 disabled={updating}
               />
+            </Form.Group>
+
+            <Form.Group controlId="partnerOrderEdit">
+              <Form.Label>Порядок</Form.Label>
+              <Form.Control type="number" value={editingPartner?.orderIndex ?? 0} disabled readOnly />
+              <Form.Text className="text-muted">Порядок меняется стрелками на карточке партнера.</Form.Text>
             </Form.Group>
           </div>
         </Modal.Body>

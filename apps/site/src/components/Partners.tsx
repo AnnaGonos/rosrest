@@ -9,6 +9,7 @@ interface Partner {
   name: string;
   imageUrl: string;
   link: string;
+  orderIndex: number;
   createdAt: string;
 }
 
@@ -42,11 +43,18 @@ export default function Partners() {
       try {
         setLoading(true)
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3002'}/partners?limit=17`
+          `${import.meta.env.VITE_API_URL || 'http://localhost:3002'}/partners?limit=17&noCache=1`,
+          { cache: 'no-store' }
         )
         if (!response.ok) throw new Error('Failed to fetch partners')
         const data = await response.json()
-        setPartners(data)
+        const sorted = [...(Array.isArray(data) ? data : [])].sort((a: Partner, b: Partner) => {
+          const orderA = Number.isFinite(Number(a.orderIndex)) ? Number(a.orderIndex) : 0
+          const orderB = Number.isFinite(Number(b.orderIndex)) ? Number(b.orderIndex) : 0
+          if (orderA !== orderB) return orderA - orderB
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        })
+        setPartners(sorted)
       } catch (err) {
         console.error('Error fetching partners:', err)
       } finally {

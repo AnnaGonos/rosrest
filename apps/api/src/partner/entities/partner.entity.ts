@@ -24,6 +24,10 @@ export class Partner {
 	@Column({ type: 'varchar', length: 500, nullable: true })
 	link?: string;
 
+	@ApiProperty({ example: 0, description: 'Порядок отображения партнера' })
+	@Column({ type: 'int', default: 0 })
+	orderIndex!: number;
+
 	@ApiProperty({ example: '2025-12-27T10:00:00.000Z' })
 	@CreateDateColumn({ type: 'timestamptz' })
 	createdAt!: Date;
