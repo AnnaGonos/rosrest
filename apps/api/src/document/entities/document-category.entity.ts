@@ -28,6 +28,10 @@ export class DocumentCategory {
 	@Column({ type: 'varchar', length: 255, nullable: true })
 	icon?: string | null;
 
+	@ApiProperty({ example: 0, description: 'Порядок сортировки внутри родительской группы' })
+	@Column({ type: 'int', default: 0 })
+	orderIndex!: number;
+
 	@TreeParent()
 	parent?: DocumentCategory | null;
 

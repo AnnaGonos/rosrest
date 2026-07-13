@@ -44,6 +44,7 @@ export const API_ENDPOINTS = {
   DOCUMENT_CATEGORIES_CREATE: buildApiUrl('document-categories'),
   DOCUMENT_CATEGORIES_UPDATE: (id: string | number) => buildApiUrl(`document-categories/${id}`),
   DOCUMENT_CATEGORIES_DELETE: (id: string | number) => buildApiUrl(`document-categories/${id}`),
+  DOCUMENT_CATEGORIES_MOVE_ORDER: (id: string | number) => buildApiUrl(`document-categories/${id}/move-order`),
 
   PARTNERS_LIST: buildApiUrl('partners'),
   PARTNERS_CREATE: buildApiUrl('partners'),

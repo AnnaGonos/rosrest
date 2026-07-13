@@ -34,6 +34,43 @@ export class DocumentService {
 	private readonly documentCacheKeys = new Set<string>()
 	private readonly CATEGORY_TREE_CACHE_KEY = 'document_categories_tree'
 
+	private compareCategories(a: DocumentCategory, b: DocumentCategory) {
+		const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER
+		const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER
+		if (aOrder !== bOrder) return aOrder - bOrder
+
+		const aCreatedAt = new Date(a.createdAt || 0).getTime()
+		const bCreatedAt = new Date(b.createdAt || 0).getTime()
+		if (aCreatedAt !== bCreatedAt) return aCreatedAt - bCreatedAt
+
+		return Number(a.id) - Number(b.id)
+	}
+
+	private sortCategoryTree(categories: DocumentCategory[] = []): DocumentCategory[] {
+		return [...categories]
+			.sort((a, b) => this.compareCategories(a, b))
+			.map((category) => ({
+				...category,
+				children: Array.isArray(category.children) ? this.sortCategoryTree(category.children) : category.children,
+			}))
+	}
+
+	private async getNextCategoryOrderIndex(parentId: number | null) {
+		const qb = this.categoryTreeRepo
+			.createQueryBuilder('category')
+			.select('COALESCE(MAX(category.orderIndex), -1)', 'maxOrder')
+
+		if (parentId === null) {
+			qb.where('category.parentId IS NULL')
+		} else {
+			qb.where('category.parentId = :parentId', { parentId })
+		}
+
+		const row = await qb.getRawOne<{ maxOrder: string | null }>()
+		const maxOrder = row?.maxOrder !== undefined && row?.maxOrder !== null ? Number(row.maxOrder) : -1
+		return Number.isFinite(maxOrder) ? maxOrder + 1 : 0
+	}
+
 	private async getNextOrderIndex(
 		type: DocumentTypeEnum,
 		categoryId: number | null,
@@ -609,6 +646,7 @@ export class DocumentService {
 		if (dto.blocks) {
 			(category as any).blocks = dto.blocks;
 		}
+		(category as any).orderIndex = await this.getNextCategoryOrderIndex(parent?.id ?? null)
 		const saved = await this.categoryTreeRepo.save(category)
 		await this.invalidateCache()
 		return saved
@@ -617,12 +655,13 @@ export class DocumentService {
 	async getCategoryTree() {
 		const cached = await this.cacheManager.get<DocumentCategory[]>(this.CATEGORY_TREE_CACHE_KEY)
 		if (cached && Array.isArray(cached)) {
-			return cached
+			return this.sortCategoryTree(cached)
 		}
 
 		const trees = await this.categoryTreeRepo.findTrees()
-		await this.cacheManager.set(this.CATEGORY_TREE_CACHE_KEY, trees)
-		return trees
+		const sortedTrees = this.sortCategoryTree(trees)
+		await this.cacheManager.set(this.CATEGORY_TREE_CACHE_KEY, sortedTrees)
+		return sortedTrees
 	}
 
 	async findOneCategory(id: number) {
@@ -670,6 +709,10 @@ export class DocumentService {
 			(category as any).blocks = dto.blocks;
 		}
 
+		if (dto.parentId !== undefined) {
+			category.orderIndex = await this.getNextCategoryOrderIndex(category.parent?.id ?? null)
+		}
+
 		if (dto.slug !== undefined) {
 			if (!dto.slug.trim()) {
 				throw new BadRequestException(`Slug cannot be empty`)
@@ -706,6 +749,43 @@ export class DocumentService {
 		const result = await this.categoryTreeRepo.findOne({ where: { id } })
 		await this.invalidateCache()
 		return result
+	}
+
+	async moveCategoryOrder(id: number, direction: 'up' | 'down') {
+		if (direction !== 'up' && direction !== 'down') {
+			throw new BadRequestException('Direction must be "up" or "down"')
+		}
+
+		const category = await this.categoryTreeRepo.findOne({ where: { id }, relations: ['parent'] })
+		if (!category) {
+			throw new NotFoundException(`Category with ID ${id} not found`)
+		}
+
+		const parentId = category.parent?.id ?? null
+		const siblings = await this.categoryTreeRepo.find({
+			where: parentId === null ? { parent: IsNull() } : { parent: { id: parentId } },
+		})
+		const orderedSiblings = [...siblings].sort((a, b) => this.compareCategories(a, b))
+		const currentIndex = orderedSiblings.findIndex((item) => item.id === id)
+		if (currentIndex === -1) {
+			throw new NotFoundException(`Category with ID ${id} not found in target scope`)
+		}
+
+		const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+		if (targetIndex < 0 || targetIndex >= orderedSiblings.length) {
+			return category
+		}
+
+		const current = orderedSiblings[currentIndex]
+		const neighbor = orderedSiblings[targetIndex]
+		await this.categoryTreeRepo.manager.transaction(async (manager) => {
+			await manager.getRepository(DocumentCategory).update(current.id, { orderIndex: neighbor.orderIndex })
+			await manager.getRepository(DocumentCategory).update(neighbor.id, { orderIndex: current.orderIndex })
+		})
+
+		category.orderIndex = neighbor.orderIndex
+		await this.invalidateCache()
+		return category
 	}
 
 	async removeCategory(id: number) {

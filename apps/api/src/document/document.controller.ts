@@ -309,6 +309,29 @@ export class DocumentCategoryController {
 		return await this.documentService.updateCategory(id, dto);
 	}
 
+	@Post(':id/move-order')
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@ApiBody({
+		description: 'Move document category up or down by swapping with the sibling',
+		schema: {
+			type: 'object',
+			properties: {
+				direction: { type: 'string', enum: ['up', 'down'], example: 'up' },
+			},
+			required: ['direction'],
+		},
+	})
+	@ApiOkResponse({ description: 'Category order updated successfully' })
+	@ApiResponse({ status: 400, description: 'Bad request' })
+	@ApiResponse({ status: 404, description: 'Category not found' })
+	async moveOrder(
+		@Param('id', new ParseIntPipe()) id: number,
+		@Body('direction') direction: 'up' | 'down',
+	) {
+		return await this.documentService.moveCategoryOrder(id, direction)
+	}
+
 	@Delete(':id')
 	@UseGuards(JwtAuthGuard)
 	@ApiBearerAuth()
