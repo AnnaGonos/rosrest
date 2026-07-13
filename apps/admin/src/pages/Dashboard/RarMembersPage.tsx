@@ -69,6 +69,7 @@ export default function RarMembersPage() {
     const [sectionTitle, setSectionTitle] = useState('')
     const [sectionSlug, setSectionSlug] = useState('')
     const [sectionIcon, setSectionIcon] = useState('')
+    const [sectionOrderIndex, setSectionOrderIndex] = useState('')
     const [sectionFormError, setSectionFormError] = useState<string | null>(null)
     const [savingSection, setSavingSection] = useState(false)
     const [confirmDeleteSectionModal, setConfirmDeleteSectionModal] = useState(false)
@@ -375,6 +376,7 @@ export default function RarMembersPage() {
         setSectionTitle('')
         setSectionSlug('')
         setSectionIcon('')
+        setSectionOrderIndex('')
         setSectionModalOpened(true)
     }
 
@@ -384,6 +386,7 @@ export default function RarMembersPage() {
         setSectionTitle(section.title)
         setSectionSlug(section.slug)
         setSectionIcon(section.icon || '')
+        setSectionOrderIndex(typeof section.orderIndex === 'number' ? String(section.orderIndex) : '')
         setSectionModalOpened(true)
     }
 
@@ -406,6 +409,13 @@ export default function RarMembersPage() {
             return
         }
 
+        const normalizedOrderIndex = sectionOrderIndex.trim()
+        const parsedOrderIndex = normalizedOrderIndex === '' ? undefined : Number(normalizedOrderIndex)
+        if (normalizedOrderIndex !== '' && (!Number.isInteger(parsedOrderIndex) || (parsedOrderIndex as number) < 0)) {
+            setSectionFormError('Порядок должен быть целым неотрицательным числом')
+            return
+        }
+
         try {
             setSavingSection(true)
             setSectionFormError(null)
@@ -421,7 +431,12 @@ export default function RarMembersPage() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ title, slug, icon: sectionIcon.trim() || null }),
+                body: JSON.stringify({
+                    title,
+                    slug,
+                    icon: sectionIcon.trim() || null,
+                    ...(parsedOrderIndex !== undefined ? { orderIndex: parsedOrderIndex } : {}),
+                }),
             })
 
             if (!response.ok) {
@@ -924,6 +939,20 @@ export default function RarMembersPage() {
                     <Form.Group className="mb-3">
                         <Form.Label>Иконка (опционально)</Form.Label>
                         <Form.Control value={sectionIcon} onChange={(e) => setSectionIcon(e.target.value)} placeholder="bi bi-newspaper" />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Порядок</Form.Label>
+                        <Form.Control
+                            type="number"
+                            min={0}
+                            step={1}
+                            value={sectionOrderIndex}
+                            onChange={(e) => setSectionOrderIndex(e.target.value)}
+                            placeholder="0"
+                        />
+                        <Form.Text className="text-muted">
+                            Меньше число = выше в списке. Если оставить пустым, порядок задастся автоматически.
+                        </Form.Text>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
