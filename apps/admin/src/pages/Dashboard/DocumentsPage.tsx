@@ -359,7 +359,7 @@ export default function DocumentsPage() {
                         >
                           <i className="bi bi-pencil" />
                         </Button>
-                        <Button
+                        {/* <Button
                           variant="outline-secondary"
                           size="sm"
                           onClick={() => moveCategory(c.id, 'up')}
@@ -376,7 +376,7 @@ export default function DocumentsPage() {
                           title="Опустить ниже"
                         >
                           <i className="bi bi-arrow-down" />
-                        </Button>
+                        </Button> */}
                         <Button
                           variant="outline-danger"
                           size="sm"
