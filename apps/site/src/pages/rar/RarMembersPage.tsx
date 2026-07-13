@@ -11,6 +11,7 @@ interface RarSection {
     title: string
     slug: string
     icon?: string | null
+    orderIndex?: number | null
 }
 
 export default function RarMembersPage() {
@@ -71,7 +72,12 @@ export default function RarMembersPage() {
     }
 
     const items = [...sections]
-        .sort((a, b) => ruCollator.compare(normalizeSortText(a.title), normalizeSortText(b.title)))
+        .sort((a, b) => {
+            const aOrder = a.orderIndex ?? Number.MAX_SAFE_INTEGER
+            const bOrder = b.orderIndex ?? Number.MAX_SAFE_INTEGER
+            if (aOrder !== bOrder) return aOrder - bOrder
+            return ruCollator.compare(normalizeSortText(a.title), normalizeSortText(b.title))
+        })
         .map(section => ({
             title: section.title,
             href: `/members/${section.slug}`,

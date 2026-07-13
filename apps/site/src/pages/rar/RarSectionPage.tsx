@@ -22,6 +22,7 @@ interface RarSection {
     title: string
     slug: string
     icon?: string | null
+    orderIndex?: number | null
 }
 
 interface RarMember {

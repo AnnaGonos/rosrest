@@ -15,6 +15,9 @@ export class RarSection {
   @Column({ type: 'varchar', nullable: true })
   icon?: string | null;
 
+  @Column({ type: 'int', default: 0 })
+  orderIndex!: number;
+
   @ManyToMany(() => RarMember, (member) => member.sections)
   members!: RarMember[];
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Container, Row, Col, Card, Button, Modal, Form, Alert, Spinner } from 'react-bootstrap'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -31,6 +31,7 @@ interface RarSection {
     title: string
     slug: string
     icon?: string | null
+    orderIndex?: number | null
 }
 
 interface RarMember {
@@ -72,6 +73,8 @@ export default function RarMembersPage() {
     const [savingSection, setSavingSection] = useState(false)
     const [confirmDeleteSectionModal, setConfirmDeleteSectionModal] = useState(false)
     const [sectionToDelete, setSectionToDelete] = useState<string | null>(null)
+    const [sectionOrderDirty, setSectionOrderDirty] = useState(false)
+    const sectionOrderBackupRef = useRef<RarSection[] | null>(null)
 
     const transliterate = (text: string): string => {
         const map: { [key: string]: string } = {
@@ -184,7 +187,15 @@ export default function RarMembersPage() {
             if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`)
 
             const data: RarSection[] = await response.json()
-            setSections(data)
+            const sorted = [...data].sort((a, b) => {
+                const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER
+                const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER
+                if (aOrder !== bOrder) return aOrder - bOrder
+                return a.title.localeCompare(b.title, 'ru')
+            })
+            setSections(sorted)
+            setSectionOrderDirty(false)
+            sectionOrderBackupRef.current = null
         } catch (err) {
             console.error('Sections load error:', err)
         }
@@ -232,6 +243,70 @@ export default function RarMembersPage() {
         setMemberSectionIds((prev) =>
             prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id]
         )
+    }
+
+    const handleSectionDragStart = (event: React.DragEvent, index: number) => {
+        event.dataTransfer.setData('text/plain', String(index))
+        event.dataTransfer.effectAllowed = 'move'
+    }
+
+    const handleSectionDrop = (event: React.DragEvent, targetIndex: number) => {
+        event.preventDefault()
+        const sourceIndex = Number(event.dataTransfer.getData('text/plain'))
+        if (!Number.isFinite(sourceIndex) || sourceIndex === targetIndex) return
+
+        if (!sectionOrderBackupRef.current) {
+            sectionOrderBackupRef.current = sections.slice()
+        }
+
+        const nextSections = sections.slice()
+        const [movedSection] = nextSections.splice(sourceIndex, 1)
+        if (!movedSection) return
+        nextSections.splice(targetIndex, 0, movedSection)
+        nextSections.forEach((section, index) => {
+            section.orderIndex = index
+        })
+
+        setSections(nextSections)
+        setSectionOrderDirty(true)
+    }
+
+    const cancelSectionOrder = () => {
+        if (sectionOrderBackupRef.current) {
+            setSections(sectionOrderBackupRef.current)
+        }
+        sectionOrderBackupRef.current = null
+        setSectionOrderDirty(false)
+    }
+
+    const saveSectionOrder = async () => {
+        if (!sectionOrderDirty) return
+
+        try {
+            const token = localStorage.getItem('admin_token')
+            for (let index = 0; index < sections.length; index += 1) {
+                const section = sections[index]
+                const response = await fetch(API_ENDPOINTS.RAR_SECTIONS.update(section.id), {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderIndex: index }),
+                })
+
+                if (!response.ok) {
+                    const text = await response.text()
+                    throw new Error(text || `HTTP ${response.status}`)
+                }
+            }
+
+            sectionOrderBackupRef.current = null
+            setSectionOrderDirty(false)
+            await loadSections()
+        } catch (err) {
+            setSectionFormError(err instanceof Error ? err.message : 'Ошибка сохранения порядка секций')
+        }
     }
 
     const handleSaveMember = async () => {
@@ -443,11 +518,29 @@ export default function RarMembersPage() {
                     </Col>
                 </Row>
 
+                {sectionOrderDirty && (
+                    <div className="d-flex gap-2 mb-3">
+                        <Button variant="success" onClick={saveSectionOrder}>
+                            Сохранить порядок секций
+                        </Button>
+                        <Button variant="outline-secondary" onClick={cancelSectionOrder}>
+                            Отменить изменения
+                        </Button>
+                    </div>
+                )}
+
                 {error && <Alert variant="danger">{error}</Alert>}
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '40px' }}>
-                    {sections.map((section) => (
-                        <div key={section.id}>
+                    {sections.map((section, index) => (
+                        <div
+                            key={section.id}
+                            draggable
+                            onDragStart={(event) => handleSectionDragStart(event, index)}
+                            onDragOver={(event) => event.preventDefault()}
+                            onDrop={(event) => handleSectionDrop(event, index)}
+                            style={{ cursor: 'move' }}
+                        >
                             <Card
                                 className="h-100"
                                 style={{
@@ -478,6 +571,7 @@ export default function RarMembersPage() {
                                                     {section.title}
                                                 </div>
                                                 <div className="text-muted">/{section.slug}</div>
+                                                <div className="text-muted" style={{ fontSize: '12px' }}>Порядок: {section.orderIndex ?? index}</div>
                                             </div>
                                             <div className="d-flex gap-2" style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                                 <Button

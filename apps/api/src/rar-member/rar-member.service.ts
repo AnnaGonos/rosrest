@@ -42,6 +42,7 @@ export class RarMemberService {
       .leftJoinAndSelect('block.children', 'children')
       .leftJoinAndSelect('member.sections', 'section')
       .orderBy('page.publishedAt', 'ASC')
+      .addOrderBy('section.orderIndex', 'ASC')
       .addOrderBy('section.title', 'ASC');
 
     if (opts?.isDraft !== undefined) {
@@ -282,7 +283,12 @@ function toPlainMember(member: RarMember): any {
     } : null,
     sections: Array.isArray(member.sections) 
       ? member.sections
-        .sort((a: any, b: any) => a.title.localeCompare(b.title, 'ru'))
+        .sort((a: any, b: any) => {
+          const aOrder = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER;
+          const bOrder = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          return a.title.localeCompare(b.title, 'ru');
+        })
         .map(toPlainSection)
       : [],
   };

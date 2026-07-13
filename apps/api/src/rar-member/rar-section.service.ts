@@ -33,7 +33,7 @@ export class RarSectionService {
   }
 
   async findAll(): Promise<RarSection[]> {
-    return this.sectionRepository.find({ order: { title: 'ASC' } });
+    return this.sectionRepository.find({ order: { orderIndex: 'ASC', title: 'ASC' } });
   }
 
   async findOne(id: string): Promise<RarSection> {
@@ -42,24 +42,35 @@ export class RarSectionService {
     return section;
   }
 
-  async create(data: { title: string; slug: string; icon?: string }): Promise<RarSection> {
+  async create(data: { title: string; slug: string; icon?: string; orderIndex?: number }): Promise<RarSection> {
+    const { maxOrderIndex } = (await this.sectionRepository
+      .createQueryBuilder('section')
+      .select('MAX(section.orderIndex)', 'maxOrderIndex')
+      .getRawOne<{ maxOrderIndex: string | null }>()) ?? { maxOrderIndex: null };
+
+    const nextOrderIndex = typeof data.orderIndex === 'number'
+      ? data.orderIndex
+      : (maxOrderIndex !== null ? Number(maxOrderIndex) + 1 : 0);
+
     const section = this.sectionRepository.create({
       title: data.title,
       slug: data.slug,
       icon: data.icon ?? null,
+      orderIndex: Number.isFinite(nextOrderIndex) ? nextOrderIndex : 0,
     });
     const saved = await this.sectionRepository.save(section);
     await this.clearCache();
     return saved;
   }
 
-  async update(id: string, update: { title?: string; slug?: string; icon?: string | null }): Promise<RarSection> {
+  async update(id: string, update: { title?: string; slug?: string; icon?: string | null; orderIndex?: number }): Promise<RarSection> {
     const section = await this.sectionRepository.findOne({ where: { id } });
     if (!section) throw new Error('Section not found');
 
     if (update.title !== undefined) section.title = update.title;
     if (update.slug !== undefined) section.slug = update.slug;
     if (update.icon !== undefined) section.icon = update.icon;
+    if (update.orderIndex !== undefined) section.orderIndex = update.orderIndex;
 
     const saved = await this.sectionRepository.save(section);
     await this.clearCache();
