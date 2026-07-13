@@ -18,7 +18,6 @@ type Category = {
   id: number
   name: string
   createdAt: string
-  orderIndex?: number
   children?: any[]
   slug?: string | null
   icon?: string | null
@@ -73,7 +72,6 @@ export default function DocumentsPage() {
   const [newIcon, setNewIcon] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [createError, setCreateError] = useState('')
-  const [movingCategoryId, setMovingCategoryId] = useState<number | null>(null)
 
   useEffect(() => {
     loadCategories()
@@ -90,16 +88,10 @@ export default function DocumentsPage() {
       const data = await res.json()
       const list = Array.isArray(data) ? data : []
 
-      const sorted = [...list].sort((a, b) => {
-        const orderA = typeof a.orderIndex === 'number' ? a.orderIndex : Number.MAX_SAFE_INTEGER
-        const orderB = typeof b.orderIndex === 'number' ? b.orderIndex : Number.MAX_SAFE_INTEGER
-        if (orderA !== orderB) return orderA - orderB
-
+      const sorted = list.sort((a, b) => {
         const dateA = new Date(a.createdAt || 0).getTime()
         const dateB = new Date(b.createdAt || 0).getTime()
-        if (dateA !== dateB) return dateA - dateB
-
-        return Number(a.id) - Number(b.id)
+        return dateA - dateB
       })
       setCategories(sorted)
     } catch (err: any) {
@@ -123,50 +115,6 @@ export default function DocumentsPage() {
   const openDelete = (c: Category) => {
     setDeletingCategory(c)
     setDeleteModalOpened(true)
-  }
-
-  const moveCategory = async (categoryId: number, direction: 'up' | 'down') => {
-    const current = [...categories]
-    const index = current.findIndex((category) => category.id === categoryId)
-    if (index === -1) return
-
-    const targetIndex = direction === 'up' ? index - 1 : index + 1
-    if (targetIndex < 0 || targetIndex >= current.length) return
-
-    const tokenValue = localStorage.getItem('admin_token')
-    if (!tokenValue) {
-      setError('Нет токена администратора')
-      return
-    }
-
-    const next = [...current]
-    const [moved] = next.splice(index, 1)
-    next.splice(targetIndex, 0, moved)
-
-    setCategories(next)
-    setMovingCategoryId(categoryId)
-
-    try {
-      const res = await fetch(API_ENDPOINTS.DOCUMENT_CATEGORIES_MOVE_ORDER(categoryId), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${tokenValue}`,
-        },
-        body: JSON.stringify({ direction }),
-      })
-
-      if (!res.ok) {
-        throw new Error(`Ошибка обновления порядка: ${res.status}`)
-      }
-
-      await loadCategories()
-    } catch (err: any) {
-      setCategories(current)
-      setError(err.message || 'Ошибка изменения порядка категории')
-    } finally {
-      setMovingCategoryId(null)
-    }
   }
 
   const handleDeleteCategory = async () => {
@@ -359,24 +307,6 @@ export default function DocumentsPage() {
                         >
                           <i className="bi bi-pencil" />
                         </Button>
-                        {/* <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={() => moveCategory(c.id, 'up')}
-                          disabled={movingCategoryId === c.id || categories[0]?.id === c.id}
-                          title="Поднять выше"
-                        >
-                          <i className="bi bi-arrow-up" />
-                        </Button>
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={() => moveCategory(c.id, 'down')}
-                          disabled={movingCategoryId === c.id || categories[categories.length - 1]?.id === c.id}
-                          title="Опустить ниже"
-                        >
-                          <i className="bi bi-arrow-down" />
-                        </Button> */}
                         <Button
                           variant="outline-danger"
                           size="sm"
